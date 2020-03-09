@@ -1,9 +1,9 @@
 #include <stm32f4xx.h>
 #include <system_clock_config.h>
 #include <gpio.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <main.h>
-#include <stdbool.h>
 #include <timer.h>
 
 
