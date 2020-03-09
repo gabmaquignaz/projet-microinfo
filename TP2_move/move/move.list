@@ -304,11 +304,12 @@ Disassembly of section .text:
  80004f2:	f000 fbad 	bl	8000c50 <SystemClock_Config>
  80004f6:	f000 f8d3 	bl	80006a0 <motor_init>
  80004fa:	4902      	ldr	r1, [pc, #8]	; (8000504 <main+0x14>)
- 80004fc:	4801      	ldr	r0, [pc, #4]	; (8000504 <main+0x14>)
+ 80004fc:	4802      	ldr	r0, [pc, #8]	; (8000508 <main+0x18>)
  80004fe:	f7ff ffe7 	bl	80004d0 <move_straight>
  8000502:	e7fe      	b.n	8000502 <main+0x12>
- 8000504:	41200000 	.word	0x41200000
-	...
+ 8000504:	41880000 	.word	0x41880000
+ 8000508:	41200000 	.word	0x41200000
+ 800050c:	00000000 	.word	0x00000000
 
 08000510 <gpio_config_output_pushpull>:
  8000510:	b082      	sub	sp, #8
