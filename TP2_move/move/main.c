@@ -45,7 +45,7 @@ int main(void)
     **/
 
     motor_init();
-    move_straight(10,10);
+    move_straight(2,1);
 
     while (1) {
 
