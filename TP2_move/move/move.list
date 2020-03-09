@@ -304,7 +304,7 @@ Disassembly of section .text:
  80004f2:	f000 fbad 	bl	8000c50 <SystemClock_Config>
  80004f6:	f000 f8d3 	bl	80006a0 <motor_init>
  80004fa:	f04f 517e 	mov.w	r1, #1065353216	; 0x3f800000
- 80004fe:	f04f 4080 	mov.w	r0, #1073741824	; 0x40000000
+ 80004fe:	f04f 507e 	mov.w	r0, #1065353216	; 0x3f800000
  8000502:	f7ff ffe5 	bl	80004d0 <move_straight>
  8000506:	e7fe      	b.n	8000506 <main+0x16>
 	...
