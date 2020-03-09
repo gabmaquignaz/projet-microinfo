@@ -303,12 +303,13 @@ Disassembly of section .text:
  80004f0:	b508      	push	{r3, lr}
  80004f2:	f000 fbad 	bl	8000c50 <SystemClock_Config>
  80004f6:	f000 f8d3 	bl	80006a0 <motor_init>
- 80004fa:	4902      	ldr	r1, [pc, #8]	; (8000504 <main+0x14>)
- 80004fc:	4801      	ldr	r0, [pc, #4]	; (8000504 <main+0x14>)
- 80004fe:	f7ff ffe7 	bl	80004d0 <move_straight>
- 8000502:	e7fe      	b.n	8000502 <main+0x12>
- 8000504:	41200000 	.word	0x41200000
-	...
+ 80004fa:	4903      	ldr	r1, [pc, #12]	; (8000508 <main+0x18>)
+ 80004fc:	f04f 4080 	mov.w	r0, #1073741824	; 0x40000000
+ 8000500:	f7ff ffe6 	bl	80004d0 <move_straight>
+ 8000504:	e7fe      	b.n	8000504 <main+0x14>
+ 8000506:	bf00      	nop
+ 8000508:	41200000 	.word	0x41200000
+ 800050c:	00000000 	.word	0x00000000
 
 08000510 <gpio_config_output_pushpull>:
  8000510:	b082      	sub	sp, #8
