@@ -56,7 +56,7 @@ int main(void)
 
     //triangle pattern
     while (1) {
-    		turn(120,120);
+    		turn(120,100);
     	    move_straight(5,10);
     }
 }
