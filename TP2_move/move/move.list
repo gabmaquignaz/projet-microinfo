@@ -348,16 +348,17 @@ Disassembly of section .text:
  8000562:	f000 fbdd 	bl	8000d20 <SystemClock_Config>
  8000566:	f000 f8db 	bl	8000720 <motor_init>
  800056a:	4904      	ldr	r1, [pc, #16]	; (800057c <main+0x1c>)
- 800056c:	4803      	ldr	r0, [pc, #12]	; (800057c <main+0x1c>)
+ 800056c:	4804      	ldr	r0, [pc, #16]	; (8000580 <main+0x20>)
  800056e:	f7ff ffbf 	bl	80004f0 <turn>
- 8000572:	4903      	ldr	r1, [pc, #12]	; (8000580 <main+0x20>)
- 8000574:	4803      	ldr	r0, [pc, #12]	; (8000584 <main+0x24>)
+ 8000572:	4904      	ldr	r1, [pc, #16]	; (8000584 <main+0x24>)
+ 8000574:	4804      	ldr	r0, [pc, #16]	; (8000588 <main+0x28>)
  8000576:	f7ff ffab 	bl	80004d0 <move_straight>
  800057a:	e7f6      	b.n	800056a <main+0xa>
- 800057c:	42f00000 	.word	0x42f00000
- 8000580:	41200000 	.word	0x41200000
- 8000584:	40a00000 	.word	0x40a00000
-	...
+ 800057c:	42c80000 	.word	0x42c80000
+ 8000580:	42f00000 	.word	0x42f00000
+ 8000584:	41200000 	.word	0x41200000
+ 8000588:	40a00000 	.word	0x40a00000
+ 800058c:	00000000 	.word	0x00000000
 
 08000590 <gpio_config_output_pushpull>:
  8000590:	b082      	sub	sp, #8
