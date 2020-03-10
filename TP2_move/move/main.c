@@ -24,7 +24,15 @@ void delay(unsigned int n)
 
 void move_straight(float dist, float speed){
 	motor_set_position(dist,dist,speed,speed);
+}
 
+//angle in °, rot_speed in °/s
+void turn (float angle, float rot_speed){
+
+	float lin_dist = (PI/180)*angle*WHEEL_DISTANCE/2;
+	float lin_speed = (PI/180)*rot_speed*WHEEL_DISTANCE/2;
+
+	motor_set_position(lin_dist, -lin_dist, lin_speed, lin_speed);
 }
 
 
@@ -45,10 +53,11 @@ int main(void)
     **/
 
     motor_init();
-    move_straight(1,1);
 
+    //triangle pattern
     while (1) {
-
+    		turn(120,120);
+    	    move_straight(5,10);
     }
 }
 

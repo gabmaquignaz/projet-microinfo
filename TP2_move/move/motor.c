@@ -168,9 +168,14 @@ void motor_stop(void)
 */
 void motor_set_position(float position_r, float position_l, float speed_r, float speed_l)
 {
-	motor_set_speed(speed_r, speed_l);
 	pos_target_left = position_l*1000/WHEEL_PERIMETER;
 	pos_target_right = position_r*1000/WHEEL_PERIMETER;
+	counter_left = 0;
+	counter_right = 0;
+
+	motor_set_speed(speed_r, speed_l);
+
+	while ((counter_left != pos_target_left) | (counter_right != pos_target_right)) __asm__ volatile ("nop");
 }
 
 /*
@@ -201,16 +206,17 @@ void motor_set_speed(float speed_r, float speed_l)
 */
 void MOTOR_RIGHT_IRQHandler(void)
 {
-	if (elec_pos_right == NSTEP_ONE_EL_TURN-1) counter_right++;
 	if (pos_target_right == counter_right) motor_stop();
 	else{
 		if ((pos_target_right > counter_right)){
 			if (elec_pos_right < (NSTEP_ONE_EL_TURN-1)) elec_pos_right ++;
 			else elec_pos_right = INIT_POS;
+			counter_right++;
 		}
 		else{
 			if (elec_pos_right > INIT_POS) elec_pos_right --;
 			else elec_pos_right = (NSTEP_ONE_EL_TURN-1);
+			counter_right--;
 		}
 		right_motor_update(step_table[elec_pos_right]);
 	}
@@ -229,19 +235,21 @@ void MOTOR_RIGHT_IRQHandler(void)
 */
 void MOTOR_LEFT_IRQHandler(void)
 {
-	if (elec_pos_left == NSTEP_ONE_EL_TURN-1) counter_left++;
 	if (pos_target_left == counter_left) motor_stop();
-		else{
-			if ((pos_target_left > counter_left)){
-				if (elec_pos_left < (NSTEP_ONE_EL_TURN-1)) elec_pos_left ++;
-				else elec_pos_left = INIT_POS;
-			}
-			else{
-				if (elec_pos_left > INIT_POS) elec_pos_left --;
-				else elec_pos_left = (NSTEP_ONE_EL_TURN-1);
-			}
-			left_motor_update(step_table[elec_pos_left]);
+	else{
+		if ((pos_target_left > counter_left)){
+			if (elec_pos_left < (NSTEP_ONE_EL_TURN-1)) elec_pos_left ++;
+			else elec_pos_left = INIT_POS;
+			counter_left++;
 		}
+		else{
+			if (elec_pos_left > INIT_POS) elec_pos_left --;
+			else elec_pos_left = (NSTEP_ONE_EL_TURN-1);
+			counter_left--;
+		}
+		left_motor_update(step_table[elec_pos_left]);
+	}
+
 	// Clear interrupt flag
     MOTOR_LEFT_TIMER->SR &= ~TIM_SR_UIF;
     MOTOR_LEFT_TIMER->SR;	// Read back in order to ensure the effective IF clearing
