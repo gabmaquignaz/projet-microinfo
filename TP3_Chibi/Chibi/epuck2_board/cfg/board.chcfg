@@ -461,7 +461,7 @@
         Speed="Maximum"
         Resistor="Floating"
         Mode="Output"
-        Alternate="0" />
+        Alternate="0" ></pin5>
       <pin6
         ID="LED3"
         Type="PushPull"

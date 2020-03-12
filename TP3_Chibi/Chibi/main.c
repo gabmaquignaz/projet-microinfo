@@ -83,27 +83,27 @@ static THD_FUNCTION(ThdBodyLed, arg) {
         /*
         *   1st case :  pause the thread during 500ms
         */
-        chThdSleepMilliseconds(500);
+       chThdSleepMilliseconds(500);
 
         /*
         *   2nd case :  make the thread work during the 500ms
         */
 
-        // //about 500ms at 168MHz
-        // for(uint32_t i = 0 ; i < 21000000 ; i++){
-        //     __asm__ volatile ("nop");
-        // }
+         //about 500ms at 168MHz
+         //for(uint32_t i = 0 ; i < 21000000 ; i++){
+        	 //	 __asm__ volatile ("nop");
+         //}
 
         /*
         *   3rd case :  make the thread work during the 500ms
         *               and block the preemption
         */
 
-        // chSysLock();
-        // for(uint32_t i = 0 ; i < 21000000 ; i++){
-        //     __asm__ volatile ("nop");
-        // }
-        // chSysUnlock();
+        //chSysLock();
+        //for(uint32_t i = 0 ; i < 21000000 ; i++){
+        //    __asm__ volatile ("nop");
+        //}
+        //chSysUnlock();
     }
 }
 
@@ -153,11 +153,11 @@ int main(void)
     /*
     *   TASKS 3,4,5,6,7 : UNDERSTANDING THREADS ON CHIBIOS
     */
-    //chThdCreateStatic(waThdFrontLed, sizeof(waThdFrontLed), NORMALPRIO, ThdFrontLed, NULL);
-    //chThdCreateStatic(waThdBodyLed, sizeof(waThdBodyLed), NORMALPRIO, ThdBodyLed, NULL);
+    chThdCreateStatic(waThdFrontLed, sizeof(waThdFrontLed), NORMALPRIO, ThdFrontLed, NULL);
+    chThdCreateStatic(waThdBodyLed, sizeof(waThdBodyLed), NORMALPRIO, ThdBodyLed, NULL);
 
     //to change the priority of the thread invoking the function. The main function in this case
-    //chThdSetPriority(NORMALPRIO+2);
+    chThdSetPriority(NORMALPRIO+2);
 
     messagebus_topic_t *imu_topic = messagebus_find_topic_blocking(&bus, "/imu");
     imu_msg_t imu_values;

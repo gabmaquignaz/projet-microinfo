@@ -6,6 +6,8 @@
 
 #define STANDARD_GRAVITY    9.80665f
 #define DEG2RAD(deg) (deg / 180 * M_PI)
+#define SENSITIVITY_ACC 16384
+#define SENSITIVITY_GYR 131
 
 extern messagebus_t bus;
 
@@ -22,9 +24,13 @@ static bool imu_configured = false;
  * 			RAW gyroscope to rad/s speed
  */
 void imu_compute_units(void){
-	/*
-    *   TASK 10 : TO COMPLETE
-    */
+	imu_values.acceleration[X_AXIS] = STANDARD_GRAVITY*(imu_values.acc_raw[X_AXIS]-imu_values.acc_offset[X_AXIS])/SENSITIVITY_ACC;
+	imu_values.acceleration[Y_AXIS] = STANDARD_GRAVITY*(imu_values.acc_raw[Y_AXIS]-imu_values.acc_offset[Y_AXIS])/SENSITIVITY_ACC;
+	imu_values.acceleration[Z_AXIS] = STANDARD_GRAVITY*(imu_values.acc_raw[Z_AXIS]-imu_values.acc_offset[Z_AXIS])/SENSITIVITY_ACC;
+
+	imu_values.gyro_rate[X_AXIS] = DEG2RAD(imu_values.gyro_raw[X_AXIS]-imu_values.gyro_offset[X_AXIS])/SENSITIVITY_GYR;
+	imu_values.gyro_rate[Y_AXIS] = DEG2RAD(imu_values.gyro_raw[Y_AXIS]-imu_values.gyro_offset[Y_AXIS])/SENSITIVITY_GYR;
+	imu_values.gyro_rate[Z_AXIS] = DEG2RAD(imu_values.gyro_raw[Z_AXIS]-imu_values.gyro_offset[Z_AXIS])/SENSITIVITY_GYR;
 }
 
  /**
@@ -97,9 +103,38 @@ void imu_stop(void) {
 
 void imu_compute_offset(messagebus_topic_t * imu_topic, uint16_t nb_samples){
 
-    /*
-    *   TASK 9 : TO COMPLETE
-    */
+	int sum_acc_x = 0;
+	int sum_acc_y = 0;
+	int sum_acc_z = 0;
+
+	int sum_gyr_x = 0;
+	int sum_gyr_y = 0;
+	int sum_gyr_z = 0;
+
+
+	for(uint8_t i = 0; i < nb_samples; i++){
+
+		//wait for new measures to be published
+		messagebus_topic_wait(imu_topic, &imu_values, sizeof(imu_values));
+
+		sum_acc_x += imu_values.acc_raw[X_AXIS];
+		sum_acc_y += imu_values.acc_raw[Y_AXIS];
+		sum_acc_z += imu_values.acc_raw[Z_AXIS];
+
+		sum_gyr_x += imu_values.gyro_raw[X_AXIS];
+		sum_gyr_y += imu_values.gyro_raw[Y_AXIS];
+		sum_gyr_z += imu_values.gyro_raw[Z_AXIS];
+
+	}
+
+	imu_values.acc_offset[X_AXIS] = sum_acc_x/nb_samples;
+	imu_values.acc_offset[Y_AXIS] = sum_acc_y/nb_samples;
+	imu_values.acc_offset[Z_AXIS] = sum_acc_z/nb_samples;
+
+	imu_values.gyro_offset[X_AXIS] = sum_gyr_x/nb_samples;
+	imu_values.gyro_offset[Y_AXIS] = sum_gyr_y/nb_samples;
+	imu_values.gyro_offset[Z_AXIS] = sum_gyr_z/nb_samples;
+
 }
 
 int16_t get_acc(uint8_t axis) {
