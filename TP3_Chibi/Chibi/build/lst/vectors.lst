@@ -1,4 +1,4 @@
-ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 1
+ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 1
   55              		.weak	Vector1B4
   56              		.thumb_set Vector1B4,_unhandled_exception
   57              		.weak	Vector1B0
-ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 2
+ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s 			page 2
 
 
   58              		.thumb_set Vector1B0,_unhandled_exception
@@ -118,7 +118,7 @@ ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 1
  112              		.thumb_set Vector144,_unhandled_exception
  113              		.weak	Vector140
  114              		.thumb_set Vector140,_unhandled_exception
-ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 3
+ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s 			page 3
 
 
  115              		.weak	Vector13C
@@ -178,7 +178,7 @@ ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 1
  169              		.weak	VectorD0
  170              		.thumb_set VectorD0,_unhandled_exception
  171              		.weak	VectorCC
-ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 4
+ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s 			page 4
 
 
  172              		.thumb_set VectorCC,_unhandled_exception
@@ -238,7 +238,7 @@ ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 1
  226              		.thumb_set Vector60,_unhandled_exception
  227              		.weak	Vector5C
  228              		.thumb_set Vector5C,_unhandled_exception
-ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 5
+ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s 			page 5
 
 
  229              		.weak	Vector58
@@ -298,7 +298,7 @@ ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 1
  279              		.align	2
  280              		.type	_vectors, %object
  281              		.size	_vectors, 448
-ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 6
+ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s 			page 6
 
 
  282              	_vectors:
@@ -358,7 +358,7 @@ ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 1
  336 00d4 00000000 		.word	VectorD4
  337 00d8 00000000 		.word	VectorD8
  338 00dc 00000000 		.word	VectorDC
-ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 7
+ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s 			page 7
 
 
  339 00e0 00000000 		.word	VectorE0
@@ -418,7 +418,7 @@ ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 1
  393 01b8 00000000 		.word	Vector1B8
  394 01bc 00000000 		.word	Vector1BC
  395              		.text
-ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 8
+ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s 			page 8
 
 
  396              	.Letext0:
@@ -478,7 +478,7 @@ ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 1
  450 0066 08       		.byte	0x8
  451 0067 05       		.byte	0x5
  452 0068 B9020000 		.4byte	.LASF8
-ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 9
+ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s 			page 9
 
 
  453 006c 02       		.uleb128 0x2
@@ -538,7 +538,7 @@ ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 1
  507 00da 0B       		.uleb128 0xb
  508 00db 98020000 		.4byte	.LASF17
  509 00df 01       		.byte	0x1
-ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 10
+ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s 			page 10
 
 
  510 00e0 33       		.byte	0x33
@@ -598,7 +598,7 @@ ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 1
  564 014c 3C       		.byte	0x3c
  565 014d B3000000 		.4byte	0xb3
  566 0151 28       		.byte	0x28
-ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 11
+ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s 			page 11
 
 
  567 0152 0B       		.uleb128 0xb
@@ -658,7 +658,7 @@ ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 1
  621 01c1 01       		.byte	0x1
  622 01c2 58       		.byte	0x58
  623 01c3 91000000 		.4byte	0x91
-ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 12
+ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s 			page 12
 
 
  624 01c7 0E       		.uleb128 0xe
@@ -718,7 +718,7 @@ ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 1
  678 0012 00       		.byte	0
  679 0013 02       		.uleb128 0x2
  680 0014 24       		.uleb128 0x24
-ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 13
+ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s 			page 13
 
 
  681 0015 00       		.byte	0
@@ -778,7 +778,7 @@ ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 1
  735 004b 19       		.uleb128 0x19
  736 004c 00       		.byte	0
  737 004d 00       		.byte	0
-ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 14
+ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s 			page 14
 
 
  738 004e 07       		.uleb128 0x7
@@ -838,7 +838,7 @@ ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 1
  792 0084 0B       		.uleb128 0xb
  793 0085 49       		.uleb128 0x49
  794 0086 13       		.uleb128 0x13
-ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 15
+ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s 			page 15
 
 
  795 0087 38       		.uleb128 0x38
@@ -898,7 +898,7 @@ ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 1
  849 00bd 12       		.uleb128 0x12
  850 00be 06       		.uleb128 0x6
  851 00bf 40       		.uleb128 0x40
-ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 16
+ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s 			page 16
 
 
  852 00c0 18       		.uleb128 0x18
@@ -958,7 +958,7 @@ ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 1
  906 001c 00000000 		.4byte	0
  907              		.section	.debug_ranges,"",%progbits
  908              	.Ldebug_ranges0:
-ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 17
+ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s 			page 17
 
 
  909 0000 00000000 		.4byte	.LFB112
@@ -1018,7 +1018,7 @@ ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 1
  932      65642069 
  932      6E7400
  933              	.LASF16:
-ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 18
+ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s 			page 18
 
 
  934 00a4 696E6974 		.ascii	"init_stack\000"
@@ -1078,7 +1078,7 @@ ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 1
  950              	.LASF27:
  951 0205 7376635F 		.ascii	"svc_handler\000"
  951      68616E64 
-ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 19
+ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s 			page 19
 
 
  951      6C657200 
@@ -1138,7 +1138,7 @@ ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 1
  975      6E646C65 
  975      7200
  976              	.LASF22:
-ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 20
+ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s 			page 20
 
 
  977 02a6 75736167 		.ascii	"usagefault_handler\000"
@@ -1198,7 +1198,7 @@ ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 1
  998      6E646C65 
  998      7200
  999              	.LASF0:
-ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 21
+ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s 			page 21
 
 
  1000 036d 7369676E 		.ascii	"signed char\000"
@@ -1215,134 +1215,134 @@ ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 1
  1004      5F656E64 
  1004      5F5F00
  1005              		.ident	"GCC: (GNU Tools for Arm Embedded Processors 7-2017-q4-major) 7.2.1 20170904 (release) [ARM
-ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 22
+ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s 			page 22
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 vectors.c
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:18     .text._unhandled_exception:0000000000000000 $t
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 _unhandled_exception
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:47     .text._unhandled_exception:000000000000000c $d
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector1BC
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector1B8
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector1B4
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector1B0
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector1AC
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector1A8
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector1A4
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector1A0
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector19C
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector198
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector194
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector190
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector18C
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector188
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector184
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector180
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector17C
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector178
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector174
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector170
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector16C
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector168
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector164
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector160
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector15C
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector158
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector154
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector150
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector14C
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector148
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector144
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector140
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector13C
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector138
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector134
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector130
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector12C
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector128
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector124
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector120
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector11C
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector118
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector114
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector110
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector10C
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector108
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector104
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector100
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 VectorFC
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 VectorF8
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 VectorF4
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 VectorF0
-ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 23
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:18     .text._unhandled_exception:0000000000000000 $t
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 _unhandled_exception
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:47     .text._unhandled_exception:000000000000000c $d
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector1BC
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector1B8
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector1B4
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector1B0
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector1AC
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector1A8
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector1A4
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector1A0
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector19C
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector198
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector194
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector190
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector18C
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector188
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector184
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector180
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector17C
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector178
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector174
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector170
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector16C
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector168
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector164
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector160
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector15C
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector158
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector154
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector150
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector14C
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector148
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector144
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector140
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector13C
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector138
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector134
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector130
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector12C
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector128
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector124
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector120
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector11C
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector118
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector114
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector110
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector10C
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector108
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector104
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector100
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 VectorFC
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 VectorF8
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 VectorF4
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 VectorF0
+ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s 			page 23
 
 
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 VectorEC
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 VectorE8
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 VectorE4
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 VectorE0
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 VectorDC
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 VectorD8
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 VectorD4
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 VectorD0
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 VectorCC
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 VectorC8
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 VectorC4
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 VectorC0
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 VectorBC
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 VectorB8
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 VectorB4
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 VectorB0
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 VectorAC
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 VectorA8
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 VectorA4
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 VectorA0
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector9C
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector98
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector94
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector90
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector8C
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector88
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector84
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector80
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector7C
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector78
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector74
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector70
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector6C
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector68
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector64
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector60
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector5C
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector58
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector54
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector50
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector4C
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector48
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector44
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector40
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 SysTick_Handler
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 PendSV_Handler
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector34
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 DebugMon_Handler
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 SVC_Handler
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector28
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector24
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector20
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Vector1C
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 UsageFault_Handler
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 BusFault_Handler
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 MemManage_Handler
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 HardFault_Handler
-ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s 			page 24
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 VectorEC
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 VectorE8
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 VectorE4
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 VectorE0
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 VectorDC
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 VectorD8
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 VectorD4
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 VectorD0
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 VectorCC
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 VectorC8
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 VectorC4
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 VectorC0
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 VectorBC
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 VectorB8
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 VectorB4
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 VectorB0
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 VectorAC
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 VectorA8
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 VectorA4
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 VectorA0
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector9C
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector98
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector94
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector90
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector8C
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector88
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector84
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector80
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector7C
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector78
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector74
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector70
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector6C
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector68
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector64
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector60
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector5C
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector58
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector54
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector50
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector4C
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector48
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector44
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector40
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 SysTick_Handler
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 PendSV_Handler
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector34
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 DebugMon_Handler
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 SVC_Handler
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector28
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector24
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector20
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Vector1C
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 UsageFault_Handler
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 BusFault_Handler
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 MemManage_Handler
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 HardFault_Handler
+ARM GAS  /var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s 			page 24
 
 
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 NMI_Handler
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:26     .text._unhandled_exception:0000000000000000 Reset_Handler
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:282    .vectors:0000000000000000 _vectors
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:275    .rodata._unhandled_exception.str1.4:0000000000000000 $d
-/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc8SFTPQ.s:279    .vectors:0000000000000000 $d
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 NMI_Handler
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:26     .text._unhandled_exception:0000000000000000 Reset_Handler
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:282    .vectors:0000000000000000 _vectors
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:275    .rodata._unhandled_exception.str1.4:0000000000000000 $d
+/var/folders/gd/b85s80v10ws684278k5gqzcr0000gn/T//cc9HEIl7.s:279    .vectors:0000000000000000 $d
 
 UNDEFINED SYMBOLS
 chSysHalt

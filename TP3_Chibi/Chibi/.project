@@ -31,6 +31,11 @@
 			<locationURI>PARENT-2-PROJECT_LOC/lib/ChibiOS</locationURI>
 		</link>
 		<link>
+			<name>lib</name>
+			<type>2</type>
+			<location>/Users/gabmac/Documents/GitHub/projet-microinfo/lib</location>
+		</link>
+		<link>
 			<name>msgbus</name>
 			<type>2</type>
 			<locationURI>PARENT-2-PROJECT_LOC/lib/msgbus</locationURI>

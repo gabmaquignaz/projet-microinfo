@@ -769,7 +769,7 @@
                                      PIN_ODR_HIGH(GPIOD_SDIO_CMD) |         \
                                      PIN_ODR_HIGH(GPIOD_REMOTE) |           \
                                      PIN_ODR_LOW(GPIOD_SEL_3) |             \
-                                     PIN_ODR_HIGH(GPIOD_LED1) |             \
+                                     PIN_ODR_LOW(GPIOD_LED1) |              \
                                      PIN_ODR_HIGH(GPIOD_LED3) |             \
                                      PIN_ODR_LOW(GPIOD_AUDIO_PWR) |         \
                                      PIN_ODR_HIGH(GPIOD_UART_TX) |          \

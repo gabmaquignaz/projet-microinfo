@@ -1,5 +1,5 @@
 # List of all the board related files.
-BOARDSRC = ./epuck2_board/board.c
+BOARDSRC = $(CHIBIOS_EXT)/os/hal/boards/epuck2/board.c
 
 # Required include directories
-BOARDINC = ./epuck2_board/
+BOARDINC = $(CHIBIOS_EXT)/os/hal/boards/epuck2

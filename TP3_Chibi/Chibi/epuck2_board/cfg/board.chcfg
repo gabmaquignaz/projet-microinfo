@@ -421,7 +421,7 @@
         Speed="Maximum"
         Resistor="PullUp"
         Mode="Alternate"
-        Alternate="9" />
+        Alternate="9" ></pin0>
       <pin1
         ID="CAN_TX"
         Type="PushPull"
@@ -457,7 +457,7 @@
       <pin5
         ID="LED1"
         Type="PushPull"
-        Level="High"
+        Level="Low"
         Speed="Maximum"
         Resistor="Floating"
         Mode="Output"
