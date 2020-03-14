@@ -6,8 +6,8 @@
 
 #define STANDARD_GRAVITY    9.80665f
 #define DEG2RAD(deg) (deg / 180 * M_PI)
-#define SENSITIVITY_ACC 16384
-#define SENSITIVITY_GYR 131
+#define SENSITIVITY_ACC 16384 // datasheet
+#define SENSITIVITY_GYR 131 // datasheet
 
 extern messagebus_t bus;
 
