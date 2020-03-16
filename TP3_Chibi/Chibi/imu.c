@@ -103,37 +103,38 @@ void imu_stop(void) {
 
 void imu_compute_offset(messagebus_topic_t * imu_topic, uint16_t nb_samples){
 
-	int sum_acc_x = 0;
-	int sum_acc_y = 0;
-	int sum_acc_z = 0;
+	int64_t sum_acc_x = 0;
+	int64_t sum_acc_y = 0;
+	int64_t sum_acc_z = 0;
 
-	int sum_gyr_x = 0;
-	int sum_gyr_y = 0;
-	int sum_gyr_z = 0;
+	int64_t sum_gyr_x = 0;
+	int64_t sum_gyr_y = 0;
+	int64_t sum_gyr_z = 0;
 
 
-	for(uint8_t i = 0; i < nb_samples; i++){
+	for(uint16_t i = 0; i < nb_samples; i++){
 
 		//wait for new measures to be published
 		messagebus_topic_wait(imu_topic, &imu_values, sizeof(imu_values));
 
-		sum_acc_x += imu_values.acc_raw[X_AXIS];
-		sum_acc_y += imu_values.acc_raw[Y_AXIS];
-		sum_acc_z += imu_values.acc_raw[Z_AXIS];
+		sum_acc_x += imu_values.acc_raw[X_AXIS]/nb_samples;
+		sum_acc_y += imu_values.acc_raw[Y_AXIS]/nb_samples;
+		sum_acc_z += imu_values.acc_raw[Z_AXIS]/nb_samples;
 
-		sum_gyr_x += imu_values.gyro_raw[X_AXIS];
-		sum_gyr_y += imu_values.gyro_raw[Y_AXIS];
-		sum_gyr_z += imu_values.gyro_raw[Z_AXIS];
+		sum_gyr_x += imu_values.gyro_raw[X_AXIS]/nb_samples;
+		sum_gyr_y += imu_values.gyro_raw[Y_AXIS]/nb_samples;
+		sum_gyr_z += imu_values.gyro_raw[Z_AXIS]/nb_samples;
 
 	}
 
-	imu_values.acc_offset[X_AXIS] = sum_acc_x/nb_samples;
-	imu_values.acc_offset[Y_AXIS] = sum_acc_y/nb_samples;
-	imu_values.acc_offset[Z_AXIS] = sum_acc_z/nb_samples;
+	imu_values.acc_offset[X_AXIS] = sum_acc_x;
+	imu_values.acc_offset[Y_AXIS] = sum_acc_y;
+	imu_values.acc_offset[Z_AXIS] = sum_acc_z;
 
-	imu_values.gyro_offset[X_AXIS] = sum_gyr_x/nb_samples;
-	imu_values.gyro_offset[Y_AXIS] = sum_gyr_y/nb_samples;
-	imu_values.gyro_offset[Z_AXIS] = sum_gyr_z/nb_samples;
+	imu_values.gyro_offset[X_AXIS] = sum_gyr_x;
+	imu_values.gyro_offset[Y_AXIS] = sum_gyr_y;
+	imu_values.gyro_offset[Z_AXIS] = sum_gyr_z;
+
 
 }
 

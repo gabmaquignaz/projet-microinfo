@@ -8,6 +8,9 @@
 
 #define NB_SAMPLES_OFFSET     200
 
+#define TRESH				1
+
+
 messagebus_t bus;
 MUTEX_DECL(bus_lock);
 CONDVAR_DECL(bus_condvar);
@@ -122,17 +125,33 @@ void show_gravity(imu_msg_t *imu_values){
     //reset the timer counter
     GPTD11.tim->CNT = 0;
 
-    /*
-    *   Use this to capture the counter and stop to prevent 
-    *   the system to switch to another thread.
-    *   Place it at the end of the code you want to measure
-    */
+    //compute quadrant
+    float x_vector = imu_values->acceleration[X_AXIS];
+	float y_vector = imu_values->acceleration[Y_AXIS];
+
+
+	//turn off all LEDs
+	palSetPad(GPIOD, GPIOD_LED1);
+	palSetPad(GPIOD, GPIOD_LED3);
+	palSetPad(GPIOD, GPIOD_LED5);
+	palSetPad(GPIOD, GPIOD_LED7);
+
+	//detect gravity
+		if (abs(x_vector) > abs(y_vector)){
+			if (x_vector > TRESH) palClearPad(GPIOD, GPIOD_LED7);
+			else if(x_vector < -TRESH) palClearPad(GPIOD, GPIOD_LED3);
+		}
+
+		else{
+			if (y_vector > TRESH) palClearPad(GPIOD, GPIOD_LED5);
+			else if(y_vector < -TRESH) palClearPad(GPIOD, GPIOD_LED1);
+		}
+
+
     time = GPTD11.tim->CNT;
+
     chSysUnlock();
 
-    /*
-    *   TASK 11 : TO COMPLETE
-    */
 
 }
 
