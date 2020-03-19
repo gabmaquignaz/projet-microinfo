@@ -57,25 +57,15 @@ static THD_FUNCTION(ProcessImage, arg) {
 			//gets the pointer to the array filled with the last image in RGB565
 			img_buff_ptr = dcmi_get_last_image_ptr();
 
-			uint8_t green_value = 0;
-
 			for(uint16_t i = 0; i < IMAGE_BUFFER_SIZE; i++){
 
-				//reset green value for the current bit
-				green_value = 0;
+				// ---Version plus clean---
+				//stick the two 8-bit ints together in a 16-bit int,
+				//select only green with a mask,
+				//shift right and put the value in an 8-bit int
 
-				for(uint8_t j = 0; j < DEMI_ARRAY_SIZE_G; j++){
-
-					// ---Version plus clean---
-					//stick the two 8-bit ints together in a 16-bit int,
-					//select only green with a mask,
-					//shift right and put the value in an 8-bit int
-
-					uint16_t green_select = (((img_buff_ptr[2*i] << 8) + img_buff_ptr[2*i+1]) & GREEN) >> 5;
-					green_value = (uint8_t) green_select;
-				}
-
-				image[i] = green_value;
+				uint16_t green_select = (((img_buff_ptr[2*i] << 8) + img_buff_ptr[2*i+1]) & GREEN) >> 5;
+				image[i] = (uint8_t) green_select;
 			}
 
 			//Send the data
