@@ -30,5 +30,10 @@
 			<type>2</type>
 			<locationURI>PARENT-2-PROJECT_LOC/lib/e-puck2_main-processor</locationURI>
 		</link>
+		<link>
+			<name>lib</name>
+			<type>2</type>
+			<location>/Users/gabmac/Documents/GitHub/projet-microinfo/lib</location>
+		</link>
 	</linkedResources>
 </projectDescription>
