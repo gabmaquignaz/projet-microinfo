@@ -13,7 +13,7 @@
 #define WANTED_DIST			10
 #define WANTED_OR			(640/2)
 #define KI					0.001
-#define KP					800
+#define KP					600
 #define ARW					500
 #define TRESHOLD				0.1
 
