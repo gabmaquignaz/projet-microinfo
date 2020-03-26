@@ -35,15 +35,7 @@ static float micBack_output[FFT_SIZE];
 *	uint16_t num_samples	Tells how many data we get in total (should always be 640)
 */
 void processAudioData(int16_t *data, uint16_t num_samples){
-
-	/*
-	*
-	*	We get 160 samples per mic every 10ms
-	*	So we fill the samples buffers to reach
-	*	1024 samples, then we compute the FFTs.
-	*
-	*/
-
+	if (num_samples != 640) return;
 	
 }
 

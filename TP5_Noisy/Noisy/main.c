@@ -98,18 +98,17 @@ int main(void)
         if(size == FFT_SIZE){
 
 
-        		//static complex_float cmplx_input[FFT_SIZE];
-/*
+        		static complex_float cmplx_input[FFT_SIZE];
+
         		for(uint16_t i=0 ; i<FFT_SIZE ; i++){
         			cmplx_input[i].real = bufferCmplxInput[2*i];
         			cmplx_input[i].imag = bufferCmplxInput[2*i+1];
 
         		}
-*/
 
-        		//doFFT_optimized(FFT_SIZE, bufferCmplxInput);
+
+        		doFFT_optimized(FFT_SIZE, bufferCmplxInput);
         		//doFFT_c(FFT_SIZE, cmplx_input);
-        	//test
 
             arm_cmplx_mag_f32(bufferCmplxInput, bufferOutput, FFT_SIZE);
 

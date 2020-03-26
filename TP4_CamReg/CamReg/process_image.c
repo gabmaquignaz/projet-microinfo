@@ -15,6 +15,7 @@
 #define SIZE2DIST				360	//pixel*cm
 
 
+static float hor_pos = 0;
 static float distance_cm = 0;
 
 //semaphore
@@ -93,6 +94,10 @@ float get_distance_cm(void){
 	return distance_cm;
 }
 
+float get_hor_pos(void){
+	return hor_pos;
+}
+
 void process_image_start(void){
 	chThdCreateStatic(waProcessImage, sizeof(waProcessImage), NORMALPRIO, ProcessImage, NULL);
 	chThdCreateStatic(waCaptureImage, sizeof(waCaptureImage), NORMALPRIO, CaptureImage, NULL);
@@ -124,6 +129,7 @@ void line_position (uint8_t* image, uint16_t size){
 
 				uint16_t largeur_trait = black_stop-black_start;
 				distance_cm = SIZE2DIST/largeur_trait;
+				hor_pos = (black_start + largeur_trait/2);
 
 				//output information
 				//chprintf((BaseSequentialStream *) &SDU1, "Position : %d, Size : %d\n", black_start + largeur_trait/2, largeur_trait );
