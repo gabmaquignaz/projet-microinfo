@@ -125,8 +125,6 @@ void line_position (uint8_t* image, uint16_t size){
 				uint16_t largeur_trait = black_stop-black_start;
 				distance_cm = SIZE2DIST/largeur_trait;
 
-				//TEST
-
 				//output information
 				//chprintf((BaseSequentialStream *) &SDU1, "Position : %d, Size : %d\n", black_start + largeur_trait/2, largeur_trait );
 			}
