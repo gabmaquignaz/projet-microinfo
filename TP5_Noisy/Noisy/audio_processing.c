@@ -74,7 +74,7 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 		if (counter >= FFT_SIZE) {
 			sent ++;
 
-			if (sent >= 10){
+			if (sent >=10){
 
 				doFFT_optimized(FFT_SIZE, micFront_cmplx_input);
 
@@ -84,7 +84,7 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 
 				sent = 0;
 
-				sound_remote(micFront_output);
+				//sound_remote(micFront_output);
 
 			}
 
