@@ -17,7 +17,7 @@
 #include <arm_math.h>
 
 //uncomment to send the FFTs results from the real microphones
-//#define SEND_FROM_MIC
+#define SEND_FROM_MIC
 
 //uncomment to use double buffering to send the FFT to the computer
 #define DOUBLE_BUFFERING
@@ -83,15 +83,17 @@ int main(void)
         wait_send_to_computer();
 #ifdef DOUBLE_BUFFERING
         //we copy the buffer to avoid conflicts
-        arm_copy_f32(get_audio_buffer_ptr(LEFT_OUTPUT), send_tab, FFT_SIZE);
+        arm_copy_f32(get_audio_buffer_ptr(FRONT_OUTPUT), send_tab, FFT_SIZE);
         SendFloatToComputer((BaseSequentialStream *) &SD3, send_tab, FFT_SIZE);
 #else
-        SendFloatToComputer((BaseSequentialStream *) &SD3, get_audio_buffer_ptr(LEFT_OUTPUT), FFT_SIZE);
+        SendFloatToComputer((BaseSequentialStream *) &SD3, get_audio_buffer_ptr(FRONT_OUTPUT), FFT_SIZE);
 #endif  /* DOUBLE_BUFFERING */
 #else
 
         float* bufferCmplxInput = get_audio_buffer_ptr(LEFT_CMPLX_INPUT);
         float* bufferOutput = get_audio_buffer_ptr(LEFT_OUTPUT);
+
+        static float BufferCorrected[2*FFT_SIZE];
 
         uint16_t size = ReceiveInt16FromComputer((BaseSequentialStream *) &SD3, bufferCmplxInput, FFT_SIZE);
 
@@ -103,14 +105,19 @@ int main(void)
         		for(uint16_t i=0 ; i<FFT_SIZE ; i++){
         			cmplx_input[i].real = bufferCmplxInput[2*i];
         			cmplx_input[i].imag = bufferCmplxInput[2*i+1];
-
         		}
 
 
-        		doFFT_optimized(FFT_SIZE, bufferCmplxInput);
-        		//doFFT_c(FFT_SIZE, cmplx_input);
+        		//doFFT_optimized(FFT_SIZE, bufferCmplxInput);
+        		doFFT_c(FFT_SIZE, cmplx_input);
 
-            arm_cmplx_mag_f32(bufferCmplxInput, bufferOutput, FFT_SIZE);
+        		 for(uint16_t i=0 ; i<(FFT_SIZE) ; i++){
+        			 BufferCorrected[2*i] = cmplx_input[i].real;
+        			 BufferCorrected[2*i+1] = cmplx_input[i].imag;
+
+        		 }
+
+            arm_cmplx_mag_f32(BufferCorrected, bufferOutput, FFT_SIZE);
 
             SendFloatToComputer((BaseSequentialStream *) &SD3, bufferOutput, FFT_SIZE);
 
