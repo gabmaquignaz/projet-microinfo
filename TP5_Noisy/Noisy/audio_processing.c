@@ -84,7 +84,7 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 
 				sent = 0;
 
-				//sound_remote(micFront_output);
+				sound_remote(micFront_output);
 
 			}
 
