@@ -35,13 +35,14 @@ build/obj/main.o: main.c \
  /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/xlocale.h \
  /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/strings.h \
  /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/sys/string.h \
+ /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/math.h \
  ../../lib/e-puck2_main-processor/ChibiOS//os/rt/include/ch.h \
  ../../lib/e-puck2_main-processor/ChibiOS//os/rt/ports/ARMCMx/compilers/GCC/chtypes.h \
  /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/lib/gcc/arm-none-eabi/7.2.1/include/stdint.h \
  /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/stdint.h \
  /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/sys/_intsup.h \
  /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/lib/gcc/arm-none-eabi/7.2.1/include/stdbool.h \
- chconf.h \
+ ../../lib/e-puck2_main-processor/src/chconf.h \
  ../../lib/e-puck2_main-processor/ChibiOS//os/rt/include/chlicense.h \
  ../../lib/e-puck2_main-processor/ChibiOS//os/rt/include/chsystypes.h \
  ../../lib/e-puck2_main-processor/ChibiOS//os/rt/ports/ARMCMx/chcore.h \
@@ -78,7 +79,8 @@ build/obj/main.o: main.c \
  ../../lib/e-puck2_main-processor/ChibiOS//os/rt/include/chstreams.h \
  ../../lib/e-puck2_main-processor/ChibiOS//os/hal/include/hal.h \
  ../../lib/e-puck2_main-processor/ChibiOS//os/hal/osal/rt/osal.h \
- halconf.h mcuconf.h \
+ ../../lib/e-puck2_main-processor/src/halconf.h \
+ ../../lib/e-puck2_main-processor/src/mcuconf.h \
  ../../lib/e-puck2_main-processor/ChibiOS//os/hal/ports/STM32/STM32F4xx/hal_lld.h \
  ../../lib/e-puck2_main-processor/ChibiOS//os/hal/ports/STM32/STM32F4xx/stm32_registry.h \
  ../../lib/e-puck2_main-processor/ChibiOS//os/hal/ports/common/ARMCMx/nvic.h \
@@ -126,12 +128,11 @@ build/obj/main.o: main.c \
  ../../lib/e-puck2_main-processor/ChibiOS//os/hal/ports/STM32/LLD/OTGv1/stm32_otg.h \
  ../../lib/e-puck2_main-processor/ChibiOS//os/hal/include/st.h \
  ../../lib/e-puck2_main-processor/ChibiOS//os/hal/ports/STM32/LLD/TIMv1/st_lld.h \
- mcuconf.h \
+ ../../lib/e-puck2_main-processor/src/mcuconf.h \
  ../../lib/e-puck2_main-processor/ChibiOS_ext/os/hal/ports/STM32/STM32F4xx/stm32_registry.h \
  ../../lib/e-puck2_main-processor/ChibiOS//os/hal/include/mmc_spi.h \
  ../../lib/e-puck2_main-processor/ChibiOS//os/hal/include/serial_usb.h \
- ../../lib/e-puck2_main-processor/src/memory_protection.h \
- ../../lib/e-puck2_main-processor/src/usbcfg.h main.h \
+ ../../lib/e-puck2_main-processor/src/memory_protection.h main.h \
  ../../lib/e-puck2_main-processor/src/camera/dcmi_camera.h \
  ../../lib/e-puck2_main-processor/ChibiOS_ext/os/hal/include/dcmi.h \
  ../../lib/e-puck2_main-processor/ChibiOS_ext/os/hal/include/../ports/STM32/STM32F4xx/dcmi_lld.h \
@@ -141,15 +142,7 @@ build/obj/main.o: main.c \
  ../../lib/e-puck2_main-processor/src/msgbus/messagebus.h \
  /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/unistd.h \
  /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/sys/unistd.h \
- ../../lib/e-puck2_main-processor/src/parameter/parameter.h \
- ../../lib/e-puck2_main-processor/ChibiOS//os/hal/lib/streams/chprintf.h \
- ../../lib/e-puck2_main-processor/src/motors.h \
- ../../lib/e-puck2_main-processor/src/audio/microphone.h \
- ../../lib/e-puck2_main-processor/src/audio/mp45dt02_processing.h \
- audio_processing.h fft.h communications.h \
- ../../lib/e-puck2_main-processor/ChibiOS//os/ext/CMSIS/include/arm_math.h \
- ../../lib/e-puck2_main-processor/ChibiOS//os/ext/CMSIS/include/core_cm4.h \
- /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/math.h
+ ../../lib/e-puck2_main-processor/src/parameter/parameter.h
 
 /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/stdio.h:
 
@@ -223,6 +216,8 @@ build/obj/main.o: main.c \
 
 /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/sys/string.h:
 
+/Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/math.h:
+
 ../../lib/e-puck2_main-processor/ChibiOS//os/rt/include/ch.h:
 
 ../../lib/e-puck2_main-processor/ChibiOS//os/rt/ports/ARMCMx/compilers/GCC/chtypes.h:
@@ -235,7 +230,7 @@ build/obj/main.o: main.c \
 
 /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/lib/gcc/arm-none-eabi/7.2.1/include/stdbool.h:
 
-chconf.h:
+../../lib/e-puck2_main-processor/src/chconf.h:
 
 ../../lib/e-puck2_main-processor/ChibiOS//os/rt/include/chlicense.h:
 
@@ -309,9 +304,9 @@ chconf.h:
 
 ../../lib/e-puck2_main-processor/ChibiOS//os/hal/osal/rt/osal.h:
 
-halconf.h:
+../../lib/e-puck2_main-processor/src/halconf.h:
 
-mcuconf.h:
+../../lib/e-puck2_main-processor/src/mcuconf.h:
 
 ../../lib/e-puck2_main-processor/ChibiOS//os/hal/ports/STM32/STM32F4xx/hal_lld.h:
 
@@ -407,7 +402,7 @@ mcuconf.h:
 
 ../../lib/e-puck2_main-processor/ChibiOS//os/hal/ports/STM32/LLD/TIMv1/st_lld.h:
 
-mcuconf.h:
+../../lib/e-puck2_main-processor/src/mcuconf.h:
 
 ../../lib/e-puck2_main-processor/ChibiOS_ext/os/hal/ports/STM32/STM32F4xx/stm32_registry.h:
 
@@ -416,8 +411,6 @@ mcuconf.h:
 ../../lib/e-puck2_main-processor/ChibiOS//os/hal/include/serial_usb.h:
 
 ../../lib/e-puck2_main-processor/src/memory_protection.h:
-
-../../lib/e-puck2_main-processor/src/usbcfg.h:
 
 main.h:
 
@@ -440,23 +433,3 @@ main.h:
 /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/sys/unistd.h:
 
 ../../lib/e-puck2_main-processor/src/parameter/parameter.h:
-
-../../lib/e-puck2_main-processor/ChibiOS//os/hal/lib/streams/chprintf.h:
-
-../../lib/e-puck2_main-processor/src/motors.h:
-
-../../lib/e-puck2_main-processor/src/audio/microphone.h:
-
-../../lib/e-puck2_main-processor/src/audio/mp45dt02_processing.h:
-
-audio_processing.h:
-
-fft.h:
-
-communications.h:
-
-../../lib/e-puck2_main-processor/ChibiOS//os/ext/CMSIS/include/arm_math.h:
-
-../../lib/e-puck2_main-processor/ChibiOS//os/ext/CMSIS/include/core_cm4.h:
-
-/Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/math.h:
