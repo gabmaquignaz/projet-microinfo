@@ -10,10 +10,12 @@ GLOBAL_PATH = ../../lib/e-puck2_main-processor
 
 #Source files to include
 CSRC += ./main.c \
-		
+		./vision.c \
 
 #Header folders to include
 INCDIR += 
+
+
 
 #Jump to the main Makefile
 include $(GLOBAL_PATH)/Makefile

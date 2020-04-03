@@ -1,0 +1,210 @@
+/*
+ * vision.c
+ *
+ *  Created on: 2 Apr 2020
+ *      Author: Gabriel Maquignaz
+ */
+
+#include "ch.h"
+#include "hal.h"
+#include <chprintf.h>
+#include <usbcfg.h>
+
+#include <stdbool.h>
+
+#include <main.h>
+#include <camera/po8030.h>
+
+#include <vision.h>
+
+#define GREEN 					(63 << 5)	//0b00000 111111 00000
+#define RED						(31 << 11) 	//0b11111 000000 00000
+#define BLUE						31 			//0b00000 000000 11111
+
+#define BGND_NB_SAMPLES			30
+
+enum Line_detector_stae {SEARCH_BEGIN, SEARCH_END, FINISHED};
+#define DETECT_TRESH				10
+#define MIN_OBJ_SIZE 			5
+
+static float hor_dist = 0;
+static float real_dist = 0;
+static float size2dist_conv = 0;
+static uint16_t tof_dist_calib = 0;
+
+
+
+void SendUint8ToComputer(uint8_t* data, uint16_t size)
+{
+	chSequentialStreamWrite((BaseSequentialStream *)&SD3, (uint8_t*)"START", 5);
+	chSequentialStreamWrite((BaseSequentialStream *)&SD3, (uint8_t*)&size, sizeof(uint16_t));
+	chSequentialStreamWrite((BaseSequentialStream *)&SD3, (uint8_t*)data, size);
+}
+
+//semaphore
+static BSEMAPHORE_DECL(image_ready_sem, TRUE);
+
+static THD_WORKING_AREA(waCaptureImage, 256);
+static THD_FUNCTION(CaptureImage, arg) {
+
+
+    chRegSetThreadName(__FUNCTION__);
+    (void)arg;
+
+	//Takes pixels 0 to IMAGE_BUFFER_SIZE of the line 10 + 11 (minimum 2 lines because reasons)
+	po8030_advanced_config(FORMAT_RGB565, 0, 10, IMAGE_BUFFER_SIZE, 2, SUBSAMPLING_X1, SUBSAMPLING_X1);
+	dcmi_enable_double_buffering();
+	dcmi_set_capture_mode(CAPTURE_ONE_SHOT);
+	dcmi_prepare();
+
+    while(1){
+
+        //starts a capture
+		dcmi_capture_start();
+		//waits for the capture to be done
+		wait_image_ready();
+		//signals an image has been captured
+		chBSemSignal(&image_ready_sem);
+    }
+}
+
+
+static THD_WORKING_AREA(waProcessImage, 2048);
+static THD_FUNCTION(ProcessImage, arg) {
+
+    chRegSetThreadName(__FUNCTION__);
+    (void)arg;
+
+	uint8_t *img_buff_ptr;
+	uint8_t image[IMAGE_BUFFER_SIZE] = {0};
+
+	uint16_t background[IMAGE_BUFFER_SIZE] = {0};
+	uint8_t background_capture_count = 0;
+
+	while(1){
+	    	//waits until an image has been captured
+	        chBSemWait(&image_ready_sem);
+			//gets the pointer to the array filled with the last image in RGB565
+			img_buff_ptr = dcmi_get_last_image_ptr();
+
+			for(uint16_t i = 0; i < IMAGE_BUFFER_SIZE; i++){
+
+				// ---Version plus clean---
+				//stick the two 8-bit ints together in a 16-bit int,
+				//select only green with a mask,
+				//shift right and put the value in an 8-bit int
+
+				uint16_t RGB = ((img_buff_ptr[2*i] << 8) + img_buff_ptr[2*i+1]);
+				image[i] = (uint8_t) ( ((RGB & RED) >> 11) + ((RGB & GREEN) >> 5) + (RGB & BLUE) );
+			}
+
+
+			if (background_capture_count < BGND_NB_SAMPLES){
+
+				//backgrounnd capture and average
+				background_set(background, image, background_capture_count);
+				background_capture_count++;
+			}
+			else {
+
+				//substracting background from image and measuring distances
+				background_ignore(background, image);
+				dist_measure(image, IMAGE_BUFFER_SIZE);
+			}
+
+			//Send the data
+			SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
+	    }
+}
+
+uint16_t get_real_dist_mm(void){
+	return real_dist;
+}
+
+uint16_t get_hor_dist_mm(void){
+	return hor_dist;
+}
+
+void process_image_start(void){
+	chThdCreateStatic(waProcessImage, sizeof(waProcessImage), NORMALPRIO, ProcessImage, NULL);
+	chThdCreateStatic(waCaptureImage, sizeof(waCaptureImage), NORMALPRIO, CaptureImage, NULL);
+}
+
+void background_set(uint16_t *background, uint8_t *image, uint8_t counter){
+	for(uint16_t i = 0; i < IMAGE_BUFFER_SIZE; i++){
+		background[i] += image[i];
+		if (counter >= BGND_NB_SAMPLES-1) background[i] /= BGND_NB_SAMPLES;
+	}
+}
+
+void background_ignore(uint16_t *background, uint8_t *image){
+	for(uint16_t i = 0; i < IMAGE_BUFFER_SIZE; i++){
+
+		//compute difference between actual image and empty background and center at +128 to have maximum dynamic
+		int16_t diff = image[i] - background[i]+128;
+
+		//saturation instead of overflow
+		if(diff < 0) diff = 0;
+		else if(diff > 255) diff = 255;
+
+		//show diff
+		image[i] = diff;
+	}
+}
+
+
+bool dist_measure (uint8_t* image, uint16_t size){
+
+	//state of the object detector, starts by searching for the beginning of the object
+	uint8_t state = SEARCH_BEGIN;
+
+	//start and stop of the vertical object between 0 and <size>
+	uint16_t begin = 0;
+	uint16_t end = 0;
+
+	for (uint16_t i = 1; i < size; i ++){
+		switch(state){
+
+			case SEARCH_BEGIN :
+				if (image[i] - image[i-1] > DETECT_TRESH){
+					begin = i;
+					state = SEARCH_END;
+				}
+				break;
+
+			case SEARCH_END :
+				if (image[i] - image[i-1] < -DETECT_TRESH){
+					if (end-begin < MIN_OBJ_SIZE){
+						//error: object too small, may be a glitch or an unwanted reflect
+						begin = 0;
+						state = SEARCH_BEGIN;
+					}
+					else{
+						end = i;
+						state = FINISHED;
+					}
+				}
+				break;
+
+			case FINISHED :
+
+				//error: multiple objects
+				if (image[i] - image[i-1] > DETECT_TRESH) return false;
+				break;
+		}
+	}
+
+	//error: no object found or object not entirely visible
+	if (state != FINISHED) return false;
+
+	uint16_t size_obj_pix = end-begin;
+
+	//if not initialized yet, computation of the constant for size-to-distance conversion, else compute distance
+	if (!size2dist_conv) size2dist_conv = size_obj_pix*tof_dist_calib;
+	else{
+		real_dist = size2dist_conv/size_obj_pix;
+		hor_dist = (size_obj_pix - size)/2 + begin;
+	}
+	return true;
+}
+
