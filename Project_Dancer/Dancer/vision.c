@@ -19,9 +19,10 @@
 
 #define GREEN 					(63 << 5)	//0b00000 111111 00000
 #define RED						(31 << 11) 	//0b11111 000000 00000
-#define BLUE						31 			//0b00000 000000 11111
+#define BLUE						 31 			//0b00000 000000 11111
 
-#define BGND_NB_SAMPLES			30
+#define BGND_NB_SAMPLES			100
+#define DIFF_TRESH				10
 
 enum Line_detector_stae {SEARCH_BEGIN, SEARCH_END, FINISHED};
 #define DETECT_TRESH				10
@@ -89,29 +90,30 @@ static THD_FUNCTION(ProcessImage, arg) {
 
 			for(uint16_t i = 0; i < IMAGE_BUFFER_SIZE; i++){
 
-				// ---Version plus clean---
-				//stick the two 8-bit ints together in a 16-bit int,
-				//select only green with a mask,
-				//shift right and put the value in an 8-bit int
-
-				uint16_t RGB = ((img_buff_ptr[2*i] << 8) + img_buff_ptr[2*i+1]);
-				image[i] = (uint8_t) ( ((RGB & RED) >> 11) + ((RGB & GREEN) >> 5) + (RGB & BLUE) );
+				uint16_t rgb = ((img_buff_ptr[2*i] << 8) + img_buff_ptr[2*i+1]);
+				int8_t w_r = -1;
+				int8_t w_g = 2;
+				int8_t w_b = -1;
+				int16_t value = (2*w_r*((rgb & RED) >> 11) + w_g*((rgb & GREEN) >> 5) + 2*w_b*(rgb & BLUE))+128;
+				if (value < 0) value = 0;
+				else if(value > 255) value = 255;
+				image[i]=value;
 			}
 
-
+			/*
 			if (background_capture_count < BGND_NB_SAMPLES){
 
-				//backgrounnd capture and average
+				//background capture and average
 				background_set(background, image, background_capture_count);
 				background_capture_count++;
 			}
 			else {
 
-				//substracting background from image and measuring distances
+				//subtracting background from image and measuring distances
 				background_ignore(background, image);
 				dist_measure(image, IMAGE_BUFFER_SIZE);
 			}
-
+			*/
 			//Send the data
 			SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
 	    }
@@ -140,15 +142,19 @@ void background_set(uint16_t *background, uint8_t *image, uint8_t counter){
 void background_ignore(uint16_t *background, uint8_t *image){
 	for(uint16_t i = 0; i < IMAGE_BUFFER_SIZE; i++){
 
-		//compute difference between actual image and empty background and center at +128 to have maximum dynamic
-		int16_t diff = image[i] - background[i]+128;
+		int16_t diff = image[i] - background[i];
+		//show diff, correct only background (small diff between registered background), not object (big diff)
+		if (1) {
+			// center to have maximum dynamic
+			diff += 128;
 
-		//saturation instead of overflow
-		if(diff < 0) diff = 0;
-		else if(diff > 255) diff = 255;
+			//saturation instead of overflow
+			if (diff < 0) diff = 0;
+			else if(diff > 255) diff = 255;
 
-		//show diff
-		image[i] = diff;
+			image[i] = diff;
+		}
+		else image[i] = 0;
 	}
 }
 
@@ -187,7 +193,6 @@ bool dist_measure (uint8_t* image, uint16_t size){
 				break;
 
 			case FINISHED :
-
 				//error: multiple objects
 				if (image[i] - image[i-1] > DETECT_TRESH) return false;
 				break;

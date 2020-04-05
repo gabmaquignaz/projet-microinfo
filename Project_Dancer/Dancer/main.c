@@ -44,8 +44,8 @@ int main(void)
     usb_start();
 
     //start ToF with high accuracy, also starts I2C
-    VL53L0X_start();
-    VL53L0X_configAccuracy(VL53L0X_ADDR, VL53L0X_HIGH_ACCURACY);
+//    VL53L0X_start();
+//    VL53L0X_configAccuracy(VL53L0X_ADDR, VL53L0X_HIGH_ACCURACY);
 
     //starts the camera
     dcmi_start();
