@@ -8,6 +8,6 @@
 #ifndef TRAJECTOIRE_H_
 #define TRAJECTOIRE_H_
 
-
+void convert_pos(void);
 
 #endif /* TRAJECTOIRE_H_ */

@@ -27,7 +27,7 @@ build/obj/spi_comm.o: ../../lib/e-puck2_main-processor/src/spi_comm.c \
  /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/sys/_intsup.h \
  /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/sys/_stdint.h \
  /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/lib/gcc/arm-none-eabi/7.2.1/include/stdbool.h \
- chconf.h \
+ ../../lib/e-puck2_main-processor/src/chconf.h \
  ../../lib/e-puck2_main-processor/ChibiOS//os/rt/include/chlicense.h \
  ../../lib/e-puck2_main-processor/ChibiOS//os/rt/include/chsystypes.h \
  ../../lib/e-puck2_main-processor/ChibiOS//os/rt/ports/ARMCMx/chcore.h \
@@ -64,7 +64,8 @@ build/obj/spi_comm.o: ../../lib/e-puck2_main-processor/src/spi_comm.c \
  ../../lib/e-puck2_main-processor/ChibiOS//os/rt/include/chstreams.h \
  ../../lib/e-puck2_main-processor/ChibiOS//os/hal/include/hal.h \
  ../../lib/e-puck2_main-processor/ChibiOS//os/hal/osal/rt/osal.h \
- halconf.h mcuconf.h \
+ ../../lib/e-puck2_main-processor/src/halconf.h \
+ ../../lib/e-puck2_main-processor/src/mcuconf.h \
  ../../lib/e-puck2_main-processor/ChibiOS//os/hal/ports/STM32/STM32F4xx/hal_lld.h \
  ../../lib/e-puck2_main-processor/ChibiOS//os/hal/ports/STM32/STM32F4xx/stm32_registry.h \
  ../../lib/e-puck2_main-processor/ChibiOS//os/hal/ports/common/ARMCMx/nvic.h \
@@ -112,7 +113,7 @@ build/obj/spi_comm.o: ../../lib/e-puck2_main-processor/src/spi_comm.c \
  ../../lib/e-puck2_main-processor/ChibiOS//os/hal/ports/STM32/LLD/OTGv1/stm32_otg.h \
  ../../lib/e-puck2_main-processor/ChibiOS//os/hal/include/st.h \
  ../../lib/e-puck2_main-processor/ChibiOS//os/hal/ports/STM32/LLD/TIMv1/st_lld.h \
- mcuconf.h \
+ ../../lib/e-puck2_main-processor/src/mcuconf.h \
  ../../lib/e-puck2_main-processor/ChibiOS_ext/os/hal/ports/STM32/STM32F4xx/stm32_registry.h \
  ../../lib/e-puck2_main-processor/ChibiOS//os/hal/include/mmc_spi.h \
  ../../lib/e-puck2_main-processor/ChibiOS//os/hal/include/serial_usb.h \
@@ -182,7 +183,7 @@ build/obj/spi_comm.o: ../../lib/e-puck2_main-processor/src/spi_comm.c \
 
 /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/lib/gcc/arm-none-eabi/7.2.1/include/stdbool.h:
 
-chconf.h:
+../../lib/e-puck2_main-processor/src/chconf.h:
 
 ../../lib/e-puck2_main-processor/ChibiOS//os/rt/include/chlicense.h:
 
@@ -256,9 +257,9 @@ chconf.h:
 
 ../../lib/e-puck2_main-processor/ChibiOS//os/hal/osal/rt/osal.h:
 
-halconf.h:
+../../lib/e-puck2_main-processor/src/halconf.h:
 
-mcuconf.h:
+../../lib/e-puck2_main-processor/src/mcuconf.h:
 
 ../../lib/e-puck2_main-processor/ChibiOS//os/hal/ports/STM32/STM32F4xx/hal_lld.h:
 
@@ -354,7 +355,7 @@ mcuconf.h:
 
 ../../lib/e-puck2_main-processor/ChibiOS//os/hal/ports/STM32/LLD/TIMv1/st_lld.h:
 
-mcuconf.h:
+../../lib/e-puck2_main-processor/src/mcuconf.h:
 
 ../../lib/e-puck2_main-processor/ChibiOS_ext/os/hal/ports/STM32/STM32F4xx/stm32_registry.h:
 

@@ -4,16 +4,16 @@
  *  Created on: 6 Apr 2020
  *      Author: maximepoffet
  */
-#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+//#include <math.h>
 #include <trajectoire.h>
 
 #define NB_POS		100
 
-void convert_pos(void){
+/*void convert_pos(void){
 
-	float pos_pol[NB_POS];
+	float pos_pol[2*NB_POS] = {0};
 
 	float r_one = pos_pol[0];
 	float r_two;
@@ -29,7 +29,7 @@ void convert_pos(void){
 	}
 
 }
-
+*/
 
 
 
