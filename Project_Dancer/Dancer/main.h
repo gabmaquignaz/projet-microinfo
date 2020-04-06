@@ -10,6 +10,10 @@ extern "C" {
 #include "parameter/parameter.h"
 
 
+//constants for the differents parts of the project
+#define IMAGE_BUFFER_SIZE		640
+
+
 /** Robot wide IPC bus. */
 extern messagebus_t bus;
 

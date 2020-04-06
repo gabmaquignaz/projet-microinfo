@@ -55,7 +55,7 @@ Archive member included to satisfy reference by file (symbol)
 /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard/libg.a(lib_a-memcpy.o)
                               build/obj/Asercom.o (memcpy)
 /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard/libg.a(lib_a-memset.o)
-                              build/obj/mp45dt02_processing.o (memset)
+                              build/obj/process_image.o (memset)
 /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard/libg.a(lib_a-snprintf.o)
                               build/obj/memory_protection.o (snprintf)
 /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard/libg.a(lib_a-sprintf.o)
@@ -177,6 +177,56 @@ Discarded input sections
  .text          0x0000000000000000        0x0 build/obj/main.o
  .data          0x0000000000000000        0x0 build/obj/main.o
  .bss           0x0000000000000000        0x0 build/obj/main.o
+ .text          0x0000000000000000        0x0 build/obj/process_image.o
+ .data          0x0000000000000000        0x0 build/obj/process_image.o
+ .bss           0x0000000000000000        0x0 build/obj/process_image.o
+ .text.CaptureImage
+                0x0000000000000000       0xa4 build/obj/process_image.o
+ .text.get_distance_cm
+                0x0000000000000000       0x2c build/obj/process_image.o
+ .text.get_hor_pos
+                0x0000000000000000       0x2c build/obj/process_image.o
+ .text.process_image_start
+                0x0000000000000000       0x50 build/obj/process_image.o
+ .text.line_position
+                0x0000000000000000       0xd8 build/obj/process_image.o
+ .text.ProcessImage
+                0x0000000000000000       0x74 build/obj/process_image.o
+ .bss.distance_cm
+                0x0000000000000000        0x4 build/obj/process_image.o
+ .bss.hor_pos   0x0000000000000000        0x4 build/obj/process_image.o
+ .bss.waCaptureImage
+                0x0000000000000000      0x278 build/obj/process_image.o
+ .bss.waProcessImage
+                0x0000000000000000      0x578 build/obj/process_image.o
+ .data.image_ready_sem
+                0x0000000000000000        0xc build/obj/process_image.o
+ .rodata.__FUNCTION__.11332
+                0x0000000000000000        0xd build/obj/process_image.o
+ .rodata.__FUNCTION__.11340
+                0x0000000000000000        0xd build/obj/process_image.o
+ .rodata.__func__.7153
+                0x0000000000000000        0xc build/obj/process_image.o
+ .debug_info    0x0000000000000000     0x4bfa build/obj/process_image.o
+ .debug_abbrev  0x0000000000000000      0x4b0 build/obj/process_image.o
+ .debug_loc     0x0000000000000000      0x340 build/obj/process_image.o
+ .debug_aranges
+                0x0000000000000000       0x48 build/obj/process_image.o
+ .debug_ranges  0x0000000000000000      0x128 build/obj/process_image.o
+ .debug_line    0x0000000000000000      0xc0c build/obj/process_image.o
+ .debug_str     0x0000000000000000     0x292e build/obj/process_image.o
+ .comment       0x0000000000000000       0x7f build/obj/process_image.o
+ .debug_frame   0x0000000000000000       0xec build/obj/process_image.o
+ .ARM.attributes
+                0x0000000000000000       0x39 build/obj/process_image.o
+ .text          0x0000000000000000        0x0 build/obj/process_position.o
+ .data          0x0000000000000000        0x0 build/obj/process_position.o
+ .bss           0x0000000000000000        0x0 build/obj/process_position.o
+ .debug_line    0x0000000000000000        0x0 build/obj/process_position.o
+ .debug_str     0x0000000000000000      0x1d2 build/obj/process_position.o
+ .comment       0x0000000000000000       0x7f build/obj/process_position.o
+ .ARM.attributes
+                0x0000000000000000       0x39 build/obj/process_position.o
  .text          0x0000000000000000        0x0 build/obj/spi3_slave_lld.o
  .data          0x0000000000000000        0x0 build/obj/spi3_slave_lld.o
  .bss           0x0000000000000000        0x0 build/obj/spi3_slave_lld.o
@@ -872,7 +922,7 @@ Discarded input sections
  .bss.cmd_x1    0x0000000000000000        0x2 build/obj/cmd.o
  .bss.cmd_y1    0x0000000000000000        0x2 build/obj/cmd.o
  .bss.fbuff     0x0000000000000000      0x100 build/obj/cmd.o
- .bss.wa.13775  0x0000000000000000      0x978 build/obj/cmd.o
+ .bss.wa.13774  0x0000000000000000      0x978 build/obj/cmd.o
  .rodata.__func__.8875
                 0x0000000000000000        0xc build/obj/cmd.o
  .rodata.cmd_atan2.str1.4
@@ -955,26 +1005,26 @@ Discarded input sections
                 0x0000000000000000       0x1f build/obj/cmd.o
  .rodata.cmd_volume.str1.4
                 0x0000000000000000       0x2d build/obj/cmd.o
- .rodata.mode.13742
+ .rodata.mode.13741
                 0x0000000000000000       0x10 build/obj/cmd.o
- .rodata.shell_cfg.13770
+ .rodata.shell_cfg.13769
                 0x0000000000000000        0x8 build/obj/cmd.o
  .rodata.shell_commands
                 0x0000000000000000      0x188 build/obj/cmd.o
  .rodata.show_config_tree.str1.4
                 0x0000000000000000       0x40 build/obj/cmd.o
- .rodata.states.13495
+ .rodata.states.13494
                 0x0000000000000000       0x40 build/obj/cmd.o
  .rodata.str1.4
                 0x0000000000000000      0x280 build/obj/cmd.o
- .debug_info    0x0000000000000000     0x9d17 build/obj/cmd.o
+ .debug_info    0x0000000000000000     0x9d0b build/obj/cmd.o
  .debug_abbrev  0x0000000000000000      0x6fe build/obj/cmd.o
  .debug_loc     0x0000000000000000     0x3afe build/obj/cmd.o
  .debug_aranges
                 0x0000000000000000      0x1b0 build/obj/cmd.o
  .debug_ranges  0x0000000000000000      0x530 build/obj/cmd.o
  .debug_line    0x0000000000000000     0x175f build/obj/cmd.o
- .debug_str     0x0000000000000000     0x38ac build/obj/cmd.o
+ .debug_str     0x0000000000000000     0x38a5 build/obj/cmd.o
  .comment       0x0000000000000000       0x7f build/obj/cmd.o
  .debug_frame   0x0000000000000000      0xd48 build/obj/cmd.o
  .ARM.attributes
@@ -984,81 +1034,81 @@ Discarded input sections
  .bss           0x0000000000000000        0x0 build/obj/Asercom.o
  .text.run_asercom
                 0x0000000000000000     0x2058 build/obj/Asercom.o
- .bss.LED_action.12670
+ .bss.LED_action.12669
                 0x0000000000000000        0x4 build/obj/Asercom.o
- .bss.LED_nbr.12669
+ .bss.LED_nbr.12668
                 0x0000000000000000        0x4 build/obj/Asercom.o
- .bss.accelero.12693
+ .bss.accelero.12692
                 0x0000000000000000        0xc build/obj/Asercom.o
- .bss.accx.12671
+ .bss.accx.12670
                 0x0000000000000000        0x4 build/obj/Asercom.o
- .bss.accy.12672
+ .bss.accy.12671
                 0x0000000000000000        0x4 build/obj/Asercom.o
- .bss.accz.12673
+ .bss.accz.12672
                 0x0000000000000000        0x4 build/obj/Asercom.o
  .bss.buffer    0x0000000000000000     0x102b build/obj/Asercom.o
  .bss.c         0x0000000000000000        0x1 build/obj/Asercom.o
- .bss.c1.12659  0x0000000000000000        0x1 build/obj/Asercom.o
- .bss.c2.12660  0x0000000000000000        0x1 build/obj/Asercom.o
- .bss.cam_heigth.12680
+ .bss.c1.12658  0x0000000000000000        0x1 build/obj/Asercom.o
+ .bss.c2.12659  0x0000000000000000        0x1 build/obj/Asercom.o
+ .bss.cam_heigth.12679
                 0x0000000000000000        0x4 build/obj/Asercom.o
- .bss.cam_mode.12678
+ .bss.cam_mode.12677
                 0x0000000000000000        0x4 build/obj/Asercom.o
- .bss.cam_size.12682
+ .bss.cam_size.12681
                 0x0000000000000000        0x4 build/obj/Asercom.o
- .bss.cam_width.12679
+ .bss.cam_width.12678
                 0x0000000000000000        0x4 build/obj/Asercom.o
- .bss.cam_x1.12683
+ .bss.cam_x1.12682
                 0x0000000000000000        0x4 build/obj/Asercom.o
- .bss.cam_y1.12684
+ .bss.cam_y1.12683
                 0x0000000000000000        0x4 build/obj/Asercom.o
- .bss.cam_zoom.12681
+ .bss.cam_zoom.12680
                 0x0000000000000000        0x4 build/obj/Asercom.o
  .bss.e_ambient_and_reflected_ir
                 0x0000000000000000       0x28 build/obj/Asercom.o
  .bss.e_ambient_ir
                 0x0000000000000000       0x28 build/obj/Asercom.o
- .bss.first.12685
+ .bss.first.12684
                 0x0000000000000000        0x1 build/obj/Asercom.o
- .bss.gyrox.12675
+ .bss.gyrox.12674
                 0x0000000000000000        0x4 build/obj/Asercom.o
- .bss.gyroy.12676
+ .bss.gyroy.12675
                 0x0000000000000000        0x4 build/obj/Asercom.o
- .bss.gyroz.12677
+ .bss.gyroz.12676
                 0x0000000000000000        0x4 build/obj/Asercom.o
- .bss.i.12662   0x0000000000000000        0x4 build/obj/Asercom.o
- .bss.j.12663   0x0000000000000000        0x4 build/obj/Asercom.o
- .bss.mod.12687
+ .bss.i.12661   0x0000000000000000        0x4 build/obj/Asercom.o
+ .bss.j.12662   0x0000000000000000        0x4 build/obj/Asercom.o
+ .bss.mod.12686
                 0x0000000000000000        0x4 build/obj/Asercom.o
- .bss.positionl.12668
+ .bss.positionl.12667
                 0x0000000000000000        0x4 build/obj/Asercom.o
- .bss.positionr.12667
+ .bss.positionr.12666
                 0x0000000000000000        0x4 build/obj/Asercom.o
- .bss.reg.12688
+ .bss.reg.12687
                 0x0000000000000000        0x4 build/obj/Asercom.o
  .bss.selector  0x0000000000000000        0x4 build/obj/Asercom.o
- .bss.sound.12674
+ .bss.sound.12673
                 0x0000000000000000        0x4 build/obj/Asercom.o
- .bss.speedl.12666
+ .bss.speedl.12665
                 0x0000000000000000        0x4 build/obj/Asercom.o
- .bss.speedr.12665
+ .bss.speedr.12664
                 0x0000000000000000        0x4 build/obj/Asercom.o
- .bss.val.12689
+ .bss.val.12688
                 0x0000000000000000        0x4 build/obj/Asercom.o
- .bss.wait_cam.12661
+ .bss.wait_cam.12660
                 0x0000000000000000        0x1 build/obj/Asercom.o
- .data.HWversion.12696
+ .data.HWversion.12695
                 0x0000000000000000        0x4 build/obj/Asercom.o
  .rodata.run_asercom.str1.4
                 0x0000000000000000      0xa7e build/obj/Asercom.o
- .debug_info    0x0000000000000000     0x6baa build/obj/Asercom.o
+ .debug_info    0x0000000000000000     0x6b9e build/obj/Asercom.o
  .debug_abbrev  0x0000000000000000      0x349 build/obj/Asercom.o
  .debug_loc     0x0000000000000000      0x275 build/obj/Asercom.o
  .debug_aranges
                 0x0000000000000000       0x20 build/obj/Asercom.o
  .debug_ranges  0x0000000000000000       0x38 build/obj/Asercom.o
  .debug_line    0x0000000000000000     0x16c3 build/obj/Asercom.o
- .debug_str     0x0000000000000000     0x2a89 build/obj/Asercom.o
+ .debug_str     0x0000000000000000     0x2a82 build/obj/Asercom.o
  .comment       0x0000000000000000       0x7f build/obj/Asercom.o
  .debug_frame   0x0000000000000000       0x50 build/obj/Asercom.o
  .ARM.attributes
@@ -1068,76 +1118,76 @@ Discarded input sections
  .bss           0x0000000000000000        0x0 build/obj/Asercom2.o
  .text.run_asercom2
                 0x0000000000000000     0x2294 build/obj/Asercom2.o
- .bss.LED_action.13539
+ .bss.LED_action.13538
                 0x0000000000000000        0x4 build/obj/Asercom2.o
- .bss.LED_nbr.13538
+ .bss.LED_nbr.13537
                 0x0000000000000000        0x4 build/obj/Asercom2.o
- .bss.accelero.13563
+ .bss.accelero.13562
                 0x0000000000000000        0xc build/obj/Asercom2.o
- .bss.accx.13540
+ .bss.accx.13539
                 0x0000000000000000        0x4 build/obj/Asercom2.o
- .bss.accy.13541
+ .bss.accy.13540
                 0x0000000000000000        0x4 build/obj/Asercom2.o
- .bss.accz.13542
+ .bss.accz.13541
                 0x0000000000000000        0x4 build/obj/Asercom2.o
- .bss.c1.13528  0x0000000000000000        0x1 build/obj/Asercom2.o
- .bss.c2.13529  0x0000000000000000        0x1 build/obj/Asercom2.o
- .bss.cam_heigth.13549
+ .bss.c1.13527  0x0000000000000000        0x1 build/obj/Asercom2.o
+ .bss.c2.13528  0x0000000000000000        0x1 build/obj/Asercom2.o
+ .bss.cam_heigth.13548
                 0x0000000000000000        0x4 build/obj/Asercom2.o
- .bss.cam_mode.13547
+ .bss.cam_mode.13546
                 0x0000000000000000        0x4 build/obj/Asercom2.o
- .bss.cam_size.13551
+ .bss.cam_size.13550
                 0x0000000000000000        0x4 build/obj/Asercom2.o
- .bss.cam_width.13548
+ .bss.cam_width.13547
                 0x0000000000000000        0x4 build/obj/Asercom2.o
- .bss.cam_x1.13552
+ .bss.cam_x1.13551
                 0x0000000000000000        0x4 build/obj/Asercom2.o
- .bss.cam_y1.13553
+ .bss.cam_y1.13552
                 0x0000000000000000        0x4 build/obj/Asercom2.o
- .bss.cam_zoom.13550
+ .bss.cam_zoom.13549
                 0x0000000000000000        0x4 build/obj/Asercom2.o
- .bss.first.13554
+ .bss.first.13553
                 0x0000000000000000        0x1 build/obj/Asercom2.o
- .bss.gyrox.13544
+ .bss.gyrox.13543
                 0x0000000000000000        0x4 build/obj/Asercom2.o
- .bss.gyroy.13545
+ .bss.gyroy.13544
                 0x0000000000000000        0x4 build/obj/Asercom2.o
- .bss.gyroz.13546
+ .bss.gyroz.13545
                 0x0000000000000000        0x4 build/obj/Asercom2.o
- .bss.i.13531   0x0000000000000000        0x4 build/obj/Asercom2.o
- .bss.j.13532   0x0000000000000000        0x4 build/obj/Asercom2.o
- .bss.mod.13557
+ .bss.i.13530   0x0000000000000000        0x4 build/obj/Asercom2.o
+ .bss.j.13531   0x0000000000000000        0x4 build/obj/Asercom2.o
+ .bss.mod.13556
                 0x0000000000000000        0x4 build/obj/Asercom2.o
- .bss.positionl.13537
+ .bss.positionl.13536
                 0x0000000000000000        0x4 build/obj/Asercom2.o
- .bss.positionr.13536
+ .bss.positionr.13535
                 0x0000000000000000        0x4 build/obj/Asercom2.o
- .bss.reg.13558
+ .bss.reg.13557
                 0x0000000000000000        0x4 build/obj/Asercom2.o
- .bss.rgb_value.13555
+ .bss.rgb_value.13554
                 0x0000000000000000        0xc build/obj/Asercom2.o
- .bss.sound.13543
+ .bss.sound.13542
                 0x0000000000000000        0x4 build/obj/Asercom2.o
- .bss.speedl.13535
+ .bss.speedl.13534
                 0x0000000000000000        0x4 build/obj/Asercom2.o
- .bss.speedr.13534
+ .bss.speedr.13533
                 0x0000000000000000        0x4 build/obj/Asercom2.o
- .bss.val.13559
+ .bss.val.13558
                 0x0000000000000000        0x4 build/obj/Asercom2.o
- .bss.wait_cam.13530
+ .bss.wait_cam.13529
                 0x0000000000000000        0x1 build/obj/Asercom2.o
- .data.HWversion.13568
+ .data.HWversion.13567
                 0x0000000000000000        0x4 build/obj/Asercom2.o
  .rodata.run_asercom2.str1.4
                 0x0000000000000000      0xb7e build/obj/Asercom2.o
- .debug_info    0x0000000000000000     0x6bc0 build/obj/Asercom2.o
+ .debug_info    0x0000000000000000     0x6bb4 build/obj/Asercom2.o
  .debug_abbrev  0x0000000000000000      0x332 build/obj/Asercom2.o
  .debug_loc     0x0000000000000000      0x349 build/obj/Asercom2.o
  .debug_aranges
                 0x0000000000000000       0x20 build/obj/Asercom2.o
  .debug_ranges  0x0000000000000000       0x38 build/obj/Asercom2.o
  .debug_line    0x0000000000000000     0x181c build/obj/Asercom2.o
- .debug_str     0x0000000000000000     0x2acb build/obj/Asercom2.o
+ .debug_str     0x0000000000000000     0x2ac4 build/obj/Asercom2.o
  .comment       0x0000000000000000       0x7f build/obj/Asercom2.o
  .debug_frame   0x0000000000000000       0x50 build/obj/Asercom2.o
  .ARM.attributes
@@ -1747,13 +1797,13 @@ Discarded input sections
                 0x0000000000000000       0x28 build/obj/ir_remote.o
  .bss.ir_remote_values
                 0x0000000000000000        0x3 build/obj/ir_remote.o
- .bss.remote_cmd_recv_thd_wa.11460
+ .bss.remote_cmd_recv_thd_wa.11459
                 0x0000000000000000      0x278 build/obj/ir_remote.o
- .bss.remote_motion_thd_wa.11459
+ .bss.remote_motion_thd_wa.11458
                 0x0000000000000000      0x1f8 build/obj/ir_remote.o
- .rodata.__FUNCTION__.11426
+ .rodata.__FUNCTION__.11425
                 0x0000000000000000       0x12 build/obj/ir_remote.o
- .rodata.__FUNCTION__.11449
+ .rodata.__FUNCTION__.11448
                 0x0000000000000000       0x14 build/obj/ir_remote.o
  .rodata.__func__.7153
                 0x0000000000000000        0xc build/obj/ir_remote.o
@@ -1762,14 +1812,14 @@ Discarded input sections
  .rodata.remote_motion_thd.str1.4
                 0x0000000000000000        0xb build/obj/ir_remote.o
  .rodata.trans  0x0000000000000000        0x4 build/obj/ir_remote.o
- .debug_info    0x0000000000000000     0x4f84 build/obj/ir_remote.o
+ .debug_info    0x0000000000000000     0x4f78 build/obj/ir_remote.o
  .debug_abbrev  0x0000000000000000      0x4ee build/obj/ir_remote.o
  .debug_loc     0x0000000000000000      0x36f build/obj/ir_remote.o
  .debug_aranges
                 0x0000000000000000       0x50 build/obj/ir_remote.o
  .debug_ranges  0x0000000000000000      0x1b8 build/obj/ir_remote.o
  .debug_line    0x0000000000000000      0xc6e build/obj/ir_remote.o
- .debug_str     0x0000000000000000     0x2945 build/obj/ir_remote.o
+ .debug_str     0x0000000000000000     0x293e build/obj/ir_remote.o
  .comment       0x0000000000000000       0x7f build/obj/ir_remote.o
  .debug_frame   0x0000000000000000      0x10c build/obj/ir_remote.o
  .ARM.attributes
@@ -1912,7 +1962,7 @@ Discarded input sections
                 0x0000000000000000       0x40 build/obj/battery_level.o
  .bss.adc_value
                 0x0000000000000000        0x4 build/obj/battery_level.o
- .bss.battery_thd_wa.12102
+ .bss.battery_thd_wa.12101
                 0x0000000000000000      0x278 build/obj/battery_level.o
  .bss.battery_value
                 0x0000000000000000        0xc build/obj/battery_level.o
@@ -1921,14 +1971,14 @@ Discarded input sections
  .rodata.battery_thd.str1.4
                 0x0000000000000000       0x1b build/obj/battery_level.o
  .rodata.group  0x0000000000000000       0x28 build/obj/battery_level.o
- .debug_info    0x0000000000000000     0x4907 build/obj/battery_level.o
+ .debug_info    0x0000000000000000     0x48fb build/obj/battery_level.o
  .debug_abbrev  0x0000000000000000      0x42e build/obj/battery_level.o
  .debug_loc     0x0000000000000000      0x13e build/obj/battery_level.o
  .debug_aranges
                 0x0000000000000000       0x50 build/obj/battery_level.o
  .debug_ranges  0x0000000000000000       0x98 build/obj/battery_level.o
  .debug_line    0x0000000000000000      0xba3 build/obj/battery_level.o
- .debug_str     0x0000000000000000     0x27d9 build/obj/battery_level.o
+ .debug_str     0x0000000000000000     0x27d2 build/obj/battery_level.o
  .comment       0x0000000000000000       0x7f build/obj/battery_level.o
  .debug_frame   0x0000000000000000      0x130 build/obj/battery_level.o
  .ARM.attributes
@@ -1998,20 +2048,20 @@ Discarded input sections
                 0x0000000000000000      0x378 build/obj/imu.o
  .bss.imu_values
                 0x0000000000000000       0x50 build/obj/imu.o
- .rodata.__FUNCTION__.11427
+ .rodata.__FUNCTION__.11426
                 0x0000000000000000        0xf build/obj/imu.o
  .rodata.__func__.7153
                 0x0000000000000000        0xc build/obj/imu.o
  .rodata.imu_reader_thd.str1.4
                 0x0000000000000000        0x5 build/obj/imu.o
- .debug_info    0x0000000000000000     0x4fd5 build/obj/imu.o
+ .debug_info    0x0000000000000000     0x4fc9 build/obj/imu.o
  .debug_abbrev  0x0000000000000000      0x4ea build/obj/imu.o
  .debug_loc     0x0000000000000000      0x55a build/obj/imu.o
  .debug_aranges
                 0x0000000000000000       0xa8 build/obj/imu.o
  .debug_ranges  0x0000000000000000      0x158 build/obj/imu.o
  .debug_line    0x0000000000000000      0xd10 build/obj/imu.o
- .debug_str     0x0000000000000000     0x2a2a build/obj/imu.o
+ .debug_str     0x0000000000000000     0x2a23 build/obj/imu.o
  .comment       0x0000000000000000       0x7f build/obj/imu.o
  .debug_frame   0x0000000000000000      0x2cc build/obj/imu.o
  .ARM.attributes
@@ -2087,22 +2137,22 @@ Discarded input sections
                 0x0000000000000000        0x1 build/obj/proximity.o
  .data.adc2_ready
                 0x0000000000000000        0xc build/obj/proximity.o
- .rodata.__FUNCTION__.12261
+ .rodata.__FUNCTION__.12260
                 0x0000000000000000        0xe build/obj/proximity.o
  .rodata.adcgrpcfg2
                 0x0000000000000000       0x28 build/obj/proximity.o
  .rodata.proximity_thd.str1.4
                 0x0000000000000000        0xb build/obj/proximity.o
- .rodata.pwmcfg_proximity.12300
+ .rodata.pwmcfg_proximity.12299
                 0x0000000000000000       0x34 build/obj/proximity.o
- .debug_info    0x0000000000000000     0x4b72 build/obj/proximity.o
+ .debug_info    0x0000000000000000     0x4b66 build/obj/proximity.o
  .debug_abbrev  0x0000000000000000      0x4c6 build/obj/proximity.o
  .debug_loc     0x0000000000000000      0x283 build/obj/proximity.o
  .debug_aranges
                 0x0000000000000000       0x60 build/obj/proximity.o
  .debug_ranges  0x0000000000000000       0x98 build/obj/proximity.o
  .debug_line    0x0000000000000000      0xc25 build/obj/proximity.o
- .debug_str     0x0000000000000000     0x28b8 build/obj/proximity.o
+ .debug_str     0x0000000000000000     0x28b1 build/obj/proximity.o
  .comment       0x0000000000000000       0x7f build/obj/proximity.o
  .debug_frame   0x0000000000000000      0x174 build/obj/proximity.o
  .ARM.attributes
@@ -2298,21 +2348,21 @@ Discarded input sections
                 0x0000000000000000      0x1f0 build/obj/communication.o
  .text.communication_start
                 0x0000000000000000       0x5c build/obj/communication.o
- .bss.cmp.13624
+ .bss.cmp.13623
                 0x0000000000000000       0x10 build/obj/communication.o
  .bss.comm_rx_wa
                 0x0000000000000000      0x578 build/obj/communication.o
  .bss.comm_tx_stream_wa
                 0x0000000000000000      0x578 build/obj/communication.o
- .bss.dtgrm.13622
+ .bss.dtgrm.13621
                 0x0000000000000000       0x64 build/obj/communication.o
- .bss.mem.13623
+ .bss.mem.13622
                 0x0000000000000000        0xc build/obj/communication.o
  .bss.messagebus
                 0x0000000000000000        0xc build/obj/communication.o
- .bss.rcv_buffer.13679
+ .bss.rcv_buffer.13678
                 0x0000000000000000      0x7d0 build/obj/communication.o
- .bss.rcv_handler.13678
+ .bss.rcv_handler.13677
                 0x0000000000000000       0x18 build/obj/communication.o
  .bss.reply_buf
                 0x0000000000000000       0x64 build/obj/communication.o
@@ -2328,14 +2378,14 @@ Discarded input sections
                 0x0000000000000000       0x29 build/obj/communication.o
  .rodata.ping_cb.str1.4
                 0x0000000000000000        0x5 build/obj/communication.o
- .debug_info    0x0000000000000000     0x55b7 build/obj/communication.o
+ .debug_info    0x0000000000000000     0x55ab build/obj/communication.o
  .debug_abbrev  0x0000000000000000      0x52d build/obj/communication.o
  .debug_loc     0x0000000000000000      0x55a build/obj/communication.o
  .debug_aranges
                 0x0000000000000000       0x58 build/obj/communication.o
  .debug_ranges  0x0000000000000000       0x88 build/obj/communication.o
  .debug_line    0x0000000000000000      0xd0c build/obj/communication.o
- .debug_str     0x0000000000000000     0x29c3 build/obj/communication.o
+ .debug_str     0x0000000000000000     0x29bc build/obj/communication.o
  .comment       0x0000000000000000       0x7f build/obj/communication.o
  .debug_frame   0x0000000000000000      0x180 build/obj/communication.o
  .ARM.attributes
@@ -6369,14 +6419,14 @@ Discarded input sections
                 0x0000000000000000      0x20d build/obj/skel_user.o
  .rodata.vmDescription
                 0x0000000000000000       0x84 build/obj/skel_user.o
- .debug_info    0x0000000000000000     0x50e2 build/obj/skel_user.o
+ .debug_info    0x0000000000000000     0x50d6 build/obj/skel_user.o
  .debug_abbrev  0x0000000000000000      0x40f build/obj/skel_user.o
  .debug_loc     0x0000000000000000      0x540 build/obj/skel_user.o
  .debug_aranges
                 0x0000000000000000       0x78 build/obj/skel_user.o
  .debug_ranges  0x0000000000000000       0xd0 build/obj/skel_user.o
  .debug_line    0x0000000000000000      0xd1a build/obj/skel_user.o
- .debug_str     0x0000000000000000     0x2e5c build/obj/skel_user.o
+ .debug_str     0x0000000000000000     0x2e55 build/obj/skel_user.o
  .comment       0x0000000000000000       0x7f build/obj/skel_user.o
  .debug_frame   0x0000000000000000      0x248 build/obj/skel_user.o
  .ARM.attributes
@@ -7018,6 +7068,8 @@ Linker script and memory map
 LOAD build/obj/crt0_v7m.o
 LOAD build/obj/chcoreasm_v7m.o
 LOAD build/obj/main.o
+LOAD build/obj/process_image.o
+LOAD build/obj/process_position.o
 LOAD build/obj/spi3_slave_lld.o
 LOAD build/obj/dcmi_lld.o
 LOAD build/obj/dcmi.o
@@ -9403,120 +9455,120 @@ OUTPUT(build/Dancer.elf elf32-littlearm)
  .debug_line    0x000000000001f7cb      0xa62 build/obj/serial_lld.o
  .debug_line    0x000000000002022d      0x89d build/obj/board.o
 
-.debug_str      0x0000000000000000     0x6dbe
- .debug_str     0x0000000000000000     0x229b build/obj/main.o
-                                       0x24ad (size before relaxing)
- .debug_str     0x000000000000229b      0x863 build/obj/dcmi_lld.o
+.debug_str      0x0000000000000000     0x6d77
+ .debug_str     0x0000000000000000     0x22cf build/obj/main.o
+                                       0x24e1 (size before relaxing)
+ .debug_str     0x00000000000022cf      0x7e8 build/obj/dcmi_lld.o
                                        0x2657 (size before relaxing)
- .debug_str     0x0000000000002afe      0x291 build/obj/memory_protection.o
+ .debug_str     0x0000000000002ab7      0x291 build/obj/memory_protection.o
                                        0x243a (size before relaxing)
- .debug_str     0x0000000000002d8f       0x4f build/obj/panic.o
+ .debug_str     0x0000000000002d48       0x4f build/obj/panic.o
                                        0x1d51 (size before relaxing)
- .debug_str     0x0000000000002dde       0x78 build/obj/malloc_lock.o
+ .debug_str     0x0000000000002d97       0x78 build/obj/malloc_lock.o
                                         0xc8f (size before relaxing)
- .debug_str     0x0000000000002e56      0x20f build/obj/newlib_syscalls.o
+ .debug_str     0x0000000000002e0f      0x20f build/obj/newlib_syscalls.o
                                        0x2376 (size before relaxing)
- .debug_str     0x0000000000003065       0x7e build/obj/crt1.o
+ .debug_str     0x000000000000301e       0x7e build/obj/crt1.o
                                         0x24e (size before relaxing)
- .debug_str     0x00000000000030e3      0x17b build/obj/vectors.o
+ .debug_str     0x000000000000309c      0x17b build/obj/vectors.o
                                         0x413 (size before relaxing)
- .debug_str     0x000000000000325e      0x4ac build/obj/chsys.o
+ .debug_str     0x0000000000003217      0x4ac build/obj/chsys.o
                                        0x1351 (size before relaxing)
- .debug_str     0x000000000000370a       0x80 build/obj/chdebug.o
+ .debug_str     0x00000000000036c3       0x80 build/obj/chdebug.o
                                         0x9cb (size before relaxing)
- .debug_str     0x000000000000378a       0x5a build/obj/chvt.o
+ .debug_str     0x0000000000003743       0x5a build/obj/chvt.o
                                         0x8bc (size before relaxing)
- .debug_str     0x00000000000037e4      0x162 build/obj/chschd.o
+ .debug_str     0x000000000000379d      0x162 build/obj/chschd.o
                                         0xb13 (size before relaxing)
- .debug_str     0x0000000000003946      0x24c build/obj/chthreads.o
+ .debug_str     0x00000000000038ff      0x24c build/obj/chthreads.o
                                         0xc54 (size before relaxing)
- .debug_str     0x0000000000003b92       0x7a build/obj/chtm.o
+ .debug_str     0x0000000000003b4b       0x7a build/obj/chtm.o
                                         0x9a1 (size before relaxing)
- .debug_str     0x0000000000003c0c       0x3e build/obj/chstats.o
+ .debug_str     0x0000000000003bc5       0x3e build/obj/chstats.o
                                         0x95d (size before relaxing)
- .debug_str     0x0000000000003c4a       0x62 build/obj/chregistry.o
+ .debug_str     0x0000000000003c03       0x62 build/obj/chregistry.o
                                         0x94f (size before relaxing)
- .debug_str     0x0000000000003cac       0xb4 build/obj/chmtx.o
+ .debug_str     0x0000000000003c65       0xb4 build/obj/chmtx.o
                                         0xa34 (size before relaxing)
- .debug_str     0x0000000000003d60      0x18f build/obj/chevents.o
+ .debug_str     0x0000000000003d19      0x18f build/obj/chevents.o
                                         0xb54 (size before relaxing)
- .debug_str     0x0000000000003eef      0x115 build/obj/chqueues.o
+ .debug_str     0x0000000000003ea8      0x115 build/obj/chqueues.o
                                         0xadf (size before relaxing)
- .debug_str     0x0000000000004004       0x88 build/obj/chmemcore.o
+ .debug_str     0x0000000000003fbd       0x88 build/obj/chmemcore.o
                                         0x995 (size before relaxing)
- .debug_str     0x000000000000408c       0xd6 build/obj/chheap.o
+ .debug_str     0x0000000000004045       0xd6 build/obj/chheap.o
                                         0x95f (size before relaxing)
- .debug_str     0x0000000000004162       0xa8 build/obj/chcore_v7m.o
+ .debug_str     0x000000000000411b       0xa8 build/obj/chcore_v7m.o
                                         0x9e6 (size before relaxing)
- .debug_str     0x000000000000420a       0xd7 build/obj/hal.o
+ .debug_str     0x00000000000041c3       0xd7 build/obj/hal.o
                                        0x1df2 (size before relaxing)
- .debug_str     0x00000000000042e1      0x385 build/obj/hal_mmcsd.o
+ .debug_str     0x000000000000429a      0x385 build/obj/hal_mmcsd.o
                                        0x20b6 (size before relaxing)
- .debug_str     0x0000000000004666      0x1ae build/obj/adc.o
+ .debug_str     0x000000000000461f      0x1ae build/obj/adc.o
                                        0x1fd8 (size before relaxing)
- .debug_str     0x0000000000004814      0x1fd build/obj/can.o
+ .debug_str     0x00000000000047cd      0x1fd build/obj/can.o
                                        0x2061 (size before relaxing)
- .debug_str     0x0000000000004a11      0x162 build/obj/dac.o
+ .debug_str     0x00000000000049ca      0x162 build/obj/dac.o
                                        0x2017 (size before relaxing)
- .debug_str     0x0000000000004b73       0xf8 build/obj/ext.o
+ .debug_str     0x0000000000004b2c       0xf8 build/obj/ext.o
                                        0x1ee5 (size before relaxing)
- .debug_str     0x0000000000004c6b      0x159 build/obj/gpt.o
+ .debug_str     0x0000000000004c24      0x159 build/obj/gpt.o
                                        0x1f4f (size before relaxing)
- .debug_str     0x0000000000004dc4      0x130 build/obj/i2c.o
+ .debug_str     0x0000000000004d7d      0x130 build/obj/i2c.o
                                        0x1f75 (size before relaxing)
- .debug_str     0x0000000000004ef4       0xd5 build/obj/i2s.o
+ .debug_str     0x0000000000004ead       0xd5 build/obj/i2s.o
                                        0x1eba (size before relaxing)
- .debug_str     0x0000000000004fc9      0x1f5 build/obj/pwm.o
+ .debug_str     0x0000000000004f82      0x1f5 build/obj/pwm.o
                                        0x1fe8 (size before relaxing)
- .debug_str     0x00000000000051be      0x43e build/obj/sdc.o
+ .debug_str     0x0000000000005177      0x43e build/obj/sdc.o
                                        0x267b (size before relaxing)
- .debug_str     0x00000000000055fc       0xbb build/obj/serial.o
+ .debug_str     0x00000000000055b5       0xbb build/obj/serial.o
                                        0x1fcb (size before relaxing)
- .debug_str     0x00000000000056b7      0x21b build/obj/serial_usb.o
+ .debug_str     0x0000000000005670      0x21b build/obj/serial_usb.o
                                        0x21da (size before relaxing)
- .debug_str     0x00000000000058d2      0x17c build/obj/spi.o
+ .debug_str     0x000000000000588b      0x17c build/obj/spi.o
                                        0x1fda (size before relaxing)
- .debug_str     0x0000000000005a4e       0xdb build/obj/st.o
+ .debug_str     0x0000000000005a07       0xdb build/obj/st.o
                                        0x1e0d (size before relaxing)
- .debug_str     0x0000000000005b29      0x2c9 build/obj/usb.o
+ .debug_str     0x0000000000005ae2      0x2c9 build/obj/usb.o
                                        0x25e3 (size before relaxing)
- .debug_str     0x0000000000005df2       0x7a build/obj/nvic.o
+ .debug_str     0x0000000000005dab       0x7a build/obj/nvic.o
                                        0x1e55 (size before relaxing)
- .debug_str     0x0000000000005e6c      0x157 build/obj/stm32_dma.o
+ .debug_str     0x0000000000005e25      0x157 build/obj/stm32_dma.o
                                        0x24f0 (size before relaxing)
- .debug_str     0x0000000000005fc3       0xac build/obj/hal_lld.o
+ .debug_str     0x0000000000005f7c       0xac build/obj/hal_lld.o
                                        0x1e99 (size before relaxing)
- .debug_str     0x000000000000606f       0xee build/obj/adc_lld.o
+ .debug_str     0x0000000000006028       0xee build/obj/adc_lld.o
                                        0x25f9 (size before relaxing)
- .debug_str     0x000000000000615d      0x123 build/obj/ext_lld_isr.o
+ .debug_str     0x0000000000006116      0x123 build/obj/ext_lld_isr.o
                                        0x239d (size before relaxing)
- .debug_str     0x0000000000006280      0x14d build/obj/can_lld.o
+ .debug_str     0x0000000000006239      0x14d build/obj/can_lld.o
                                        0x2223 (size before relaxing)
- .debug_str     0x00000000000063cd       0x6e build/obj/ext_lld.o
+ .debug_str     0x0000000000006386       0x6e build/obj/ext_lld.o
                                        0x1e54 (size before relaxing)
- .debug_str     0x000000000000643b      0x12a build/obj/sdc_lld.o
+ .debug_str     0x00000000000063f4      0x12a build/obj/sdc_lld.o
                                        0x2722 (size before relaxing)
- .debug_str     0x0000000000006565       0x7c build/obj/dac_lld.o
+ .debug_str     0x000000000000651e       0x7c build/obj/dac_lld.o
                                        0x2072 (size before relaxing)
- .debug_str     0x00000000000065e1       0x8e build/obj/pal_lld.o
+ .debug_str     0x000000000000659a       0x8e build/obj/pal_lld.o
                                        0x1e86 (size before relaxing)
- .debug_str     0x000000000000666f      0x158 build/obj/i2c_lld.o
+ .debug_str     0x0000000000006628      0x158 build/obj/i2c_lld.o
                                        0x27a4 (size before relaxing)
- .debug_str     0x00000000000067c7      0x22a build/obj/usb_lld.o
+ .debug_str     0x0000000000006780      0x22a build/obj/usb_lld.o
                                        0x289d (size before relaxing)
- .debug_str     0x00000000000069f1       0x6c build/obj/i2s_lld.o
+ .debug_str     0x00000000000069aa       0x6c build/obj/i2s_lld.o
                                        0x1f05 (size before relaxing)
- .debug_str     0x0000000000006a5d       0xb5 build/obj/spi_lld.o
+ .debug_str     0x0000000000006a16       0xb5 build/obj/spi_lld.o
                                        0x20b7 (size before relaxing)
- .debug_str     0x0000000000006b12       0x85 build/obj/gpt_lld.o
+ .debug_str     0x0000000000006acb       0x85 build/obj/gpt_lld.o
                                        0x1f68 (size before relaxing)
- .debug_str     0x0000000000006b97       0x93 build/obj/pwm_lld.o
+ .debug_str     0x0000000000006b50       0x93 build/obj/pwm_lld.o
                                        0x1ff9 (size before relaxing)
- .debug_str     0x0000000000006c2a       0x8c build/obj/st_lld.o
+ .debug_str     0x0000000000006be3       0x8c build/obj/st_lld.o
                                        0x1f3e (size before relaxing)
- .debug_str     0x0000000000006cb6       0x89 build/obj/serial_lld.o
+ .debug_str     0x0000000000006c6f       0x89 build/obj/serial_lld.o
                                        0x20ac (size before relaxing)
- .debug_str     0x0000000000006d3f       0x7f build/obj/board.o
+ .debug_str     0x0000000000006cf8       0x7f build/obj/board.o
                                        0x1dbf (size before relaxing)
 
 .debug_frame    0x0000000000000000     0x6524
@@ -9899,6 +9951,7 @@ SPISLAVED3                                        build/obj/spi3_slave.o
                                                   build/obj/spi3_slave_lld.o
 SVC_Handler                                       build/obj/chcore_v7m.o
                                                   build/obj/vectors.o
+SendUint8ToComputer                               build/obj/process_image.o
 SysTick_Handler                                   build/obj/st_lld.o
                                                   build/obj/vectors.o
 SystemCoreClock                                   build/obj/hal_lld.o
@@ -10795,6 +10848,7 @@ __stack_chk_fail                                  build/obj/main.o
                                                   build/obj/dcmi.o
                                                   build/obj/dcmi_lld.o
                                                   build/obj/spi3_slave_lld.o
+                                                  build/obj/process_image.o
 __stack_chk_guard                                 build/obj/main.o
                                                   build/obj/aseba_bridge.o
                                                   build/obj/skel_user.o
@@ -10952,6 +11006,7 @@ __stack_chk_guard                                 build/obj/main.o
                                                   build/obj/dcmi.o
                                                   build/obj/dcmi_lld.o
                                                   build/obj/spi3_slave_lld.o
+                                                  build/obj/process_image.o
 __subdf3                                          /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v7e-m/fpv4-sp/hard/libgcc.a(_arm_addsubdf3.o)
 __submore                                         /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard/libg.a(lib_a-ungetc.o)
                                                   /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard/libg.a(lib_a-svfiscanf.o)
@@ -11064,6 +11119,7 @@ _dbg_check_lock                                   build/obj/chdebug.o
                                                   build/obj/play_melody.o
                                                   build/obj/spi3_slave.o
                                                   build/obj/dcmi.o
+                                                  build/obj/process_image.o
                                                   build/obj/chcoreasm_v7m.o
 _dbg_check_lock_from_isr                          build/obj/chdebug.o
                                                   build/obj/testsys.o
@@ -11140,6 +11196,7 @@ _dbg_check_unlock                                 build/obj/chdebug.o
                                                   build/obj/play_melody.o
                                                   build/obj/spi3_slave.o
                                                   build/obj/dcmi.o
+                                                  build/obj/process_image.o
                                                   build/obj/chcoreasm_v7m.o
 _dbg_check_unlock_from_isr                        build/obj/chdebug.o
                                                   build/obj/testsys.o
@@ -11387,6 +11444,7 @@ _stats_start_measure_crit_thd                     build/obj/chstats.o
                                                   build/obj/play_melody.o
                                                   build/obj/spi3_slave.o
                                                   build/obj/dcmi.o
+                                                  build/obj/process_image.o
                                                   build/obj/chcoreasm_v7m.o
 _stats_stop_measure_crit_isr                      build/obj/chstats.o
                                                   build/obj/testsys.o
@@ -11461,6 +11519,7 @@ _stats_stop_measure_crit_thd                      build/obj/chstats.o
                                                   build/obj/play_melody.o
                                                   build/obj/spi3_slave.o
                                                   build/obj/dcmi.o
+                                                  build/obj/process_image.o
                                                   build/obj/chcoreasm_v7m.o
 _stm32_dma_streams                                build/obj/stm32_dma.o
                                                   build/obj/spi_lld.o
@@ -11741,6 +11800,7 @@ ch                                                build/obj/chschd.o
                                                   build/obj/spi3_slave.o
                                                   build/obj/dcmi.o
                                                   build/obj/dcmi_lld.o
+                                                  build/obj/process_image.o
 chCondBroadcast                                   build/obj/chcond.o
                                                   build/obj/testmtx.o
                                                   build/obj/play_sound_file.o
@@ -11799,6 +11859,7 @@ chDbgCheckClassI                                  build/obj/chdebug.o
                                                   build/obj/play_sound_file.o
                                                   build/obj/proximity.o
                                                   build/obj/battery_level.o
+                                                  build/obj/process_image.o
 chDbgCheckClassS                                  build/obj/chdebug.o
                                                   build/obj/chmboxes.o
                                                   build/obj/chmsg.o
@@ -12051,6 +12112,7 @@ chSchRescheduleS                                  build/obj/chschd.o
                                                   build/obj/chsem.o
                                                   build/obj/chthreads.o
                                                   build/obj/chsys.o
+                                                  build/obj/process_image.o
 chSchWakeupS                                      build/obj/chschd.o
                                                   build/obj/testbmk.o
                                                   build/obj/chmsg.o
@@ -12082,6 +12144,7 @@ chSemSignalI                                      build/obj/chsem.o
                                                   build/obj/proximity.o
                                                   build/obj/battery_level.o
                                                   build/obj/mp45dt02_processing.o
+                                                  build/obj/process_image.o
 chSemSignalWait                                   build/obj/chsem.o
                                                   build/obj/testsem.o
 chSemWait                                         build/obj/chsem.o
@@ -12091,6 +12154,7 @@ chSemWait                                         build/obj/chsem.o
                                                   build/obj/proximity.o
                                                   build/obj/battery_level.o
                                                   build/obj/mp45dt02_processing.o
+                                                  build/obj/process_image.o
 chSemWaitS                                        build/obj/chsem.o
 chSemWaitTimeout                                  build/obj/chsem.o
                                                   build/obj/testsem.o
@@ -12168,6 +12232,7 @@ chSysHalt                                         build/obj/chsys.o
                                                   build/obj/dcmi.o
                                                   build/obj/dcmi_lld.o
                                                   build/obj/spi3_slave_lld.o
+                                                  build/obj/process_image.o
                                                   build/obj/main.o
 chSysInit                                         build/obj/chsys.o
                                                   build/obj/main.o
@@ -12229,6 +12294,7 @@ chThdCreateStatic                                 build/obj/chthreads.o
                                                   build/obj/cmd.o
                                                   build/obj/play_melody.o
                                                   build/obj/mp45dt02_processing.o
+                                                  build/obj/process_image.o
 chThdDequeueAllI                                  build/obj/chthreads.o
                                                   build/obj/usb_lld.o
                                                   build/obj/can_lld.o
@@ -12654,6 +12720,7 @@ dcmiUnprepare                                     build/obj/dcmi.o
 dcmi_capture_start                                build/obj/dcmi_camera.o
                                                   build/obj/e_common.o
                                                   build/obj/cmd.o
+                                                  build/obj/process_image.o
 dcmi_capture_stop                                 build/obj/dcmi_camera.o
                                                   build/obj/cmd.o
 dcmi_disable_double_buffering                     build/obj/dcmi_camera.o
@@ -12663,11 +12730,13 @@ dcmi_double_buffering_enabled                     build/obj/dcmi_camera.o
                                                   build/obj/cmd.o
 dcmi_enable_double_buffering                      build/obj/dcmi_camera.o
                                                   build/obj/cmd.o
+                                                  build/obj/process_image.o
 dcmi_get_first_buffer_ptr                         build/obj/dcmi_camera.o
                                                   build/obj/cmd.o
 dcmi_get_last_image_ptr                           build/obj/dcmi_camera.o
                                                   build/obj/Asercom2.o
                                                   build/obj/Asercom.o
+                                                  build/obj/process_image.o
 dcmi_get_second_buffer_ptr                        build/obj/dcmi_camera.o
                                                   build/obj/cmd.o
 dcmi_lld_init                                     build/obj/dcmi_lld.o
@@ -12685,9 +12754,11 @@ dcmi_lld_unprepare                                build/obj/dcmi_lld.o
 dcmi_prepare                                      build/obj/dcmi_camera.o
                                                   build/obj/e_common.o
                                                   build/obj/cmd.o
+                                                  build/obj/process_image.o
 dcmi_set_capture_mode                             build/obj/dcmi_camera.o
                                                   build/obj/e_common.o
                                                   build/obj/cmd.o
+                                                  build/obj/process_image.o
 dcmi_start                                        build/obj/dcmi_camera.o
 dcmi_start_one_shot                               build/obj/dcmi_camera.o
 dcmi_start_stream                                 build/obj/dcmi_camera.o
@@ -13065,6 +13136,7 @@ get_battery_voltage                               build/obj/battery_level.o
                                                   build/obj/utility.o
 get_calibrated_prox                               build/obj/proximity.o
                                                   build/obj/e_prox.o
+get_distance_cm                                   build/obj/process_image.o
 get_fat                                           build/obj/ff.o
 get_fattime                                       build/obj/fatfs_diskio.o
                                                   build/obj/ff.o
@@ -13077,6 +13149,7 @@ get_gyro_filtered                                 build/obj/imu.o
 get_gyro_offset                                   build/obj/imu.o
                                                   build/obj/e_lsm330.o
 get_gyro_rate                                     build/obj/imu.o
+get_hor_pos                                       build/obj/process_image.o
 get_last_i2c_error                                build/obj/i2c_bus.o
 get_next_good_spad                                build/obj/vl53l0x_api_calibration.o
 get_prox                                          build/obj/proximity.o
@@ -13225,6 +13298,7 @@ left_motor_set_speed                              build/obj/motors.o
                                                   build/obj/ir_remote.o
                                                   build/obj/e_motors.o
                                                   build/obj/cmd.o
+line_position                                     build/obj/process_image.o
 localEvents                                       build/obj/skel_user.o
                                                   build/obj/aseba_node.o
 localeconv                                        /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard/libg.a(lib_a-localeconv.o)
@@ -13277,6 +13351,7 @@ memset                                            /Applications/Eclipse_e-puck2.
                                                   build/obj/proximity.o
                                                   build/obj/cmd.o
                                                   build/obj/mp45dt02_processing.o
+                                                  build/obj/process_image.o
 messagebus                                        build/obj/communication.o
 messagebus_advertise_topic                        build/obj/messagebus.o
                                                   build/obj/proximity.o
@@ -13518,6 +13593,7 @@ playWAVFile                                       build/obj/play_sound_file.o
 po8030_advanced_config                            build/obj/po8030.o
                                                   build/obj/e_common.o
                                                   build/obj/cmd.o
+                                                  build/obj/process_image.o
 po8030_config                                     build/obj/po8030.o
 po8030_get_image_size                             build/obj/po8030.o
                                                   build/obj/cmd.o
@@ -13546,6 +13622,7 @@ po8030_set_size                                   build/obj/po8030.o
 po8030_set_vga                                    build/obj/po8030.o
 po8030_start                                      build/obj/po8030.o
 printUcUsage                                      build/obj/uc_usage.o
+process_image_start                               build/obj/process_image.o
 proximity_start                                   build/obj/proximity.o
                                                   build/obj/e_ad_conv.o
 put_fat                                           build/obj/ff.o
@@ -14115,6 +14192,7 @@ waitSoundFileHasFinished                          build/obj/play_sound_file.o
 wait_image_ready                                  build/obj/dcmi_camera.o
                                                   build/obj/spi_comm.o
                                                   build/obj/e_common.o
+                                                  build/obj/process_image.o
 write_reg                                         build/obj/i2c_bus.o
                                                   build/obj/mpu9250.o
                                                   build/obj/e_I2C_protocol.o

@@ -142,7 +142,8 @@ build/obj/main.o: main.c \
  ../../lib/e-puck2_main-processor/src/msgbus/messagebus.h \
  /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/unistd.h \
  /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/sys/unistd.h \
- ../../lib/e-puck2_main-processor/src/parameter/parameter.h
+ ../../lib/e-puck2_main-processor/src/parameter/parameter.h \
+ process_image.h trajectoire.h
 
 /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/stdio.h:
 
@@ -433,3 +434,7 @@ main.h:
 /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/sys/unistd.h:
 
 ../../lib/e-puck2_main-processor/src/parameter/parameter.h:
+
+process_image.h:
+
+trajectoire.h:
