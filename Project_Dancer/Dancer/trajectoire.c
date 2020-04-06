@@ -6,12 +6,12 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
-//#include <math.h>
+#include <math.h>
 #include <trajectoire.h>
 
 #define NB_POS		100
 
-/*void convert_pos(void){
+void convert_pos(void){
 
 	float pos_pol[2*NB_POS] = {0};
 
@@ -29,7 +29,7 @@
 	}
 
 }
-*/
+
 
 
 
