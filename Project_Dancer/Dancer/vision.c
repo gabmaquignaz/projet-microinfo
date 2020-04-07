@@ -11,18 +11,20 @@
 #include <usbcfg.h>
 
 #include <stdbool.h>
+#include <math.h>
 
 #include <main.h>
 #include <camera/po8030.h>
 
 #include <vision.h>
 
-#define GREEN 					(63 << 5)	//0b00000 111111 00000
-#define RED						(31 << 11) 	//0b11111 000000 00000
-#define BLUE						 31 			//0b00000 000000 11111
+#define RED						2*((rgb & (31 << 11)) >> 11)	//0b11111 000000 00000
+#define GREEN 					((rgb & (63 << 5)) >> 5)		//0b00000 111111 00000
+#define BLUE						2*(rgb & 31) 				//0b00000 000000 11111
 
 #define BGND_NB_SAMPLES			100
 #define DIFF_TRESH				10
+#define SELECTIVITY				0.7
 
 enum Line_detector_stae {SEARCH_BEGIN, SEARCH_END, FINISHED};
 #define DETECT_TRESH				10
@@ -82,20 +84,51 @@ static THD_FUNCTION(ProcessImage, arg) {
 	uint16_t background[IMAGE_BUFFER_SIZE] = {0};
 	uint8_t background_capture_count = 0;
 
+	//reference values for obj and background
+	uint8_t r_obj = 50;
+	uint8_t g_obj = 15;
+	uint8_t b_obj = 17;
+
+	uint8_t r_back = 20;
+	uint8_t g_back = 20;
+	uint8_t b_back = 18;
+
+	//High/low values
+	uint8_t high = 250;
+	uint8_t low = 0;
+
+//	//dim(system) < 2 -> cannot solve system !
+//	if((r_obj*g_back)==(r_back*g_obj) && (r_obj*b_back)==(r_back*b_obj) && (g_obj*b_back)==(g_back*b_obj)){
+//		//error !!
+//	}
+//	//solving for 1D space of solutions
+//	else if(){
+//
+//	}
+
+	float alpha_r = -0.1;
+	float beta_r = 5.714;
+	float alpha_g = -0.8;
+	float beta_g = -5.714;
+
+	float wO = -(alpha_r*beta_r+alpha_g*beta_g)/(1+alpha_r*alpha_r+alpha_g*alpha_g);
+	float w_r = wO*alpha_r+beta_r;
+	float w_g = wO*alpha_g+beta_g;
+	float w_b = wO;
+
+
 	while(1){
 	    	//waits until an image has been captured
 	        chBSemWait(&image_ready_sem);
 			//gets the pointer to the array filled with the last image in RGB565
 			img_buff_ptr = dcmi_get_last_image_ptr();
 
+
 			for(uint16_t i = 0; i < IMAGE_BUFFER_SIZE; i++){
 
 				uint16_t rgb = ((img_buff_ptr[2*i] << 8) + img_buff_ptr[2*i+1]);
-				int8_t w_r = -1;
-				int8_t w_g = 2;
-				int8_t w_b = -1;
-				int16_t value = (2*w_r*((rgb & RED) >> 11) + w_g*((rgb & GREEN) >> 5) + 2*w_b*(rgb & BLUE))+128;
-				if (value < 0) value = 0;
+				float value = w_r*RED+w_b*GREEN+w_b*BLUE;
+				if(value <0) value = 0;
 				else if(value > 255) value = 255;
 				image[i]=value;
 			}
@@ -116,6 +149,9 @@ static THD_FUNCTION(ProcessImage, arg) {
 			*/
 			//Send the data
 			SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
+//			chprintf((BaseSequentialStream *) &SDU1,
+//						"wR = %.2f, wG = %.2f, wB = %.2f\n",w_r,w_g,w_b);
+
 	    }
 }
 
