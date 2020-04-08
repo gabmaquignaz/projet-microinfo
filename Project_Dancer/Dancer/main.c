@@ -10,6 +10,7 @@
 #include <main.h>
 #include <process_image.h>
 #include <trajectoire.h>
+#include <motors.h>
 
 
 int main(void)
@@ -18,7 +19,9 @@ int main(void)
     halInit();
     chSysInit();
     mpu_init();
+    motors_init();
 
+    convert_pos();
 
     /* Infinite loop. */
     while (1) {
