@@ -64,7 +64,7 @@ void convert_pos(void){
 	//convert into speeds [steps/s]
 	for(int16_t i = NB_POS-1 ; i >= 0 ; i--){
 
-		pos_pol[2*i] = pos_pol[2*i] / (INTERVAL_TEMPS*WHEEL_PERIMETER);
+		pos_pol[2*i] = pos_pol[2*i]*NSTEP_ONE_TURN / (INTERVAL_TEMPS*WHEEL_PERIMETER);
 		pos_pol[2*i+1] = (pos_pol[2*i+1]*NSTEP_ONE_TURN*WHEEL_DISTANCE)/(2*INTERVAL_TEMPS*WHEEL_PERIMETER);
 	}
 
@@ -83,6 +83,8 @@ void convert_pos(void){
 		chThdSleepMilliseconds(1000*INTERVAL_TEMPS);
 
 	}
+	left_motor_set_speed(0);
+	right_motor_set_speed(0);
 
 }
 
