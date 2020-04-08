@@ -106,6 +106,8 @@ static THD_FUNCTION(ProcessImage, arg) {
 //
 //	}
 
+
+
 	float alpha_r = -0.1;
 	float beta_r = 5.714;
 	float alpha_g = -0.8;
