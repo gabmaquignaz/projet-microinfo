@@ -18,9 +18,9 @@
 
 #include <vision.h>
 
-#define RED						2*((rgb & (31 << 11)) >> 11)	//0b11111 000000 00000
+#define RED						(2*((rgb & (31 << 11)) >> 11))	//0b11111 000000 00000
 #define GREEN 					((rgb & (63 << 5)) >> 5)		//0b00000 111111 00000
-#define BLUE						2*(rgb & 31) 				//0b00000 000000 11111
+#define BLUE						(2*(rgb & 31))				//0b00000 000000 11111
 
 #define BGND_NB_SAMPLES			100
 #define DIFF_TRESH				10
@@ -129,7 +129,8 @@ static THD_FUNCTION(ProcessImage, arg) {
 			for(uint16_t i = 0; i < IMAGE_BUFFER_SIZE; i++){
 
 				uint16_t rgb = ((img_buff_ptr[2*i] << 8) + img_buff_ptr[2*i+1]);
-				float value = w_r*RED+w_b*GREEN+w_b*BLUE;
+
+				float value = w_r*RED+w_g*GREEN+w_b*BLUE;
 				if(value <0) value = 0;
 				else if(value > 255) value = 255;
 				image[i]=value;
