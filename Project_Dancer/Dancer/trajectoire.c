@@ -15,9 +15,9 @@
 #define WHEEL_PERIMETER     	13 						// [cm]
 #define PI					3.14159265
 #define PERIMETER_EPUCK     (PI * WHEEL_DISTANCE)
-#define INTERVAL_TEMPS		1 						// [s]
+#define INTERVAL_TEMPS		2 						// [s]
 #define INTERVAL_COURT		0.1
-#define NSTEP_ONE_TURN		4000
+#define NSTEP_ONE_TURN		1000
 
 
 static float pos_pol[2*NB_POS] = {0};
@@ -65,7 +65,7 @@ void convert_pos(void){
 	for(int16_t i = NB_POS-1 ; i >= 0 ; i--){
 
 		pos_pol[2*i] = pos_pol[2*i]*NSTEP_ONE_TURN / (INTERVAL_TEMPS*WHEEL_PERIMETER);
-		pos_pol[2*i+1] = (pos_pol[2*i+1]*NSTEP_ONE_TURN*WHEEL_DISTANCE)/(2*INTERVAL_TEMPS*WHEEL_PERIMETER);
+		pos_pol[2*i+1] = (pos_pol[2*i+1]*NSTEP_ONE_TURN*WHEEL_DISTANCE)/(INTERVAL_TEMPS*WHEEL_PERIMETER);
 	}
 
 	for(uint8_t i = 0 ; i < NB_POS ; i++){
