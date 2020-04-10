@@ -21,12 +21,13 @@
 #define RED						(2*((rgb & (31 << 11)) >> 11))	//0b11111 000000 00000
 #define GREEN 					((rgb & (63 << 5)) >> 5)		//0b00000 111111 00000
 #define BLUE						(2*(rgb & 31))				//0b00000 000000 11111
+enum color {R, G, B};
 
 #define BGND_NB_SAMPLES			100
 #define DIFF_TRESH				10
 #define SELECTIVITY				0.7
 
-enum Line_detector_stae {SEARCH_BEGIN, SEARCH_END, FINISHED};
+enum Line_detector_state {SEARCH_BEGIN, SEARCH_END, FINISHED};
 #define DETECT_TRESH				10
 #define MIN_OBJ_SIZE 			5
 
@@ -34,6 +35,8 @@ static float hor_dist = 0;
 static float real_dist = 0;
 static float size2dist_conv = 0;
 static uint16_t tof_dist_calib = 0;
+
+
 
 
 
@@ -97,25 +100,49 @@ static THD_FUNCTION(ProcessImage, arg) {
 	uint8_t high = 250;
 	uint8_t low = 0;
 
-//	//dim(system) < 2 -> cannot solve system !
-//	if((r_obj*g_back)==(r_back*g_obj) && (r_obj*b_back)==(r_back*b_obj) && (g_obj*b_back)==(g_back*b_obj)){
-//		//error !!
-//	}
-//	//solving for 1D space of solutions
-//	else if(){
-//
-//	}
+	//augment the matrix to solve with Gauss and change last line until the matrix is invertible
+	//fourth column is for tracking of reference color on the other lines
+	float sys[3][4] = {	{r_obj,g_obj,b_obj,0},
+						{r_back,g_back,b_back,0},
+						{0,0,1,1} };
+
+	uint8_t ref_color = B; //by default, the 1 on last line is placed in third position and will represent blue when solving
+
+	while (det_3_3(sys) == 0){
+		if(sys[2][0] == 1) {} // tried every position for the one, error: dimension of system is less than 3
+
+		else if(sys[2][2] == 1){
+			sys[2][2] = 0;
+			sys[2][1] = 1;
+			ref_color = G;
+		}
+		else if(sys[2][1] == 1){
+			sys[2][1] = 0;
+			sys[2][0] = 1;
+			ref_color = R;
+		}
+	}
+
+	//diagonal coefficients must be non-zero for Gauss algorithm, exchange lines when needed
+	if(sys[0][0] == 0){
+		if(sys[1][0] == 1) exchange_lines(sys,0,1);
+		else exchange_lines(sys,0,2);
+	}
+	else if(sys[1][1] == 0){
+		exchange_lines(sys,1,2);
+	}
+	//GAUSS
 
 
 
-	float alpha_r = -0.1;
-	float beta_r = 5.714;
-	float alpha_g = -0.8;
-	float beta_g = -5.714;
+	float alpha_one = -0.1;
+	float beta_one = 5.714;
+	float alpha_two = -0.8;
+	float beta_two = -5.714;
 
-	float wO = -(alpha_r*beta_r+alpha_g*beta_g)/(1+alpha_r*alpha_r+alpha_g*alpha_g);
-	float w_r = wO*alpha_r+beta_r;
-	float w_g = wO*alpha_g+beta_g;
+	float wO = -(alpha_one*beta_one+alpha_two*beta_two)/(1+alpha_one*alpha_one+alpha_two*alpha_two);
+	float w_r = wO*alpha_one+beta_one;
+	float w_g = wO*alpha_two+beta_two;
 	float w_b = wO;
 
 
@@ -171,32 +198,28 @@ void process_image_start(void){
 	chThdCreateStatic(waCaptureImage, sizeof(waCaptureImage), NORMALPRIO, CaptureImage, NULL);
 }
 
-void background_set(uint16_t *background, uint8_t *image, uint8_t counter){
-	for(uint16_t i = 0; i < IMAGE_BUFFER_SIZE; i++){
-		background[i] += image[i];
-		if (counter >= BGND_NB_SAMPLES-1) background[i] /= BGND_NB_SAMPLES;
-	}
-}
-
-void background_ignore(uint16_t *background, uint8_t *image){
-	for(uint16_t i = 0; i < IMAGE_BUFFER_SIZE; i++){
-
-		int16_t diff = image[i] - background[i];
-		//show diff, correct only background (small diff between registered background), not object (big diff)
-		if (1) {
-			// center to have maximum dynamic
-			diff += 128;
-
-			//saturation instead of overflow
-			if (diff < 0) diff = 0;
-			else if(diff > 255) diff = 255;
-
-			image[i] = diff;
+void exchange_lines(float matrix [3][4], uint8_t line_a, uint8_t line_b){
+	if(line_a < 3 && line_b < 3 && line_a != line_b){
+		float temporary_line [4] = {0};
+		for(uint8_t i = 0; i < 4; i ++){
+			//exchange lines a and b
+			temporary_line [i] = matrix[line_a][i];
+			matrix[line_a][i] = matrix[line_b][i];
+			matrix[line_b][i] = temporary_line[i];
 		}
-		else image[i] = 0;
 	}
 }
 
+int32_t det_3_3 (float matrix [3][4]){
+	//before reducing with Gauss' theorem, the matrix only contains ints so the det is an int
+	int32_t det = matrix[0][0]*matrix[1][1]*matrix[2][2];
+	det += matrix[0][1]*matrix[1][2]*matrix[2][0];
+	det += matrix[1][0]*matrix[2][1]*matrix[0][2];
+	det -= matrix[0][2]*matrix[1][1]*matrix[2][0];
+	det -= matrix[0][1]*matrix[1][0]*matrix[2][2];
+	det -= matrix[1][2]*matrix[2][1]*matrix[0][0];
+	return det;
+}
 
 bool dist_measure (uint8_t* image, uint16_t size){
 
