@@ -91,6 +91,14 @@ void convert_pos(void){
 	pos_pol[0] = sqrt(pos_pol[0]*pos_pol[0]+pos_pol[1]*pos_pol[1]);
 	pos_pol[1] = angle_from_three_points(ORIX, ORIY, OX, OY, x_mem, pos_pol[1]);
 
+	//***Ajouté par Gab***
+	for(uint8_t i = 0; i < NB_POS; i++){
+		//Conversion from cm and ° to step/s
+		pos_pol[2*i] *= NSTEP_ONE_TURN/WHEEL_PERIMETER;
+		pos_pol[2*i+1] *= WHEEL_DISTANCE*NSTEP_ONE_TURN/(2*WHEEL_PERIMETER);
+	}
+	//********************
+
 
 	//drive
 	for(uint8_t i = 0 ; i < NB_POS ; i++){
