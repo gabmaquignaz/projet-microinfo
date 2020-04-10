@@ -23,6 +23,8 @@
 #define BLUE						(2*(rgb & 31))				//0b00000 000000 11111
 enum color {R, G, B};
 
+
+
 #define BGND_NB_SAMPLES			100
 #define DIFF_TRESH				10
 #define SELECTIVITY				0.7
@@ -84,27 +86,24 @@ static THD_FUNCTION(ProcessImage, arg) {
 	uint8_t *img_buff_ptr;
 	uint8_t image[IMAGE_BUFFER_SIZE] = {0};
 
-	uint16_t background[IMAGE_BUFFER_SIZE] = {0};
-	uint8_t background_capture_count = 0;
-
 	//reference values for obj and background
-	uint8_t r_obj = 50;
-	uint8_t g_obj = 15;
-	uint8_t b_obj = 17;
+	uint8_t r_obj = 40;
+	uint8_t g_obj = 35;
+	uint8_t b_obj = 40;
 
-	uint8_t r_back = 20;
+	uint8_t r_back = 15;
 	uint8_t g_back = 20;
-	uint8_t b_back = 18;
+	uint8_t b_back = 23;
 
 	//High/low values
-	uint8_t high = 250;
+	uint8_t high = 255;
 	uint8_t low = 0;
 
-	//augment the matrix to solve with Gauss and change last line until the matrix is invertible
-	//fourth column is for tracking of reference color on the other lines
-	float sys[3][4] = {	{r_obj,g_obj,b_obj,0},
-						{r_back,g_back,b_back,0},
-						{0,0,1,1} };
+	//add a line to the matrix to solve with Gauss and change last line until the matrix is invertible
+	//fourth column represents goal values of F, fifth column is for tracking reference color
+	float sys[M][N] = {	{r_obj,g_obj,b_obj,high,0},
+						{r_back,g_back,b_back,low,0},
+						{0,0,1,0,1} };
 
 	uint8_t ref_color = B; //by default, the 1 on last line is placed in third position and will represent blue when solving
 
@@ -124,27 +123,69 @@ static THD_FUNCTION(ProcessImage, arg) {
 	}
 
 	//diagonal coefficients must be non-zero for Gauss algorithm, exchange lines when needed
-	if(sys[0][0] == 0){
-		if(sys[1][0] == 1) exchange_lines(sys,0,1);
-		else exchange_lines(sys,0,2);
+	switch (ref_color){
+		case R:
+			exchange_lines(sys,0,2);
+			if (!(sys[1][1] && sys[2][2])) exchange_lines(sys,1,2);
+			break;
+
+		case G:
+			exchange_lines(sys,1,2);
+			if (!(sys[0][0] && sys[2][2])) exchange_lines(sys,0,2);
+			break;
+
+		case B:
+			if (!(sys[0][0] && sys[1][1])) exchange_lines(sys,0,1);
+			break;
 	}
-	else if(sys[1][1] == 0){
-		exchange_lines(sys,1,2);
+
+	//Gauss elimination
+	do_gauss(sys);
+
+	//computation of linear relations between R,G and B : weight_color_one(two) = alpha_one(two)*weight_ref_color + beta_one(two)
+	//computation of wO, the wait of the ref_color so that the gradient of F is minimum
+	//computation the weights w_r, w_g, w_b as a function of wO
+	float alpha_one, beta_one, alpha_two, beta_two, wO, w_r, w_g, w_b;
+	switch (ref_color){
+		case R:
+			alpha_one = sys[1][N-1]/sys[1][1]; //green
+			beta_one = sys[1][N-2]/sys[1][1]; // green
+			alpha_two = sys[2][N-1]/sys[2][2]; //blue
+			beta_two = sys[2][N-2]/sys[2][2]; //blue
+
+			wO = -(alpha_one*beta_one+alpha_two*beta_two)/(1+alpha_one*alpha_one+alpha_two*alpha_two);
+
+			w_r = wO;
+			w_g = wO*alpha_one+beta_one;
+			w_b = wO*alpha_two+beta_two;
+			break;
+
+		case G:
+			alpha_one = sys[0][N-1]/sys[0][0]; //red
+			beta_one = sys[0][N-2]/sys[0][0]; // red
+			alpha_two = sys[2][N-1]/sys[2][2]; //blue
+			beta_two = sys[2][N-2]/sys[2][2]; //blue
+
+			wO = -(alpha_one*beta_one+alpha_two*beta_two)/(1+alpha_one*alpha_one+alpha_two*alpha_two);
+
+			w_r = wO*alpha_one+beta_one;
+			w_g = wO;
+			w_b = wO*alpha_two+beta_two;
+			break;
+
+		case B:
+			alpha_one = sys[0][N-1]/sys[0][0]; //red
+			beta_one = sys[0][N-2]/sys[0][0]; // red
+			alpha_two = sys[1][N-1]/sys[1][1]; //green
+			beta_two = sys[1][N-2]/sys[1][1]; // green
+
+			wO = -(alpha_one*beta_one+alpha_two*beta_two)/(1+alpha_one*alpha_one+alpha_two*alpha_two);
+
+			w_r = wO*alpha_one+beta_one;
+			w_g = wO*alpha_two+beta_two;
+			w_b = wO;
+			break;
 	}
-	//GAUSS
-
-
-
-	float alpha_one = -0.1;
-	float beta_one = 5.714;
-	float alpha_two = -0.8;
-	float beta_two = -5.714;
-
-	float wO = -(alpha_one*beta_one+alpha_two*beta_two)/(1+alpha_one*alpha_one+alpha_two*alpha_two);
-	float w_r = wO*alpha_one+beta_one;
-	float w_g = wO*alpha_two+beta_two;
-	float w_b = wO;
-
 
 	while(1){
 	    	//waits until an image has been captured
@@ -163,25 +204,11 @@ static THD_FUNCTION(ProcessImage, arg) {
 				image[i]=value;
 			}
 
-			/*
-			if (background_capture_count < BGND_NB_SAMPLES){
-
-				//background capture and average
-				background_set(background, image, background_capture_count);
-				background_capture_count++;
-			}
-			else {
-
-				//subtracting background from image and measuring distances
-				background_ignore(background, image);
-				dist_measure(image, IMAGE_BUFFER_SIZE);
-			}
-			*/
 			//Send the data
 			SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
-//			chprintf((BaseSequentialStream *) &SDU1,
-//						"wR = %.2f, wG = %.2f, wB = %.2f\n",w_r,w_g,w_b);
-
+//			chprintf((BaseSequentialStream *) &SDU1,"a1 = %.2f, b1 = %.2f, a2 = %.2f, b2 = %.2f\n"
+//													"wR = %.2f, wG = %.2f, wB = %.2f\n",
+//													alpha_one, beta_one, alpha_two, beta_two,w_r,w_g,w_b);
 	    }
 }
 
@@ -198,10 +225,33 @@ void process_image_start(void){
 	chThdCreateStatic(waCaptureImage, sizeof(waCaptureImage), NORMALPRIO, CaptureImage, NULL);
 }
 
-void exchange_lines(float matrix [3][4], uint8_t line_a, uint8_t line_b){
-	if(line_a < 3 && line_b < 3 && line_a != line_b){
-		float temporary_line [4] = {0};
-		for(uint8_t i = 0; i < 4; i ++){
+void do_gauss (float matrix [M][N]){
+	//i represents line, j represents columns
+
+	//elimination of lower non-diagonal coefficients
+	for(int8_t i = 1; i < M; i++){
+		for(uint8_t j = 0; j < i; j++){
+			if(matrix[i][j]){
+				float factor = matrix[i][j]/matrix[j][j];
+				substract_lines(matrix,j,i,factor);
+			}
+		}
+	}
+	//elimination of upper non-diagonal coefficients
+	for(int8_t i = M-2 ; i >= 0; i--){
+		for(uint8_t j = M-1; j > i; j--){
+			if(matrix[i][j]){
+				float factor = matrix[i][j]/matrix[j][j];
+				substract_lines(matrix,j,i,factor);
+			}
+		}
+	}
+}
+
+void exchange_lines(float matrix [M][N], uint8_t line_a, uint8_t line_b){
+	if(line_a < M && line_b < M && line_a != line_b){
+		float temporary_line [N] = {0};
+		for(uint8_t i = 0; i < N; i ++){
 			//exchange lines a and b
 			temporary_line [i] = matrix[line_a][i];
 			matrix[line_a][i] = matrix[line_b][i];
@@ -210,7 +260,16 @@ void exchange_lines(float matrix [3][4], uint8_t line_a, uint8_t line_b){
 	}
 }
 
-int32_t det_3_3 (float matrix [3][4]){
+void substract_lines(float matrix [M][N], uint8_t line_a, uint8_t line_b, float factor){
+	//substracts factor*line_a from line_b
+	if(line_a < M && line_b < M && line_a != line_b){
+		for(uint8_t i = 0; i < N; i ++){
+			matrix[line_b][i] -= factor*matrix[line_a][i];
+		}
+	}
+}
+
+int32_t det_3_3 (float matrix [M][N]){
 	//before reducing with Gauss' theorem, the matrix only contains ints so the det is an int
 	int32_t det = matrix[0][0]*matrix[1][1]*matrix[2][2];
 	det += matrix[0][1]*matrix[1][2]*matrix[2][0];
