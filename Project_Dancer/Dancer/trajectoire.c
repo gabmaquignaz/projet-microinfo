@@ -18,6 +18,10 @@
 #define INTERVAL_TEMPS		2 						// [s]
 #define INTERVAL_COURT		0.1
 #define NSTEP_ONE_TURN		1000
+#define OX					0
+#define OY					0
+#define ORIX					0
+#define ORIY					-1
 
 
 static float pos_pol[2*NB_POS] = {0};
@@ -26,48 +30,69 @@ static float pos_car_y[NB_POS] = {0};
 static float cx[NB_POS], bx[NB_POS-1], dx[NB_POS-1];
 static float cy[NB_POS], by[NB_POS-1], dy[NB_POS-1];
 
+float angle_from_three_points(float x1, float y1, float x2, float y2, float x3, float y3){
+
+	float v1x = x2-x1;
+	float v1y = y2-y1;
+	float v2x = x3-x2;
+	float v2y = y3-y2;
+
+
+	float angle = atan2(v2y, v2x)-atan2(v1y, v1x);
+	if (angle>PI) angle -= 2*PI;
+	if (angle<-PI) angle += 2*PI;
+
+	return (angle);
+}
+
 void convert_pos(void){
 
 	//provisoire, entrée des données
 	//p0
-	pos_pol[0] = 1.414;
-	pos_pol[1] = 0.785;
+	pos_pol[0] = 10;
+	pos_pol[1] = 10;
 	//p1
-	pos_pol[2] = 1;
-	pos_pol[3] = 1.57;
+	pos_pol[2] = 0;
+	pos_pol[3] = 10;
 	//p2
-	pos_pol[4] = 1.414;
-	pos_pol[5] = 2.356;
+	pos_pol[4] = -10;
+	pos_pol[5] = 10;
 	//p3
-	pos_pol[6] = 1;
-	pos_pol[7] = 3.141;
+	pos_pol[6] = -10;
+	pos_pol[7] = 0;
 	//p4
 	pos_pol[8] = 0;
-	pos_pol[8] = 0;
+	pos_pol[9] = 0;
 
-	float r_mem;
+	//convert from cartesian (x,y) to (distance, angle)
 
-	for(uint8_t i = NB_POS-1; i>0; i--){
+	float x_mem;
 
-		//pour le premier point (i=0), l'angle et le rayon reste le même
+	for(uint8_t i = NB_POS-1; i>1; i--){
 
-		r_mem = pos_pol[2*i];
+		x_mem = pos_pol[2*i];
+
 		//distance between two consecutive points
-		pos_pol[2*i] = sqrt((pos_pol[2*i-2]*pos_pol[2*i-2])
-							+ (pos_pol[2*i]*pos_pol[2*i])
-							+ 2*pos_pol[2*i-2]*pos_pol[2*i]*cos(pos_pol[2*i+1-2]-pos_pol[2*i+1]));
+		pos_pol[2*i] = sqrt((pos_pol[2*i]-pos_pol[2*(i-1)])*(pos_pol[2*i]-pos_pol[2*(i-1)])
+							+(pos_pol[2*i+1]-pos_pol[2*(i-1)+1])*(pos_pol[2*i+1]-pos_pol[2*(i-1)+1]));
 
 		//angle between two consecutive vectors
-		pos_pol[2*i+1] = PI - (r_mem*sin(pos_pol[2*i+1-2] - pos_pol[2*i+1]))/pos_pol[2*i];
+		pos_pol[2*i+1] = angle_from_three_points(pos_pol[2*(i-2)], pos_pol[2*(i-2)+1],
+												pos_pol[2*(i-1)], pos_pol[2*(i-1)+1],
+												x_mem, pos_pol[2*i+1]);
+
 	}
+	//first section from origin
+	x_mem = pos_pol[2];
+	pos_pol[2] = sqrt(pos_pol[2]*pos_pol[2]+pos_pol[3]*pos_pol[3]);
+	pos_pol[3] = angle_from_three_points(OX, OY, pos_pol[0], pos_pol[1], x_mem, pos_pol[3]);
 
-	//convert into speeds [steps/s]
-	for(int16_t i = NB_POS-1 ; i >= 0 ; i--){
+	x_mem = pos_pol[0];
+	pos_pol[0] = sqrt(pos_pol[0]*pos_pol[0]+pos_pol[1]*pos_pol[1]);
+	pos_pol[1] = angle_from_three_points(ORIX, ORIY, OX, OY, x_mem, pos_pol[1]);
 
-		pos_pol[2*i] = pos_pol[2*i]*NSTEP_ONE_TURN / (INTERVAL_TEMPS*WHEEL_PERIMETER);
-		pos_pol[2*i+1] = (pos_pol[2*i+1]*NSTEP_ONE_TURN*WHEEL_DISTANCE)/(INTERVAL_TEMPS*WHEEL_PERIMETER);
-	}
 
+	//drive
 	for(uint8_t i = 0 ; i < NB_POS ; i++){
 
 		//be sure that the motors are initialized
@@ -81,14 +106,15 @@ void convert_pos(void){
 		left_motor_set_speed(pos_pol[2*i]);
 		right_motor_set_speed(pos_pol[2*i]);
 		chThdSleepMilliseconds(1000*INTERVAL_TEMPS);
-
 	}
+
 	left_motor_set_speed(0);
 	right_motor_set_speed(0);
 
 }
 
 
+//************** NOT USED FOR THE MOMENT *****************
 void interpolate(void){
 
 	int n = NB_POS-1, i, j;
@@ -156,9 +182,6 @@ void interpolate(void){
 
 		}
 	}
-
-
-
 }
 
 
