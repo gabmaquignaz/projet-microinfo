@@ -52,8 +52,8 @@ int main(void)
 	po8030_start();
 	process_image_start();
 
-    uint16_t sum = 0;
-    float mean = 0;
+//    uint16_t sum = 0;
+//    float mean = 0;
 
     //Infinite loop
     while (1) {

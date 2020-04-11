@@ -21,13 +21,10 @@
 #define RED						(2*((rgb & (31 << 11)) >> 11))	//0b11111 000000 00000
 #define GREEN 					((rgb & (63 << 5)) >> 5)		//0b00000 111111 00000
 #define BLUE						(2*(rgb & 31))				//0b00000 000000 11111
-enum color {R, G, B};
-
-
-
-#define BGND_NB_SAMPLES			100
-#define DIFF_TRESH				10
-#define SELECTIVITY				0.7
+enum ref_color {R, G, B};
+static float w_r, w_g, w_b;
+#define M						3
+#define N						5
 
 enum Line_detector_state {SEARCH_BEGIN, SEARCH_END, FINISHED};
 #define DETECT_TRESH				10
@@ -39,7 +36,13 @@ static float size2dist_conv = 0;
 static uint16_t tof_dist_calib = 0;
 
 
+int32_t det_3_3 (float matrix [M][N]);
+void do_gauss (float matrix [M][N]);
+void exchange_lines(float matrix [M][N], uint8_t line_a, uint8_t line_b);
+void substract_lines(float matrix [M][N], uint8_t line_a, uint8_t line_b, float factor);
 
+bool compute_weights (uint8_t r_obj, uint8_t g_obj, uint8_t b_obj, uint8_t r_back, uint8_t g_back, uint8_t b_back);
+bool dist_measure (uint8_t* image, uint16_t size);
 
 
 void SendUint8ToComputer(uint8_t* data, uint16_t size)
@@ -86,7 +89,7 @@ static THD_FUNCTION(ProcessImage, arg) {
 	uint8_t *img_buff_ptr;
 	uint8_t image[IMAGE_BUFFER_SIZE] = {0};
 
-	//reference values for obj and background
+	//reference values for obj and background (should be measured)
 	uint8_t r_obj = 40;
 	uint8_t g_obj = 35;
 	uint8_t b_obj = 40;
@@ -95,6 +98,118 @@ static THD_FUNCTION(ProcessImage, arg) {
 	uint8_t g_back = 20;
 	uint8_t b_back = 23;
 
+	while (!compute_weights(r_obj, g_obj, b_obj, r_back, g_back, b_back)){
+		//Measure colors and tell user there's an error
+	}
+
+	while(1){
+	    	//waits until an image has been captured
+	        chBSemWait(&image_ready_sem);
+			//gets the pointer to the array filled with the last image in RGB565
+			img_buff_ptr = dcmi_get_last_image_ptr();
+
+
+			for(uint16_t i = 0; i < IMAGE_BUFFER_SIZE; i++){
+
+				uint16_t rgb = ((img_buff_ptr[2*i] << 8) + img_buff_ptr[2*i+1]);
+
+				float value = w_r*RED+w_g*GREEN+w_b*BLUE;
+				if(value <0) value = 0;
+				else if(value > 255) value = 255;
+				image[i]=value;
+			}
+
+			//Send the data
+			SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
+//			chprintf((BaseSequentialStream *) &SDU1,"a1 = %.2f, b1 = %.2f, a2 = %.2f, b2 = %.2f\n"
+//													"wR = %.2f, wG = %.2f, wB = %.2f\n",
+//													alpha_one, beta_one, alpha_two, beta_two,w_r,w_g,w_b);
+	    }
+}
+
+
+//*************** high level interaction functions ***************
+
+uint16_t get_real_dist_mm(void){
+	return real_dist;
+}
+
+uint16_t get_hor_dist_mm(void){
+	return hor_dist;
+}
+
+void process_image_start(void){
+	chThdCreateStatic(waProcessImage, sizeof(waProcessImage), NORMALPRIO, ProcessImage, NULL);
+	chThdCreateStatic(waCaptureImage, sizeof(waCaptureImage), NORMALPRIO, CaptureImage, NULL);
+}
+
+
+
+//*************** low level linear algebra functions ***************
+
+void do_gauss (float matrix [M][N]){
+	//i represents line, j represents columns
+
+	//elimination of lower non-diagonal coefficients
+	for(int8_t i = 1; i < M; i++){
+		for(uint8_t j = 0; j < i; j++){
+			if(matrix[i][j]){
+				float factor = matrix[i][j]/matrix[j][j];
+				substract_lines(matrix,j,i,factor);
+			}
+		}
+	}
+	//elimination of upper non-diagonal coefficients
+	for(int8_t i = M-2 ; i >= 0; i--){
+		for(uint8_t j = M-1; j > i; j--){
+			if(matrix[i][j]){
+				float factor = matrix[i][j]/matrix[j][j];
+				substract_lines(matrix,j,i,factor);
+			}
+		}
+	}
+}
+
+
+void exchange_lines(float matrix [M][N], uint8_t line_a, uint8_t line_b){
+	if(line_a < M && line_b < M && line_a != line_b){
+		float temporary_line [N] = {0};
+		for(uint8_t i = 0; i < N; i ++){
+			//exchange lines a and b
+			temporary_line [i] = matrix[line_a][i];
+			matrix[line_a][i] = matrix[line_b][i];
+			matrix[line_b][i] = temporary_line[i];
+		}
+	}
+}
+
+
+void substract_lines(float matrix [M][N], uint8_t line_a, uint8_t line_b, float factor){
+	//substracts factor*line_a from line_b
+	if(line_a < M && line_b < M && line_a != line_b){
+		for(uint8_t i = 0; i < N; i ++){
+			matrix[line_b][i] -= factor*matrix[line_a][i];
+		}
+	}
+}
+
+
+int32_t det_3_3 (float matrix [M][N]){
+	//before reducing with Gauss' theorem, the matrix only contains ints so the det is an int
+	int32_t det = matrix[0][0]*matrix[1][1]*matrix[2][2];
+	det += matrix[0][1]*matrix[1][2]*matrix[2][0];
+	det += matrix[1][0]*matrix[2][1]*matrix[0][2];
+	det -= matrix[0][2]*matrix[1][1]*matrix[2][0];
+	det -= matrix[0][1]*matrix[1][0]*matrix[2][2];
+	det -= matrix[1][2]*matrix[2][1]*matrix[0][0];
+	return det;
+}
+
+
+
+//*************** higher level object recognition functions ***************
+
+bool compute_weights (uint8_t r_obj, uint8_t g_obj, uint8_t b_obj, uint8_t r_back, uint8_t g_back, uint8_t b_back){
 	//High/low values
 	uint8_t high = 255;
 	uint8_t low = 0;
@@ -108,7 +223,7 @@ static THD_FUNCTION(ProcessImage, arg) {
 	uint8_t ref_color = B; //by default, the 1 on last line is placed in third position and will represent blue when solving
 
 	while (det_3_3(sys) == 0){
-		if(sys[2][0] == 1) {} // tried every position for the one, error: dimension of system is less than 3
+		if(sys[2][0] == 1) return false; // tried every position for the one, error: dimension of system is less than 3
 
 		else if(sys[2][2] == 1){
 			sys[2][2] = 0;
@@ -145,7 +260,7 @@ static THD_FUNCTION(ProcessImage, arg) {
 	//computation of linear relations between R,G and B : weight_color_one(two) = alpha_one(two)*weight_ref_color + beta_one(two)
 	//computation of wO, the wait of the ref_color so that the gradient of F is minimum
 	//computation the weights w_r, w_g, w_b as a function of wO
-	float alpha_one, beta_one, alpha_two, beta_two, wO, w_r, w_g, w_b;
+	float alpha_one, beta_one, alpha_two, beta_two, wO;
 	switch (ref_color){
 		case R:
 			alpha_one = sys[1][N-1]/sys[1][1]; //green
@@ -186,99 +301,10 @@ static THD_FUNCTION(ProcessImage, arg) {
 			w_b = wO;
 			break;
 	}
-
-	while(1){
-	    	//waits until an image has been captured
-	        chBSemWait(&image_ready_sem);
-			//gets the pointer to the array filled with the last image in RGB565
-			img_buff_ptr = dcmi_get_last_image_ptr();
-
-
-			for(uint16_t i = 0; i < IMAGE_BUFFER_SIZE; i++){
-
-				uint16_t rgb = ((img_buff_ptr[2*i] << 8) + img_buff_ptr[2*i+1]);
-
-				float value = w_r*RED+w_g*GREEN+w_b*BLUE;
-				if(value <0) value = 0;
-				else if(value > 255) value = 255;
-				image[i]=value;
-			}
-
-			//Send the data
-			SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
-//			chprintf((BaseSequentialStream *) &SDU1,"a1 = %.2f, b1 = %.2f, a2 = %.2f, b2 = %.2f\n"
-//													"wR = %.2f, wG = %.2f, wB = %.2f\n",
-//													alpha_one, beta_one, alpha_two, beta_two,w_r,w_g,w_b);
-	    }
+	return true;
 }
 
-uint16_t get_real_dist_mm(void){
-	return real_dist;
-}
 
-uint16_t get_hor_dist_mm(void){
-	return hor_dist;
-}
-
-void process_image_start(void){
-	chThdCreateStatic(waProcessImage, sizeof(waProcessImage), NORMALPRIO, ProcessImage, NULL);
-	chThdCreateStatic(waCaptureImage, sizeof(waCaptureImage), NORMALPRIO, CaptureImage, NULL);
-}
-
-void do_gauss (float matrix [M][N]){
-	//i represents line, j represents columns
-
-	//elimination of lower non-diagonal coefficients
-	for(int8_t i = 1; i < M; i++){
-		for(uint8_t j = 0; j < i; j++){
-			if(matrix[i][j]){
-				float factor = matrix[i][j]/matrix[j][j];
-				substract_lines(matrix,j,i,factor);
-			}
-		}
-	}
-	//elimination of upper non-diagonal coefficients
-	for(int8_t i = M-2 ; i >= 0; i--){
-		for(uint8_t j = M-1; j > i; j--){
-			if(matrix[i][j]){
-				float factor = matrix[i][j]/matrix[j][j];
-				substract_lines(matrix,j,i,factor);
-			}
-		}
-	}
-}
-
-void exchange_lines(float matrix [M][N], uint8_t line_a, uint8_t line_b){
-	if(line_a < M && line_b < M && line_a != line_b){
-		float temporary_line [N] = {0};
-		for(uint8_t i = 0; i < N; i ++){
-			//exchange lines a and b
-			temporary_line [i] = matrix[line_a][i];
-			matrix[line_a][i] = matrix[line_b][i];
-			matrix[line_b][i] = temporary_line[i];
-		}
-	}
-}
-
-void substract_lines(float matrix [M][N], uint8_t line_a, uint8_t line_b, float factor){
-	//substracts factor*line_a from line_b
-	if(line_a < M && line_b < M && line_a != line_b){
-		for(uint8_t i = 0; i < N; i ++){
-			matrix[line_b][i] -= factor*matrix[line_a][i];
-		}
-	}
-}
-
-int32_t det_3_3 (float matrix [M][N]){
-	//before reducing with Gauss' theorem, the matrix only contains ints so the det is an int
-	int32_t det = matrix[0][0]*matrix[1][1]*matrix[2][2];
-	det += matrix[0][1]*matrix[1][2]*matrix[2][0];
-	det += matrix[1][0]*matrix[2][1]*matrix[0][2];
-	det -= matrix[0][2]*matrix[1][1]*matrix[2][0];
-	det -= matrix[0][1]*matrix[1][0]*matrix[2][2];
-	det -= matrix[1][2]*matrix[2][1]*matrix[0][0];
-	return det;
-}
 
 bool dist_measure (uint8_t* image, uint16_t size){
 
