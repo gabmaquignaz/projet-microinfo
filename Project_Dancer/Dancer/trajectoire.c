@@ -82,7 +82,7 @@ void convert_pos(void){
 												x_mem, pos_pol[2*i+1]);
 
 	}
-	//first section from origin
+	//first two sections from origin
 	x_mem = pos_pol[2];
 	pos_pol[2] = sqrt(pos_pol[2]*pos_pol[2]+pos_pol[3]*pos_pol[3]);
 	pos_pol[3] = angle_from_three_points(OX, OY, pos_pol[0], pos_pol[1], x_mem, pos_pol[3]);
