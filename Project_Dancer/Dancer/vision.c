@@ -18,13 +18,16 @@
 
 #include <vision.h>
 
-#define RED						(2*((rgb & (31 << 11)) >> 11))	//0b11111 000000 00000
-#define GREEN 					((rgb & (63 << 5)) >> 5)		//0b00000 111111 00000
-#define BLUE						(2*(rgb & 31))				//0b00000 000000 11111
-enum ref_color {R, G, B};
-static float w_r, w_g, w_b;
-#define M						3
-#define N						5
+#define RED							(31 << 11)	//0b11111 000000 00000
+#define GREEN 						(63 << 5)	//0b00000 111111 00000
+#define BLUE							31			//0b00000 000000 11111
+enum color {R, G, B};
+#define M							3
+#define N							5
+
+#define NB_SAMPLES_CALIB				20			//take 20 successive measurements
+#define WIDTH_SAMPLES_CALIB			20			//20 pixels-wide zone
+#define START_CALIB					((IMAGE_BUFFER_SIZE-WIDTH_SAMPLES_CALIB)/2 )
 
 enum Line_detector_state {SEARCH_BEGIN, SEARCH_END, FINISHED};
 #define DETECT_TRESH				10
@@ -33,15 +36,16 @@ enum Line_detector_state {SEARCH_BEGIN, SEARCH_END, FINISHED};
 static float hor_dist = 0;
 static float real_dist = 0;
 static float size2dist_conv = 0;
-static uint16_t tof_dist_calib = 0;
+static uint16_t tof_dist_calib_mm = 0;
 
 
 int32_t det_3_3 (float matrix [M][N]);
 void do_gauss (float matrix [M][N]);
 void exchange_lines(float matrix [M][N], uint8_t line_a, uint8_t line_b);
-void substract_lines(float matrix [M][N], uint8_t line_a, uint8_t line_b, float factor);
+void subtract_lines(float matrix [M][N], uint8_t line_a, uint8_t line_b, float factor);
 
-bool compute_weights (uint8_t r_obj, uint8_t g_obj, uint8_t b_obj, uint8_t r_back, uint8_t g_back, uint8_t b_back);
+void read_colors(uint8_t* img_buff_ptr, uint16_t i, uint8_t* colors);
+bool compute_weights (uint8_t r_obj, uint8_t g_obj, uint8_t b_obj, uint8_t r_back, uint8_t g_back, uint8_t b_back,float* w_r_ptr, float* w_g_ptr, float* w_b_ptr);
 bool dist_measure (uint8_t* image, uint16_t size);
 
 
@@ -51,6 +55,7 @@ void SendUint8ToComputer(uint8_t* data, uint16_t size)
 	chSequentialStreamWrite((BaseSequentialStream *)&SD3, (uint8_t*)&size, sizeof(uint16_t));
 	chSequentialStreamWrite((BaseSequentialStream *)&SD3, (uint8_t*)data, size);
 }
+
 
 //semaphore
 static BSEMAPHORE_DECL(image_ready_sem, TRUE);
@@ -80,7 +85,7 @@ static THD_FUNCTION(CaptureImage, arg) {
 }
 
 
-static THD_WORKING_AREA(waProcessImage, 2048);
+static THD_WORKING_AREA(waProcessImage, 1024);
 static THD_FUNCTION(ProcessImage, arg) {
 
     chRegSetThreadName(__FUNCTION__);
@@ -90,17 +95,21 @@ static THD_FUNCTION(ProcessImage, arg) {
 	uint8_t image[IMAGE_BUFFER_SIZE] = {0};
 
 	//reference values for obj and background (should be measured)
-	uint8_t r_obj = 40;
-	uint8_t g_obj = 35;
-	uint8_t b_obj = 40;
+//	uint8_t r_obj = 50;
+//	uint8_t g_obj = 20;
+//	uint8_t b_obj = 20;
+//
+//	uint8_t r_back = 27;
+//	uint8_t g_back = 32;
+//	uint8_t b_back = 29;
 
-	uint8_t r_back = 15;
-	uint8_t g_back = 20;
-	uint8_t b_back = 23;
+	uint8_t colors_tab [3] = {0}; //contains the three measured values R,G,B
+	float w_r, w_g, w_b; //weights used to detect the desired color in the image
+	uint8_t r_obj, g_obj, b_obj, r_back, g_back, b_back; //average color values, used for computation of weights
+	uint32_t sum_r = 0; uint32_t sum_g = 0; uint32_t sum_b = 0; //used to store the sum for averages
+	uint8_t calibration_counter = 0;
 
-	while (!compute_weights(r_obj, g_obj, b_obj, r_back, g_back, b_back)){
-		//Measure colors and tell user there's an error
-	}
+    chThdSleepMilliseconds(1000);
 
 	while(1){
 	    	//waits until an image has been captured
@@ -108,35 +117,79 @@ static THD_FUNCTION(ProcessImage, arg) {
 			//gets the pointer to the array filled with the last image in RGB565
 			img_buff_ptr = dcmi_get_last_image_ptr();
 
-
-			for(uint16_t i = 0; i < IMAGE_BUFFER_SIZE; i++){
-
-				uint16_t rgb = ((img_buff_ptr[2*i] << 8) + img_buff_ptr[2*i+1]);
-
-				float value = w_r*RED+w_g*GREEN+w_b*BLUE;
-				if(value <0) value = 0;
-				else if(value > 255) value = 255;
-				image[i]=value;
+			//***calibration***
+			if(calibration_counter < NB_SAMPLES_CALIB){
+				for(uint16_t i = START_CALIB; i < START_CALIB + WIDTH_SAMPLES_CALIB; i++){
+					//average in space, the object is supposed to be monochrome
+					read_colors(img_buff_ptr, i, colors_tab);
+					sum_r += colors_tab[R];
+					sum_g += colors_tab[G];
+					sum_b += colors_tab[B];
+				}
+				calibration_counter ++;
+				if(calibration_counter == NB_SAMPLES_CALIB){
+					//average in time
+					r_obj = sum_r/(NB_SAMPLES_CALIB*WIDTH_SAMPLES_CALIB);
+					g_obj = sum_g/(NB_SAMPLES_CALIB*WIDTH_SAMPLES_CALIB);
+					b_obj = sum_b/(NB_SAMPLES_CALIB*WIDTH_SAMPLES_CALIB);
+					sum_r = 0;
+					sum_g = 0;
+					sum_b = 0;
+					chThdSleepMilliseconds(3000);
+				}
 			}
+			else if (calibration_counter >= NB_SAMPLES_CALIB && calibration_counter < 2*NB_SAMPLES_CALIB){
+				for(uint16_t i = 0; i < IMAGE_BUFFER_SIZE; i++){
+					//average in space, the object is supposed to be monochrome
+					read_colors(img_buff_ptr, i, colors_tab);
+					sum_r += colors_tab[R];
+					sum_g += colors_tab[G];
+					sum_b += colors_tab[B];
+				}
+				calibration_counter ++;
+				if(calibration_counter == 2*NB_SAMPLES_CALIB){
+					//average in time
+					r_back = sum_r/(NB_SAMPLES_CALIB*IMAGE_BUFFER_SIZE);
+					g_back = sum_g/(NB_SAMPLES_CALIB*IMAGE_BUFFER_SIZE);
+					b_back = sum_b/(NB_SAMPLES_CALIB*IMAGE_BUFFER_SIZE);
+					sum_r = 0;
+					sum_g = 0;
+					sum_b = 0;
+					compute_weights(r_obj, g_obj, b_obj, r_back, g_back, b_back, &w_r, &w_g, &w_b);
+				}
+			}
+			else {
+				for(uint16_t i = 0; i < IMAGE_BUFFER_SIZE; i++){
 
-			//Send the data
-			SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
-//			chprintf((BaseSequentialStream *) &SDU1,"a1 = %.2f, b1 = %.2f, a2 = %.2f, b2 = %.2f\n"
-//													"wR = %.2f, wG = %.2f, wB = %.2f\n",
-//													alpha_one, beta_one, alpha_two, beta_two,w_r,w_g,w_b);
+					read_colors(img_buff_ptr, i, colors_tab);
+
+					//compute f: R3->R1 for each pixel, avoid overflow, store value in image[]
+					float f_value = w_r*colors_tab[R]+w_g*colors_tab[G]+w_b*colors_tab[B];
+					if (f_value < 0) f_value = 0;
+					else if(f_value > 255) f_value = 255;
+					image[i] = f_value;
+				}
+				//Send the data
+				SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
+//				chprintf((BaseSequentialStream *) &SDU1,"OBJCET : R = %d, G = %d, B = %d\n"
+//														"BACKGROUND : R = %d, G = %d, B = %d\n\n",
+//															r_obj, g_obj, b_obj,r_back,g_back,b_back);
+			}
 	    }
 }
 
 
-//*************** high level interaction functions ***************
+//*************** high level interaction functions (visible by other files) ***************
 
 uint16_t get_real_dist_mm(void){
 	return real_dist;
 }
 
+
 uint16_t get_hor_dist_mm(void){
 	return hor_dist;
 }
+
 
 void process_image_start(void){
 	chThdCreateStatic(waProcessImage, sizeof(waProcessImage), NORMALPRIO, ProcessImage, NULL);
@@ -145,71 +198,9 @@ void process_image_start(void){
 
 
 
-//*************** low level linear algebra functions ***************
+//*************** medium level object recognition functions ***************
 
-void do_gauss (float matrix [M][N]){
-	//i represents line, j represents columns
-
-	//elimination of lower non-diagonal coefficients
-	for(int8_t i = 1; i < M; i++){
-		for(uint8_t j = 0; j < i; j++){
-			if(matrix[i][j]){
-				float factor = matrix[i][j]/matrix[j][j];
-				substract_lines(matrix,j,i,factor);
-			}
-		}
-	}
-	//elimination of upper non-diagonal coefficients
-	for(int8_t i = M-2 ; i >= 0; i--){
-		for(uint8_t j = M-1; j > i; j--){
-			if(matrix[i][j]){
-				float factor = matrix[i][j]/matrix[j][j];
-				substract_lines(matrix,j,i,factor);
-			}
-		}
-	}
-}
-
-
-void exchange_lines(float matrix [M][N], uint8_t line_a, uint8_t line_b){
-	if(line_a < M && line_b < M && line_a != line_b){
-		float temporary_line [N] = {0};
-		for(uint8_t i = 0; i < N; i ++){
-			//exchange lines a and b
-			temporary_line [i] = matrix[line_a][i];
-			matrix[line_a][i] = matrix[line_b][i];
-			matrix[line_b][i] = temporary_line[i];
-		}
-	}
-}
-
-
-void substract_lines(float matrix [M][N], uint8_t line_a, uint8_t line_b, float factor){
-	//substracts factor*line_a from line_b
-	if(line_a < M && line_b < M && line_a != line_b){
-		for(uint8_t i = 0; i < N; i ++){
-			matrix[line_b][i] -= factor*matrix[line_a][i];
-		}
-	}
-}
-
-
-int32_t det_3_3 (float matrix [M][N]){
-	//before reducing with Gauss' theorem, the matrix only contains ints so the det is an int
-	int32_t det = matrix[0][0]*matrix[1][1]*matrix[2][2];
-	det += matrix[0][1]*matrix[1][2]*matrix[2][0];
-	det += matrix[1][0]*matrix[2][1]*matrix[0][2];
-	det -= matrix[0][2]*matrix[1][1]*matrix[2][0];
-	det -= matrix[0][1]*matrix[1][0]*matrix[2][2];
-	det -= matrix[1][2]*matrix[2][1]*matrix[0][0];
-	return det;
-}
-
-
-
-//*************** higher level object recognition functions ***************
-
-bool compute_weights (uint8_t r_obj, uint8_t g_obj, uint8_t b_obj, uint8_t r_back, uint8_t g_back, uint8_t b_back){
+bool compute_weights (uint8_t r_obj, uint8_t g_obj, uint8_t b_obj, uint8_t r_back, uint8_t g_back, uint8_t b_back, float* w_r_ptr, float* w_g_ptr, float* w_b_ptr){
 	//High/low values
 	uint8_t high = 255;
 	uint8_t low = 0;
@@ -270,9 +261,9 @@ bool compute_weights (uint8_t r_obj, uint8_t g_obj, uint8_t b_obj, uint8_t r_bac
 
 			wO = -(alpha_one*beta_one+alpha_two*beta_two)/(1+alpha_one*alpha_one+alpha_two*alpha_two);
 
-			w_r = wO;
-			w_g = wO*alpha_one+beta_one;
-			w_b = wO*alpha_two+beta_two;
+			*w_r_ptr = wO;
+			*w_g_ptr = wO*alpha_one+beta_one;
+			*w_b_ptr = wO*alpha_two+beta_two;
 			break;
 
 		case G:
@@ -283,9 +274,9 @@ bool compute_weights (uint8_t r_obj, uint8_t g_obj, uint8_t b_obj, uint8_t r_bac
 
 			wO = -(alpha_one*beta_one+alpha_two*beta_two)/(1+alpha_one*alpha_one+alpha_two*alpha_two);
 
-			w_r = wO*alpha_one+beta_one;
-			w_g = wO;
-			w_b = wO*alpha_two+beta_two;
+			*w_r_ptr = wO*alpha_one+beta_one;
+			*w_g_ptr = wO;
+			*w_b_ptr = wO*alpha_two+beta_two;
 			break;
 
 		case B:
@@ -296,14 +287,13 @@ bool compute_weights (uint8_t r_obj, uint8_t g_obj, uint8_t b_obj, uint8_t r_bac
 
 			wO = -(alpha_one*beta_one+alpha_two*beta_two)/(1+alpha_one*alpha_one+alpha_two*alpha_two);
 
-			w_r = wO*alpha_one+beta_one;
-			w_g = wO*alpha_two+beta_two;
-			w_b = wO;
+			*w_r_ptr = wO*alpha_one+beta_one;
+			*w_g_ptr = wO*alpha_two+beta_two;
+			*w_b_ptr = wO;
 			break;
 	}
 	return true;
 }
-
 
 
 bool dist_measure (uint8_t* image, uint16_t size){
@@ -352,11 +342,85 @@ bool dist_measure (uint8_t* image, uint16_t size){
 	uint16_t size_obj_pix = end-begin;
 
 	//if not initialized yet, computation of the constant for size-to-distance conversion, else compute distance
-	if (!size2dist_conv) size2dist_conv = size_obj_pix*tof_dist_calib;
+	if (!size2dist_conv) size2dist_conv = size_obj_pix*tof_dist_calib_mm;
 	else{
 		real_dist = size2dist_conv/size_obj_pix;
 		hor_dist = (size_obj_pix - size)/2 + begin;
 	}
 	return true;
+}
+
+
+
+//*************** low level calibration functions ***************
+
+void read_colors(uint8_t* img_buff_ptr, uint16_t i, uint8_t* colors){
+	//multiply red and blue (5bit) by 2 to have the same range as green (6 bit)
+	uint16_t rgb = ((img_buff_ptr[2*i] << 8) + img_buff_ptr[2*i+1]);
+	colors[R] = 2*((rgb & RED) >> 11);
+	colors[G] = (rgb & GREEN) >> 5;
+	colors[B] = 2*(rgb & BLUE);
+}
+
+
+
+//*************** low level linear algebra functions ***************
+
+void do_gauss (float matrix [M][N]){
+	//i represents line, j represents columns
+
+	//elimination of lower non-diagonal coefficients
+	for(int8_t i = 1; i < M; i++){
+		for(uint8_t j = 0; j < i; j++){
+			if(matrix[i][j]){
+				float factor = matrix[i][j]/matrix[j][j];
+				subtract_lines(matrix,j,i,factor);
+			}
+		}
+	}
+	//elimination of upper non-diagonal coefficients
+	for(int8_t i = M-2 ; i >= 0; i--){
+		for(uint8_t j = M-1; j > i; j--){
+			if(matrix[i][j]){
+				float factor = matrix[i][j]/matrix[j][j];
+				subtract_lines(matrix,j,i,factor);
+			}
+		}
+	}
+}
+
+
+void exchange_lines(float matrix [M][N], uint8_t line_a, uint8_t line_b){
+	if(line_a < M && line_b < M && line_a != line_b){
+		float temporary_line [N] = {0};
+		for(uint8_t i = 0; i < N; i ++){
+			//exchange lines a and b
+			temporary_line [i] = matrix[line_a][i];
+			matrix[line_a][i] = matrix[line_b][i];
+			matrix[line_b][i] = temporary_line[i];
+		}
+	}
+}
+
+
+void subtract_lines(float matrix [M][N], uint8_t line_a, uint8_t line_b, float factor){
+	//subtracts factor*line_a from line_b
+	if(line_a < M && line_b < M && line_a != line_b){
+		for(uint8_t i = 0; i < N; i ++){
+			matrix[line_b][i] -= factor*matrix[line_a][i];
+		}
+	}
+}
+
+
+int32_t det_3_3 (float matrix [M][N]){
+	//before reducing with Gauss' theorem, the matrix only contains ints so the det is an int
+	int32_t det = matrix[0][0]*matrix[1][1]*matrix[2][2];
+	det += matrix[0][1]*matrix[1][2]*matrix[2][0];
+	det += matrix[1][0]*matrix[2][1]*matrix[0][2];
+	det -= matrix[0][2]*matrix[1][1]*matrix[2][0];
+	det -= matrix[0][1]*matrix[1][0]*matrix[2][2];
+	det -= matrix[1][2]*matrix[2][1]*matrix[0][0];
+	return det;
 }
 

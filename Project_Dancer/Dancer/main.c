@@ -17,7 +17,7 @@
 
 
 
-#define MEAN_RANGE 		50
+#define MEAN_RANGE 		5
 
 static void serial_start(void)
 {
@@ -43,33 +43,33 @@ int main(void)
     //start the USB communication
     usb_start();
 
-    //start ToF with high accuracy, also starts I2C
+    //start ToF (also starts I2C);
 //    VL53L0X_start();
-//    VL53L0X_configAccuracy(VL53L0X_ADDR, VL53L0X_HIGH_ACCURACY);
 
-    //starts the camera
-    dcmi_start();
+    //starts camera and image processing
+  	dcmi_start();
 	po8030_start();
 	process_image_start();
 
-//    uint16_t sum = 0;
-//    float mean = 0;
+    uint16_t sum = 0;
+    float mean = 0;
 
     //Infinite loop
     while (1) {
-    	 /**
-    		for(uint8_t i = 0; i < MEAN_RANGE; i++){
-    			uint16_t curent = VL53L0X_get_dist_mm();
-    			sum+= curent;
-    			chprintf((BaseSequentialStream *)&SD3, "%d, ", curent);
-    			chThdSleepMilliseconds(100);
-    		}
-    		mean = (float)sum/MEAN_RANGE;
-    	 	chprintf((BaseSequentialStream *)&SD3, "-> Dist = %.1f mm\n", mean);
+//    		uint16_t dist = VL53L0X_get_dist_mm();
+//    		chprintf((BaseSequentialStream *)&SDU1, "%d\n ", dist);
 
-    	 	sum = 0;
-    	 	mean = 0;
-    	 	*/
+//    		for(uint8_t i = 0; i < MEAN_RANGE; i++){
+//    			uint16_t curent = VL53L0X_get_dist_mm();
+//    			sum+= curent;
+//    			chThdSleepMilliseconds(100);
+//    		}
+//    		mean = (float)sum/MEAN_RANGE;
+//    	 	chprintf((BaseSequentialStream *)&SDU1, "-> Dist = %.1f mm\n", mean);
+//
+//    	 	sum = 0;
+//    	 	mean = 0;
+
         chThdSleepMilliseconds(100);
     }
 }
