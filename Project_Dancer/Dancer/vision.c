@@ -15,19 +15,21 @@
 
 #include <main.h>
 #include <camera/po8030.h>
+#include"sensors/VL53L0X/VL53L0X.h"
 
 #include <vision.h>
 
 #define RED							(31 << 11)	//0b11111 000000 00000
 #define GREEN 						(63 << 5)	//0b00000 111111 00000
 #define BLUE							31			//0b00000 000000 11111
-enum color {R, G, B};
+enum ref_color {R, G, B};
 #define M							3
 #define N							5
 
 #define NB_SAMPLES_CALIB				20			//take 20 successive measurements
 #define WIDTH_SAMPLES_CALIB			20			//20 pixels-wide zone
-#define START_CALIB					((IMAGE_BUFFER_SIZE-WIDTH_SAMPLES_CALIB)/2 )
+#define START_CALIB					((IMAGE_BUFFER_SIZE-WIDTH_SAMPLES_CALIB)/2 ) //always center the zone
+enum obj_or_back	 {OBJ, BACK};
 
 enum Line_detector_state {SEARCH_BEGIN, SEARCH_END, FINISHED};
 #define DETECT_TRESH				10
@@ -44,8 +46,10 @@ void do_gauss (float matrix [M][N]);
 void exchange_lines(float matrix [M][N], uint8_t line_a, uint8_t line_b);
 void subtract_lines(float matrix [M][N], uint8_t line_a, uint8_t line_b, float factor);
 
-void read_colors(uint8_t* img_buff_ptr, uint16_t i, uint8_t* colors);
+void calib_colors(uint8_t* r_ptr, uint8_t* g_ptr, uint8_t* b_ptr, bool obj_or_back);
 bool compute_weights (uint8_t r_obj, uint8_t g_obj, uint8_t b_obj, uint8_t r_back, uint8_t g_back, uint8_t b_back,float* w_r_ptr, float* w_g_ptr, float* w_b_ptr);
+
+void read_image(uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float w_r, float w_g, float w_b);
 bool dist_measure (uint8_t* image, uint16_t size);
 
 
@@ -91,91 +95,32 @@ static THD_FUNCTION(ProcessImage, arg) {
     chRegSetThreadName(__FUNCTION__);
     (void)arg;
 
-	uint8_t *img_buff_ptr;
 	uint8_t image[IMAGE_BUFFER_SIZE] = {0};
+	uint8_t* img_buff_ptr;
 
-	//reference values for obj and background (should be measured)
-//	uint8_t r_obj = 50;
-//	uint8_t g_obj = 20;
-//	uint8_t b_obj = 20;
-//
-//	uint8_t r_back = 27;
-//	uint8_t g_back = 32;
-//	uint8_t b_back = 29;
-
-	uint8_t colors_tab [3] = {0}; //contains the three measured values R,G,B
-	float w_r, w_g, w_b; //weights used to detect the desired color in the image
 	uint8_t r_obj, g_obj, b_obj, r_back, g_back, b_back; //average color values, used for computation of weights
-	uint32_t sum_r = 0; uint32_t sum_g = 0; uint32_t sum_b = 0; //used to store the sum for averages
-	uint8_t calibration_counter = 0;
+	calib_colors(&r_obj, &g_obj, &b_obj, OBJ);
+	chThdSleepMilliseconds(10000);
+	calib_colors(&r_back, &g_back, &b_back, BACK);
 
-    chThdSleepMilliseconds(1000);
+	float w_r, w_g, w_b; //weights used to detect the desired color in the image
+	compute_weights (r_obj, g_obj, b_obj, r_back, g_back, b_back, &w_r, &w_g, &w_b);
 
+	chprintf((BaseSequentialStream *) &SDU1,"OBJCET : R = %d, G = %d, B = %d\n"
+											"BACKGROUND : R = %d, G = %d, B = %d\n"
+											"WEIGHTS : R = %.2f, G = %.2f, B = %.2f\n\n",
+												r_obj, g_obj, b_obj,r_back,g_back,b_back, w_r, w_g, w_b);
 	while(1){
 	    	//waits until an image has been captured
-	        chBSemWait(&image_ready_sem);
-			//gets the pointer to the array filled with the last image in RGB565
-			img_buff_ptr = dcmi_get_last_image_ptr();
+		chBSemWait(&image_ready_sem);
+		//gets the pointer to the array filled with the last image in RGB565
+		img_buff_ptr = dcmi_get_last_image_ptr();
 
-			//***calibration***
-			if(calibration_counter < NB_SAMPLES_CALIB){
-				for(uint16_t i = START_CALIB; i < START_CALIB + WIDTH_SAMPLES_CALIB; i++){
-					//average in space, the object is supposed to be monochrome
-					read_colors(img_buff_ptr, i, colors_tab);
-					sum_r += colors_tab[R];
-					sum_g += colors_tab[G];
-					sum_b += colors_tab[B];
-				}
-				calibration_counter ++;
-				if(calibration_counter == NB_SAMPLES_CALIB){
-					//average in time
-					r_obj = sum_r/(NB_SAMPLES_CALIB*WIDTH_SAMPLES_CALIB);
-					g_obj = sum_g/(NB_SAMPLES_CALIB*WIDTH_SAMPLES_CALIB);
-					b_obj = sum_b/(NB_SAMPLES_CALIB*WIDTH_SAMPLES_CALIB);
-					sum_r = 0;
-					sum_g = 0;
-					sum_b = 0;
-					chThdSleepMilliseconds(3000);
-				}
-			}
-			else if (calibration_counter >= NB_SAMPLES_CALIB && calibration_counter < 2*NB_SAMPLES_CALIB){
-				for(uint16_t i = 0; i < IMAGE_BUFFER_SIZE; i++){
-					//average in space, the object is supposed to be monochrome
-					read_colors(img_buff_ptr, i, colors_tab);
-					sum_r += colors_tab[R];
-					sum_g += colors_tab[G];
-					sum_b += colors_tab[B];
-				}
-				calibration_counter ++;
-				if(calibration_counter == 2*NB_SAMPLES_CALIB){
-					//average in time
-					r_back = sum_r/(NB_SAMPLES_CALIB*IMAGE_BUFFER_SIZE);
-					g_back = sum_g/(NB_SAMPLES_CALIB*IMAGE_BUFFER_SIZE);
-					b_back = sum_b/(NB_SAMPLES_CALIB*IMAGE_BUFFER_SIZE);
-					sum_r = 0;
-					sum_g = 0;
-					sum_b = 0;
-					compute_weights(r_obj, g_obj, b_obj, r_back, g_back, b_back, &w_r, &w_g, &w_b);
-				}
-			}
-			else {
-				for(uint16_t i = 0; i < IMAGE_BUFFER_SIZE; i++){
+		read_image(image, IMAGE_BUFFER_SIZE, img_buff_ptr, w_r, w_g, w_b);
 
-					read_colors(img_buff_ptr, i, colors_tab);
-
-					//compute f: R3->R1 for each pixel, avoid overflow, store value in image[]
-					float f_value = w_r*colors_tab[R]+w_g*colors_tab[G]+w_b*colors_tab[B];
-					if (f_value < 0) f_value = 0;
-					else if(f_value > 255) f_value = 255;
-					image[i] = f_value;
-				}
-				//Send the data
-				SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
-//				chprintf((BaseSequentialStream *) &SDU1,"OBJCET : R = %d, G = %d, B = %d\n"
-//														"BACKGROUND : R = %d, G = %d, B = %d\n\n",
-//															r_obj, g_obj, b_obj,r_back,g_back,b_back);
-			}
-	    }
+		//Send the data
+		SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
+	}
 }
 
 
@@ -198,11 +143,124 @@ void process_image_start(void){
 
 
 
-//*************** medium level object recognition functions ***************
+//*************** intermediate level object recognition functions ***************
+void read_image(uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float w_r, float w_g, float w_b){
+	for(uint16_t i = 0; i < size; i++){
+		//multiply red and blue (5bit) by 2 to have the same range as green (6 bit)
+		uint16_t rgb = ((img_buff_ptr[2*i] << 8) + img_buff_ptr[2*i+1]);
+		uint8_t red = 2*((rgb & RED) >> 11);
+		uint8_t green = (rgb & GREEN) >> 5;
+		uint8_t blue = 2*(rgb & BLUE);
+		//compute f: R3->R1 for each pixel, avoid overflow, store value in image[]
+		float f_value = w_r*red+w_g*green+w_b*blue;
+		if (f_value < 0) f_value = 0;
+		else if(f_value > 255) f_value = 255;
+		image[i] = f_value;
+	}
+}
+
+
+bool dist_measure (uint8_t* image, uint16_t size){
+
+	//state of the object detector, starts by searching for the beginning of the object
+	uint8_t state = SEARCH_BEGIN;
+
+	//start and stop of the vertical object between 0 and <size>
+	uint16_t begin = 0;
+	uint16_t end = 0;
+
+	for (uint16_t i = 1; i < size; i ++){
+		switch(state){
+
+			case SEARCH_BEGIN :
+				if (image[i] - image[i-1] > DETECT_TRESH){
+					begin = i;
+					state = SEARCH_END;
+				}
+				break;
+
+			case SEARCH_END :
+				if (image[i] - image[i-1] < -DETECT_TRESH){
+					if (end-begin < MIN_OBJ_SIZE){
+						//error: object too small, may be a glitch or an unwanted reflect
+						begin = 0;
+						state = SEARCH_BEGIN;
+					}
+					else{
+						end = i;
+						state = FINISHED;
+					}
+				}
+				break;
+
+			case FINISHED :
+				//error: multiple objects
+				if (image[i] - image[i-1] > DETECT_TRESH) return false;
+				break;
+		}
+	}
+
+	//error: no object found or object not entirely visible
+	if (state != FINISHED) return false;
+
+	uint16_t size_obj_pix = end-begin;
+
+	//if not initialized yet, computation of the constant for size-to-distance conversion, else compute distance
+	if (!size2dist_conv) size2dist_conv = size_obj_pix*tof_dist_calib_mm;
+	else{
+		real_dist = size2dist_conv/size_obj_pix;
+		hor_dist = (size_obj_pix - size)/2 + begin;
+	}
+	return true;
+}
+
+
+
+
+//*************** intermediate level calibration functions ***************
+
+void calib_colors(uint8_t* r_ptr, uint8_t* g_ptr, uint8_t* b_ptr, bool obj_or_back){
+
+	uint8_t* img_buff_ptr;
+	uint32_t sum_r = 0; uint32_t sum_g = 0; uint32_t sum_b = 0;
+	uint16_t start, width; //start and width of space average
+
+	if (obj_or_back == OBJ){
+		start = START_CALIB;
+		width = WIDTH_SAMPLES_CALIB;
+	}
+	else{
+		start = 0;
+		width = IMAGE_BUFFER_SIZE;
+	}
+
+	//sum with respect to time
+	for(uint8_t i = 0; i < NB_SAMPLES_CALIB; i++){
+
+		//waits until an image has been captured
+		chBSemWait(&image_ready_sem);
+		//gets the pointer to the array filled with the last image in RGB565
+		img_buff_ptr = dcmi_get_last_image_ptr();
+
+		//sum with respect to space, the object is supposed to be monochrome
+		for(uint16_t j = start; j < start+width; j++){
+			//multiply red and blue (5bit) by 2 to have the same range as green (6 bit)
+			uint16_t rgb = ((img_buff_ptr[2*j] << 8) + img_buff_ptr[2*j+1]);
+			sum_r += 2*((rgb & RED) >> 11);
+			sum_g += (rgb & GREEN) >> 5;
+			sum_b += 2*(rgb & BLUE);
+		}
+	}
+
+	*r_ptr = sum_r/(NB_SAMPLES_CALIB*width);
+	*g_ptr = sum_g/(NB_SAMPLES_CALIB*width);
+	*b_ptr = sum_b/(NB_SAMPLES_CALIB*width);
+}
+
 
 bool compute_weights (uint8_t r_obj, uint8_t g_obj, uint8_t b_obj, uint8_t r_back, uint8_t g_back, uint8_t b_back, float* w_r_ptr, float* w_g_ptr, float* w_b_ptr){
 	//High/low values
-	uint8_t high = 255;
+	uint8_t high = 200;
 	uint8_t low = 0;
 
 	//add a line to the matrix to solve with Gauss and change last line until the matrix is invertible
@@ -295,72 +353,6 @@ bool compute_weights (uint8_t r_obj, uint8_t g_obj, uint8_t b_obj, uint8_t r_bac
 	return true;
 }
 
-
-bool dist_measure (uint8_t* image, uint16_t size){
-
-	//state of the object detector, starts by searching for the beginning of the object
-	uint8_t state = SEARCH_BEGIN;
-
-	//start and stop of the vertical object between 0 and <size>
-	uint16_t begin = 0;
-	uint16_t end = 0;
-
-	for (uint16_t i = 1; i < size; i ++){
-		switch(state){
-
-			case SEARCH_BEGIN :
-				if (image[i] - image[i-1] > DETECT_TRESH){
-					begin = i;
-					state = SEARCH_END;
-				}
-				break;
-
-			case SEARCH_END :
-				if (image[i] - image[i-1] < -DETECT_TRESH){
-					if (end-begin < MIN_OBJ_SIZE){
-						//error: object too small, may be a glitch or an unwanted reflect
-						begin = 0;
-						state = SEARCH_BEGIN;
-					}
-					else{
-						end = i;
-						state = FINISHED;
-					}
-				}
-				break;
-
-			case FINISHED :
-				//error: multiple objects
-				if (image[i] - image[i-1] > DETECT_TRESH) return false;
-				break;
-		}
-	}
-
-	//error: no object found or object not entirely visible
-	if (state != FINISHED) return false;
-
-	uint16_t size_obj_pix = end-begin;
-
-	//if not initialized yet, computation of the constant for size-to-distance conversion, else compute distance
-	if (!size2dist_conv) size2dist_conv = size_obj_pix*tof_dist_calib_mm;
-	else{
-		real_dist = size2dist_conv/size_obj_pix;
-		hor_dist = (size_obj_pix - size)/2 + begin;
-	}
-	return true;
-}
-
-
-
-//*************** low level calibration functions ***************
-
-void read_colors(uint8_t* img_buff_ptr, uint16_t i, uint8_t* colors){
-	//multiply red and blue (5bit) by 2 to have the same range as green (6 bit)
-	uint16_t rgb = ((img_buff_ptr[2*i] << 8) + img_buff_ptr[2*i+1]);
-	colors[R] = 2*((rgb & RED) >> 11);
-	colors[G] = (rgb & GREEN) >> 5;
-	colors[B] = 2*(rgb & BLUE);
-}
 
 
 

@@ -138,7 +138,24 @@ build/obj/vision.o: vision.c \
  /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/stdlib.h \
  /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/machine/stdlib.h \
  /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/alloca.h \
- ../../lib/e-puck2_main-processor/src/camera/po8030.h vision.h
+ ../../lib/e-puck2_main-processor/src/camera/po8030.h \
+ ../../lib/e-puck2_main-processor/src/sensors/VL53L0X/VL53L0X.h \
+ ../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/vl53l0x_api.h \
+ ../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/vl53l0x_api_strings.h \
+ ../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/vl53l0x_def.h \
+ ../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/vl53l0x_device.h \
+ ../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/vl53l0x_types.h \
+ ../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/../../platform/inc/vl53l0x_platform.h \
+ ../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/../../platform/inc/../../core/inc/vl53l0x_def.h \
+ ../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/../../platform/inc/vl53l0x_platform_log.h \
+ /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/stdio.h \
+ /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/sys/stdio.h \
+ /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/string.h \
+ /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/xlocale.h \
+ /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/strings.h \
+ /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/sys/string.h \
+ ../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/../../platform/inc/vl53l0x_i2c_platform.h \
+ vision.h
 
 ../../lib/e-puck2_main-processor/ChibiOS//os/rt/include/ch.h:
 
@@ -421,5 +438,37 @@ main.h:
 /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/alloca.h:
 
 ../../lib/e-puck2_main-processor/src/camera/po8030.h:
+
+../../lib/e-puck2_main-processor/src/sensors/VL53L0X/VL53L0X.h:
+
+../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/vl53l0x_api.h:
+
+../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/vl53l0x_api_strings.h:
+
+../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/vl53l0x_def.h:
+
+../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/vl53l0x_device.h:
+
+../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/vl53l0x_types.h:
+
+../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/../../platform/inc/vl53l0x_platform.h:
+
+../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/../../platform/inc/../../core/inc/vl53l0x_def.h:
+
+../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/../../platform/inc/vl53l0x_platform_log.h:
+
+/Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/stdio.h:
+
+/Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/sys/stdio.h:
+
+/Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/string.h:
+
+/Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/xlocale.h:
+
+/Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/strings.h:
+
+/Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/sys/string.h:
+
+../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/../../platform/inc/vl53l0x_i2c_platform.h:
 
 vision.h:
