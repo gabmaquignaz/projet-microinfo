@@ -19,46 +19,58 @@
 
 #include <vision.h>
 
+
 #define RED							(31 << 11)	//0b11111 000000 00000
 #define GREEN 						(63 << 5)	//0b00000 111111 00000
 #define BLUE							31			//0b00000 000000 11111
-enum ref_color {R, G, B};
+enum Ref_color {R, G, B};
+
 #define M							3
 #define N							5
 
+#define GRADIENT_MAX 				500
+
+#define IMAGE_BUFFER_SIZE			640
 #define NB_SAMPLES_CALIB				20			//take 20 successive measurements
 #define WIDTH_SAMPLES_CALIB			20			//20 pixels-wide zone
 #define START_CALIB					((IMAGE_BUFFER_SIZE-WIDTH_SAMPLES_CALIB)/2 ) //always center the zone
-enum obj_or_back	 {OBJ, BACK};
+enum Obj_or_back	 {OBJ, BACK};
+#define TOF_MAX_DIST					100
+#define TOF_MIN_DIST					60
 
 enum Line_detector_state {SEARCH_BEGIN, SEARCH_END, FINISHED};
-#define DETECT_TRESH				10
-#define MIN_OBJ_SIZE 			5
+#define DETECT_TRESH				30
+#define MIN_OBJ_SIZE 			30
 
-static float hor_dist = 0;
-static float real_dist = 0;
-static float size2dist_conv = 0;
-static uint16_t tof_dist_calib_mm = 0;
+static float hor_dist = 0.0;
+static float real_dist = 0.0;
+static float size2dist_conv = 1.0;
 
 
+
+//detection functions
+void read_image(uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float w_r, float w_g, float w_b);
+bool dist_measure (uint8_t* image, uint16_t size);
+
+//calibration functions
+//size2dist
+void calib_colors(uint8_t* r_ptr, uint8_t* g_ptr, uint8_t* b_ptr, bool obj_or_back);
+bool compute_weights (uint8_t r_obj, uint8_t g_obj, uint8_t b_obj, uint8_t r_back, uint8_t g_back, uint8_t b_back,float* w_r_ptr, float* w_g_ptr, float* w_b_ptr);
+
+//linear algebra functions
 int32_t det_3_3 (float matrix [M][N]);
 void do_gauss (float matrix [M][N]);
 void exchange_lines(float matrix [M][N], uint8_t line_a, uint8_t line_b);
 void subtract_lines(float matrix [M][N], uint8_t line_a, uint8_t line_b, float factor);
 
-void calib_colors(uint8_t* r_ptr, uint8_t* g_ptr, uint8_t* b_ptr, bool obj_or_back);
-bool compute_weights (uint8_t r_obj, uint8_t g_obj, uint8_t b_obj, uint8_t r_back, uint8_t g_back, uint8_t b_back,float* w_r_ptr, float* w_g_ptr, float* w_b_ptr);
-
-void read_image(uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float w_r, float w_g, float w_b);
-bool dist_measure (uint8_t* image, uint16_t size);
-
-
+//send data
 void SendUint8ToComputer(uint8_t* data, uint16_t size)
 {
 	chSequentialStreamWrite((BaseSequentialStream *)&SD3, (uint8_t*)"START", 5);
 	chSequentialStreamWrite((BaseSequentialStream *)&SD3, (uint8_t*)&size, sizeof(uint16_t));
 	chSequentialStreamWrite((BaseSequentialStream *)&SD3, (uint8_t*)data, size);
 }
+
 
 
 //semaphore
@@ -97,19 +109,29 @@ static THD_FUNCTION(ProcessImage, arg) {
 
 	uint8_t image[IMAGE_BUFFER_SIZE] = {0};
 	uint8_t* img_buff_ptr;
-
-	uint8_t r_obj, g_obj, b_obj, r_back, g_back, b_back; //average color values, used for computation of weights
-	calib_colors(&r_obj, &g_obj, &b_obj, OBJ);
-	chThdSleepMilliseconds(10000);
-	calib_colors(&r_back, &g_back, &b_back, BACK);
-
 	float w_r, w_g, w_b; //weights used to detect the desired color in the image
-	compute_weights (r_obj, g_obj, b_obj, r_back, g_back, b_back, &w_r, &w_g, &w_b);
+	bool first_try = true;
+//
+//
+//	chThdSleepMilliseconds(3000);
+//
+//	do{
+//		if (first_try) first_try = false;
+//		else{
+//			chprintf((BaseSequentialStream *) &SDU1,"Error : object too dark or not distinct enough.\nWEIGHTS : R = %.2f, G = %.2f, B = %.2f\n\n",w_r,w_g,w_b);
+//			chThdSleepMilliseconds(3000);
+//		}
+//		calib_colors(&r_obj, &g_obj, &b_obj, OBJ);
+//	}
+//	while(!compute_weights (r_obj, g_obj, b_obj, r_back, g_back, b_back, &w_r, &w_g, &w_b));
+//
+//
+//	chprintf((BaseSequentialStream *) &SDU1,"OBJCET : R = %d, G = %d, B = %d\n"
+//											"BACKGROUND : R = %d, G = %d, B = %d\n"
+//											"WEIGHTS : R = %.2f, G = %.2f, B = %.2f\n\n",
+//												r_obj, g_obj, b_obj,r_back,g_back,b_back, w_r, w_g, w_b);
 
-	chprintf((BaseSequentialStream *) &SDU1,"OBJCET : R = %d, G = %d, B = %d\n"
-											"BACKGROUND : R = %d, G = %d, B = %d\n"
-											"WEIGHTS : R = %.2f, G = %.2f, B = %.2f\n\n",
-												r_obj, g_obj, b_obj,r_back,g_back,b_back, w_r, w_g, w_b);
+
 	while(1){
 	    	//waits until an image has been captured
 		chBSemWait(&image_ready_sem);
@@ -118,8 +140,9 @@ static THD_FUNCTION(ProcessImage, arg) {
 
 		read_image(image, IMAGE_BUFFER_SIZE, img_buff_ptr, w_r, w_g, w_b);
 
-		//Send the data
-		SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
+//		SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
+		if(dist_measure(image, IMAGE_BUFFER_SIZE)) chprintf((BaseSequentialStream *) &SDU1, "r = %.3f, x = %.3f\n", real_dist, hor_dist);
+		else chprintf((BaseSequentialStream *) &SDU1, "Error !");
 	}
 }
 
@@ -162,6 +185,9 @@ void read_image(uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float w_r,
 
 bool dist_measure (uint8_t* image, uint16_t size){
 
+	//error: conversion uninitialized
+	if (!size2dist_conv) return false;
+
 	//state of the object detector, starts by searching for the beginning of the object
 	uint8_t state = SEARCH_BEGIN;
 
@@ -182,7 +208,7 @@ bool dist_measure (uint8_t* image, uint16_t size){
 			case SEARCH_END :
 				if (image[i] - image[i-1] < -DETECT_TRESH){
 					if (end-begin < MIN_OBJ_SIZE){
-						//error: object too small, may be a glitch or an unwanted reflect
+						//ignore if object is too small, may be a glitch or an unwanted reflect
 						begin = 0;
 						state = SEARCH_BEGIN;
 					}
@@ -199,18 +225,13 @@ bool dist_measure (uint8_t* image, uint16_t size){
 				break;
 		}
 	}
-
 	//error: no object found or object not entirely visible
 	if (state != FINISHED) return false;
 
-	uint16_t size_obj_pix = end-begin;
 
-	//if not initialized yet, computation of the constant for size-to-distance conversion, else compute distance
-	if (!size2dist_conv) size2dist_conv = size_obj_pix*tof_dist_calib_mm;
-	else{
-		real_dist = size2dist_conv/size_obj_pix;
-		hor_dist = (size_obj_pix - size)/2 + begin;
-	}
+	uint16_t size_obj_pix = end-begin;
+	real_dist = size2dist_conv/size_obj_pix;
+	hor_dist = (size_obj_pix - size)/2 + begin;
 	return true;
 }
 
@@ -218,6 +239,22 @@ bool dist_measure (uint8_t* image, uint16_t size){
 
 
 //*************** intermediate level calibration functions ***************
+
+void vision_init (uint8_t* r_ptr, uint8_t* g_ptr, uint8_t* b_ptr){
+	//background identification
+	uint8_t r_back, g_back, b_back; //average color values
+	calib_colors(&r_back, &g_back, &b_back, BACK);
+
+	//Ready for object identification
+
+    //start ToF (also starts I2C);
+	VL53L0X_start();
+	uint16_t tof_dist_calib_mm = 0;
+	do{
+		//show ready with LEDs
+	} while (!(tof_dist_calib_mm < TOF_MAX_DIST && tof_dist_calib_mm > TOF_MIN_DIST));
+}
+
 
 void calib_colors(uint8_t* r_ptr, uint8_t* g_ptr, uint8_t* b_ptr, bool obj_or_back){
 
@@ -259,15 +296,15 @@ void calib_colors(uint8_t* r_ptr, uint8_t* g_ptr, uint8_t* b_ptr, bool obj_or_ba
 
 
 bool compute_weights (uint8_t r_obj, uint8_t g_obj, uint8_t b_obj, uint8_t r_back, uint8_t g_back, uint8_t b_back, float* w_r_ptr, float* w_g_ptr, float* w_b_ptr){
-	//High/low values
-	uint8_t high = 200;
-	uint8_t low = 0;
+
+	uint8_t goal_val_obj = 250;
+	uint8_t goal_val_back = 0;
 
 	//add a line to the matrix to solve with Gauss and change last line until the matrix is invertible
 	//fourth column represents goal values of F, fifth column is for tracking reference color
-	float sys[M][N] = {	{r_obj,g_obj,b_obj,high,0},
-						{r_back,g_back,b_back,low,0},
-						{0,0,1,0,1} };
+	float sys[M][N] = {	{r_obj,  g_obj,  b_obj,  goal_val_obj,  0},
+						{r_back, g_back, b_back, goal_val_back, 0},
+						{0,      0,      1,      0,             1} };
 
 	uint8_t ref_color = B; //by default, the 1 on last line is placed in third position and will represent blue when solving
 
@@ -350,7 +387,8 @@ bool compute_weights (uint8_t r_obj, uint8_t g_obj, uint8_t b_obj, uint8_t r_bac
 			*w_b_ptr = wO;
 			break;
 	}
-	return true;
+	if (((*w_r_ptr)*(*w_r_ptr)+(*w_g_ptr)*(*w_g_ptr)+(*w_b_ptr)*(*w_b_ptr)) > GRADIENT_MAX) return false; // object is either too dark or too similar to background
+	else return true;
 }
 
 
@@ -415,4 +453,3 @@ int32_t det_3_3 (float matrix [M][N]){
 	det -= matrix[1][2]*matrix[2][1]*matrix[0][0];
 	return det;
 }
-

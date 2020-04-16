@@ -43,9 +43,6 @@ int main(void)
     //start the USB communication
     usb_start();
 
-    //start ToF (also starts I2C);
-//    VL53L0X_start();
-
     //starts camera and image processing
   	dcmi_start();
 	po8030_start();
