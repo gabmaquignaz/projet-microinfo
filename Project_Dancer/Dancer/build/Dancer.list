@@ -1520,169 +1520,164 @@ Disassembly of section .text:
 08001310 <p_control>:
  8001310:	e92d 4ff0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
  8001314:	ed2d 8b10 	vpush	{d8-d15}
- 8001318:	f8df b228 	ldr.w	fp, [pc, #552]	; 8001544 <p_control+0x234>
- 800131c:	ed9f aa80 	vldr	s20, [pc, #512]	; 8001520 <p_control+0x210>
+ 8001318:	f8df b224 	ldr.w	fp, [pc, #548]	; 8001540 <p_control+0x230>
+ 800131c:	ed9f aa7e 	vldr	s20, [pc, #504]	; 8001518 <p_control+0x208>
  8001320:	f8db 3000 	ldr.w	r3, [fp]
- 8001324:	eddf 9a7f 	vldr	s19, [pc, #508]	; 8001524 <p_control+0x214>
- 8001328:	f8df a21c 	ldr.w	sl, [pc, #540]	; 8001548 <p_control+0x238>
- 800132c:	eddf ea7e 	vldr	s29, [pc, #504]	; 8001528 <p_control+0x218>
- 8001330:	eddf ba7e 	vldr	s23, [pc, #504]	; 800152c <p_control+0x21c>
- 8001334:	ed9f ea7e 	vldr	s28, [pc, #504]	; 8001530 <p_control+0x220>
+ 8001324:	eddf 9a7d 	vldr	s19, [pc, #500]	; 800151c <p_control+0x20c>
+ 8001328:	f8df a218 	ldr.w	sl, [pc, #536]	; 8001544 <p_control+0x234>
+ 800132c:	eddf ea7c 	vldr	s29, [pc, #496]	; 8001520 <p_control+0x210>
+ 8001330:	eddf ba7c 	vldr	s23, [pc, #496]	; 8001524 <p_control+0x214>
+ 8001334:	ed9f ea7c 	vldr	s28, [pc, #496]	; 8001528 <p_control+0x218>
  8001338:	b085      	sub	sp, #20
- 800133a:	a777      	add	r7, pc, #476	; (adr r7, 8001518 <p_control+0x208>)
+ 800133a:	a775      	add	r7, pc, #468	; (adr r7, 8001510 <p_control+0x200>)
  800133c:	e9d7 6700 	ldrd	r6, r7, [r7]
  8001340:	9303      	str	r3, [sp, #12]
  8001342:	eeb0 ca4a 	vmov.f32	s24, s20
  8001346:	eeb0 ba4a 	vmov.f32	s22, s20
  800134a:	eef0 aa4a 	vmov.f32	s21, s20
- 800134e:	e00d      	b.n	800136c <p_control+0x5c>
- 8001350:	eefd 7aef 	vcvt.s32.f32	s15, s31
- 8001354:	eeb0 ca68 	vmov.f32	s24, s17
- 8001358:	ee17 3a90 	vmov	r3, s15
- 800135c:	2b00      	cmp	r3, #0
- 800135e:	bfb8      	it	lt
- 8001360:	425b      	neglt	r3, r3
- 8001362:	2b01      	cmp	r3, #1
- 8001364:	eeb0 aa48 	vmov.f32	s20, s16
- 8001368:	f340 80c8 	ble.w	80014fc <p_control+0x1ec>
- 800136c:	f000 fca0 	bl	8001cb0 <left_motor_get_pos>
- 8001370:	fb8a 2300 	smull	r2, r3, sl, r0
- 8001374:	17c0      	asrs	r0, r0, #31
- 8001376:	ebc0 10a3 	rsb	r0, r0, r3, asr #6
- 800137a:	0043      	lsls	r3, r0, #1
- 800137c:	ee08 3a90 	vmov	s17, r3
- 8001380:	f000 fcae 	bl	8001ce0 <right_motor_get_pos>
- 8001384:	fb8a 2300 	smull	r2, r3, sl, r0
- 8001388:	17c0      	asrs	r0, r0, #31
- 800138a:	ebc0 10a3 	rsb	r0, r0, r3, asr #6
- 800138e:	0043      	lsls	r3, r0, #1
- 8001390:	ee08 3a10 	vmov	s16, r3
- 8001394:	ee19 0a90 	vmov	r0, s19
- 8001398:	f7ff f916 	bl	80005c8 <__aeabi_f2d>
- 800139c:	eef8 8ae8 	vcvt.f32.s32	s17, s17
- 80013a0:	eeb8 8ac8 	vcvt.f32.s32	s16, s16
- 80013a4:	ee68 8aae 	vmul.f32	s17, s17, s29
- 80013a8:	ee28 8a2e 	vmul.f32	s16, s16, s29
- 80013ac:	ec41 0b10 	vmov	d0, r0, r1
- 80013b0:	ec41 0b1f 	vmov	d15, r0, r1
- 80013b4:	f007 fa1c 	bl	80087f0 <cos>
- 80013b8:	ee78 7a88 	vadd.f32	s15, s17, s16
- 80013bc:	ed8d 0b00 	vstr	d0, [sp]
- 80013c0:	ee77 7acc 	vsub.f32	s15, s15, s24
- 80013c4:	eeb3 9a04 	vmov.f32	s18, #52	; 0x41a00000  20.0
- 80013c8:	ee77 7aca 	vsub.f32	s15, s15, s20
- 80013cc:	eddf da59 	vldr	s27, [pc, #356]	; 8001534 <p_control+0x224>
- 80013d0:	ed9f da59 	vldr	s26, [pc, #356]	; 8001538 <p_control+0x228>
- 80013d4:	eddf ca59 	vldr	s25, [pc, #356]	; 800153c <p_control+0x22c>
- 80013d8:	ee17 0a90 	vmov	r0, s15
- 80013dc:	f7ff f8f4 	bl	80005c8 <__aeabi_f2d>
- 80013e0:	ed9d 0b00 	vldr	d0, [sp]
- 80013e4:	4604      	mov	r4, r0
- 80013e6:	460d      	mov	r5, r1
- 80013e8:	4632      	mov	r2, r6
- 80013ea:	ec51 0b10 	vmov	r0, r1, d0
- 80013ee:	463b      	mov	r3, r7
- 80013f0:	f7ff f946 	bl	8000680 <__aeabi_dmul>
- 80013f4:	4622      	mov	r2, r4
- 80013f6:	462b      	mov	r3, r5
- 80013f8:	f7ff f942 	bl	8000680 <__aeabi_dmul>
- 80013fc:	4680      	mov	r8, r0
- 80013fe:	ee1a 0a90 	vmov	r0, s21
- 8001402:	4689      	mov	r9, r1
- 8001404:	f7ff f8e0 	bl	80005c8 <__aeabi_f2d>
- 8001408:	4602      	mov	r2, r0
- 800140a:	460b      	mov	r3, r1
- 800140c:	4640      	mov	r0, r8
- 800140e:	4649      	mov	r1, r9
- 8001410:	f7fe ff7c 	bl	800030c <__adddf3>
- 8001414:	f7ff fc14 	bl	8000c40 <__aeabi_d2f>
- 8001418:	eeb0 0a4f 	vmov.f32	s0, s30
- 800141c:	eef0 0a6f 	vmov.f32	s1, s31
- 8001420:	ee0a 0a90 	vmov	s21, r0
- 8001424:	f007 fa44 	bl	80088b0 <sin>
- 8001428:	4632      	mov	r2, r6
- 800142a:	ec51 0b10 	vmov	r0, r1, d0
- 800142e:	463b      	mov	r3, r7
- 8001430:	f7ff f926 	bl	8000680 <__aeabi_dmul>
- 8001434:	4622      	mov	r2, r4
- 8001436:	462b      	mov	r3, r5
- 8001438:	f7ff f922 	bl	8000680 <__aeabi_dmul>
- 800143c:	4604      	mov	r4, r0
- 800143e:	ee1b 0a10 	vmov	r0, s22
- 8001442:	460d      	mov	r5, r1
- 8001444:	f7ff f8c0 	bl	80005c8 <__aeabi_f2d>
- 8001448:	460b      	mov	r3, r1
- 800144a:	4602      	mov	r2, r0
- 800144c:	4629      	mov	r1, r5
- 800144e:	4620      	mov	r0, r4
- 8001450:	f7fe ff5c 	bl	800030c <__adddf3>
- 8001454:	f7ff fbf4 	bl	8000c40 <__aeabi_d2f>
- 8001458:	ee38 7a68 	vsub.f32	s14, s16, s17
- 800145c:	ee3b faea 	vsub.f32	s30, s23, s21
- 8001460:	ee37 ca0c 	vadd.f32	s24, s14, s24
- 8001464:	eddf 7a36 	vldr	s15, [pc, #216]	; 8001540 <p_control+0x230>
- 8001468:	ee3c aa4a 	vsub.f32	s20, s24, s20
- 800146c:	ee0b 0a10 	vmov	s22, r0
- 8001470:	ee1f 0a10 	vmov	r0, s30
- 8001474:	eeea 9a27 	vfma.f32	s19, s20, s15
- 8001478:	f7ff f8a6 	bl	80005c8 <__aeabi_f2d>
- 800147c:	ee7b facb 	vsub.f32	s31, s23, s22
- 8001480:	e9cd 0100 	strd	r0, r1, [sp]
- 8001484:	ee1f 0a90 	vmov	r0, s31
- 8001488:	f7ff f89e 	bl	80005c8 <__aeabi_f2d>
- 800148c:	ed9d 1b00 	vldr	d1, [sp]
- 8001490:	ec41 0b10 	vmov	d0, r0, r1
- 8001494:	f007 fa6c 	bl	8008970 <atan2>
- 8001498:	ec51 0b10 	vmov	r0, r1, d0
- 800149c:	f7ff fbd0 	bl	8000c40 <__aeabi_d2f>
- 80014a0:	ee07 0a90 	vmov	s15, r0
- 80014a4:	ee37 aae9 	vsub.f32	s20, s15, s19
- 80014a8:	eef0 6a49 	vmov.f32	s13, s18
- 80014ac:	ee2a aa2b 	vmul.f32	s20, s20, s23
- 80014b0:	eeea 6a4e 	vfms.f32	s13, s20, s28
- 80014b4:	ee86 7aad 	vdiv.f32	s14, s13, s27
- 80014b8:	ee27 7a0d 	vmul.f32	s14, s14, s26
- 80014bc:	eec7 6a2c 	vdiv.f32	s13, s14, s25
- 80014c0:	eefd 7ae6 	vcvt.s32.f32	s15, s13
+ 800134e:	e00b      	b.n	8001368 <p_control+0x58>
+ 8001350:	eef0 7acc 	vabs.f32	s15, s24
+ 8001354:	eef4 7ac7 	vcmpe.f32	s15, s14
+ 8001358:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
+ 800135c:	eeb0 ca68 	vmov.f32	s24, s17
+ 8001360:	eeb0 aa48 	vmov.f32	s20, s16
+ 8001364:	f340 80c8 	ble.w	80014f8 <p_control+0x1e8>
+ 8001368:	f000 fca2 	bl	8001cb0 <left_motor_get_pos>
+ 800136c:	fb8a 2300 	smull	r2, r3, sl, r0
+ 8001370:	17c0      	asrs	r0, r0, #31
+ 8001372:	ebc0 10a3 	rsb	r0, r0, r3, asr #6
+ 8001376:	0043      	lsls	r3, r0, #1
+ 8001378:	ee08 3a90 	vmov	s17, r3
+ 800137c:	f000 fcb0 	bl	8001ce0 <right_motor_get_pos>
+ 8001380:	fb8a 2300 	smull	r2, r3, sl, r0
+ 8001384:	17c0      	asrs	r0, r0, #31
+ 8001386:	ebc0 10a3 	rsb	r0, r0, r3, asr #6
+ 800138a:	0043      	lsls	r3, r0, #1
+ 800138c:	ee08 3a10 	vmov	s16, r3
+ 8001390:	ee19 0a90 	vmov	r0, s19
+ 8001394:	f7ff f918 	bl	80005c8 <__aeabi_f2d>
+ 8001398:	eef8 8ae8 	vcvt.f32.s32	s17, s17
+ 800139c:	eeb8 8ac8 	vcvt.f32.s32	s16, s16
+ 80013a0:	ee68 8aae 	vmul.f32	s17, s17, s29
+ 80013a4:	ee28 8a2e 	vmul.f32	s16, s16, s29
+ 80013a8:	ec41 0b10 	vmov	d0, r0, r1
+ 80013ac:	ec41 0b1f 	vmov	d15, r0, r1
+ 80013b0:	f007 fa1e 	bl	80087f0 <cos>
+ 80013b4:	ee78 7a88 	vadd.f32	s15, s17, s16
+ 80013b8:	ed8d 0b00 	vstr	d0, [sp]
+ 80013bc:	ee77 7acc 	vsub.f32	s15, s15, s24
+ 80013c0:	ed9f 9a5a 	vldr	s18, [pc, #360]	; 800152c <p_control+0x21c>
+ 80013c4:	eddf da5a 	vldr	s27, [pc, #360]	; 8001530 <p_control+0x220>
+ 80013c8:	ed9f da5a 	vldr	s26, [pc, #360]	; 8001534 <p_control+0x224>
+ 80013cc:	eddf ca5a 	vldr	s25, [pc, #360]	; 8001538 <p_control+0x228>
+ 80013d0:	ee77 7aca 	vsub.f32	s15, s15, s20
+ 80013d4:	ee17 0a90 	vmov	r0, s15
+ 80013d8:	f7ff f8f6 	bl	80005c8 <__aeabi_f2d>
+ 80013dc:	ed9d 0b00 	vldr	d0, [sp]
+ 80013e0:	4604      	mov	r4, r0
+ 80013e2:	460d      	mov	r5, r1
+ 80013e4:	4632      	mov	r2, r6
+ 80013e6:	ec51 0b10 	vmov	r0, r1, d0
+ 80013ea:	463b      	mov	r3, r7
+ 80013ec:	f7ff f948 	bl	8000680 <__aeabi_dmul>
+ 80013f0:	4622      	mov	r2, r4
+ 80013f2:	462b      	mov	r3, r5
+ 80013f4:	f7ff f944 	bl	8000680 <__aeabi_dmul>
+ 80013f8:	4680      	mov	r8, r0
+ 80013fa:	ee1a 0a90 	vmov	r0, s21
+ 80013fe:	4689      	mov	r9, r1
+ 8001400:	f7ff f8e2 	bl	80005c8 <__aeabi_f2d>
+ 8001404:	4602      	mov	r2, r0
+ 8001406:	460b      	mov	r3, r1
+ 8001408:	4640      	mov	r0, r8
+ 800140a:	4649      	mov	r1, r9
+ 800140c:	f7fe ff7e 	bl	800030c <__adddf3>
+ 8001410:	f7ff fc16 	bl	8000c40 <__aeabi_d2f>
+ 8001414:	eeb0 0a4f 	vmov.f32	s0, s30
+ 8001418:	eef0 0a6f 	vmov.f32	s1, s31
+ 800141c:	ee0a 0a90 	vmov	s21, r0
+ 8001420:	f007 fa46 	bl	80088b0 <sin>
+ 8001424:	4632      	mov	r2, r6
+ 8001426:	ec51 0b10 	vmov	r0, r1, d0
+ 800142a:	463b      	mov	r3, r7
+ 800142c:	f7ff f928 	bl	8000680 <__aeabi_dmul>
+ 8001430:	4622      	mov	r2, r4
+ 8001432:	462b      	mov	r3, r5
+ 8001434:	f7ff f924 	bl	8000680 <__aeabi_dmul>
+ 8001438:	4604      	mov	r4, r0
+ 800143a:	ee1b 0a10 	vmov	r0, s22
+ 800143e:	460d      	mov	r5, r1
+ 8001440:	f7ff f8c2 	bl	80005c8 <__aeabi_f2d>
+ 8001444:	4602      	mov	r2, r0
+ 8001446:	460b      	mov	r3, r1
+ 8001448:	4620      	mov	r0, r4
+ 800144a:	4629      	mov	r1, r5
+ 800144c:	f7fe ff5e 	bl	800030c <__adddf3>
+ 8001450:	f7ff fbf6 	bl	8000c40 <__aeabi_d2f>
+ 8001454:	ee78 7a68 	vsub.f32	s15, s16, s17
+ 8001458:	ee7b faea 	vsub.f32	s31, s23, s21
+ 800145c:	ee37 ca8c 	vadd.f32	s24, s15, s24
+ 8001460:	eddf 7a36 	vldr	s15, [pc, #216]	; 800153c <p_control+0x22c>
+ 8001464:	ee3c aa4a 	vsub.f32	s20, s24, s20
+ 8001468:	ee0b 0a10 	vmov	s22, r0
+ 800146c:	ee1f 0a90 	vmov	r0, s31
+ 8001470:	eeea 9a27 	vfma.f32	s19, s20, s15
+ 8001474:	f7ff f8a8 	bl	80005c8 <__aeabi_f2d>
+ 8001478:	ee3b cacb 	vsub.f32	s24, s23, s22
+ 800147c:	e9cd 0100 	strd	r0, r1, [sp]
+ 8001480:	ee1c 0a10 	vmov	r0, s24
+ 8001484:	f7ff f8a0 	bl	80005c8 <__aeabi_f2d>
+ 8001488:	ed9d 1b00 	vldr	d1, [sp]
+ 800148c:	ec41 0b10 	vmov	d0, r0, r1
+ 8001490:	f007 fa6e 	bl	8008970 <atan2>
+ 8001494:	ec51 0b10 	vmov	r0, r1, d0
+ 8001498:	f7ff fbd2 	bl	8000c40 <__aeabi_d2f>
+ 800149c:	ee07 0a90 	vmov	s15, r0
+ 80014a0:	ee37 aae9 	vsub.f32	s20, s15, s19
+ 80014a4:	eeb0 7a49 	vmov.f32	s14, s18
+ 80014a8:	ee2a aa2b 	vmul.f32	s20, s20, s23
+ 80014ac:	eef0 faef 	vabs.f32	s31, s31
+ 80014b0:	eeaa 7a4e 	vfms.f32	s14, s20, s28
+ 80014b4:	eec7 7a2d 	vdiv.f32	s15, s14, s27
+ 80014b8:	ee67 7a8d 	vmul.f32	s15, s15, s26
+ 80014bc:	ee87 7aac 	vdiv.f32	s14, s15, s25
+ 80014c0:	eefd 7ac7 	vcvt.s32.f32	s15, s14
  80014c4:	ee17 0a90 	vmov	r0, s15
  80014c8:	f000 fbc2 	bl	8001c50 <left_motor_set_speed>
  80014cc:	eeaa 9a0e 	vfma.f32	s18, s20, s28
- 80014d0:	ee89 7a2d 	vdiv.f32	s14, s18, s27
- 80014d4:	ee27 da0d 	vmul.f32	s26, s14, s26
- 80014d8:	ee8d 7a2c 	vdiv.f32	s14, s26, s25
- 80014dc:	eefd 7ac7 	vcvt.s32.f32	s15, s14
+ 80014d0:	eec9 7a2d 	vdiv.f32	s15, s18, s27
+ 80014d4:	ee27 da8d 	vmul.f32	s26, s15, s26
+ 80014d8:	eecd 7a2c 	vdiv.f32	s15, s26, s25
+ 80014dc:	eefd 7ae7 	vcvt.s32.f32	s15, s15
  80014e0:	ee17 0a90 	vmov	r0, s15
  80014e4:	f000 fbcc 	bl	8001c80 <right_motor_set_speed>
- 80014e8:	eefd 7acf 	vcvt.s32.f32	s15, s30
- 80014ec:	ee17 3a90 	vmov	r3, s15
- 80014f0:	2b00      	cmp	r3, #0
- 80014f2:	bfb8      	it	lt
- 80014f4:	425b      	neglt	r3, r3
- 80014f6:	2b01      	cmp	r3, #1
- 80014f8:	f73f af2a 	bgt.w	8001350 <p_control+0x40>
- 80014fc:	9a03      	ldr	r2, [sp, #12]
- 80014fe:	f8db 3000 	ldr.w	r3, [fp]
- 8001502:	429a      	cmp	r2, r3
- 8001504:	d104      	bne.n	8001510 <p_control+0x200>
- 8001506:	b005      	add	sp, #20
- 8001508:	ecbd 8b10 	vpop	{d8-d15}
- 800150c:	e8bd 8ff0 	ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
- 8001510:	f7ff fee6 	bl	80012e0 <__stack_chk_fail>
- 8001514:	f3af 8000 	nop.w
- 8001518:	80000000 	.word	0x80000000
- 800151c:	4022d97c 	.word	0x4022d97c
- 8001520:	00000000 	.word	0x00000000
- 8001524:	3fc90fdb 	.word	0x3fc90fdb
- 8001528:	40490fdb 	.word	0x40490fdb
- 800152c:	42480000 	.word	0x42480000
- 8001530:	40ab3333 	.word	0x40ab3333
- 8001534:	4216cbe4 	.word	0x4216cbe4
- 8001538:	447a0000 	.word	0x447a0000
- 800153c:	42ecdeda 	.word	0x42ecdeda
- 8001540:	40617d72 	.word	0x40617d72
- 8001544:	20000800 	.word	0x20000800
- 8001548:	10624dd3 	.word	0x10624dd3
- 800154c:	00000000 	.word	0x00000000
+ 80014e8:	eeb7 7a00 	vmov.f32	s14, #112	; 0x3f800000  1.0
+ 80014ec:	eef4 fac7 	vcmpe.f32	s31, s14
+ 80014f0:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
+ 80014f4:	f73f af2c 	bgt.w	8001350 <p_control+0x40>
+ 80014f8:	9a03      	ldr	r2, [sp, #12]
+ 80014fa:	f8db 3000 	ldr.w	r3, [fp]
+ 80014fe:	429a      	cmp	r2, r3
+ 8001500:	d104      	bne.n	800150c <p_control+0x1fc>
+ 8001502:	b005      	add	sp, #20
+ 8001504:	ecbd 8b10 	vpop	{d8-d15}
+ 8001508:	e8bd 8ff0 	ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
+ 800150c:	f7ff fee8 	bl	80012e0 <__stack_chk_fail>
+ 8001510:	80000000 	.word	0x80000000
+ 8001514:	4022d97c 	.word	0x4022d97c
+ 8001518:	00000000 	.word	0x00000000
+ 800151c:	3fc90fdb 	.word	0x3fc90fdb
+ 8001520:	40490fdb 	.word	0x40490fdb
+ 8001524:	42480000 	.word	0x42480000
+ 8001528:	40ab3333 	.word	0x40ab3333
+ 800152c:	43480000 	.word	0x43480000
+ 8001530:	4216cbe4 	.word	0x4216cbe4
+ 8001534:	447a0000 	.word	0x447a0000
+ 8001538:	42ecdeda 	.word	0x42ecdeda
+ 800153c:	40617d72 	.word	0x40617d72
+ 8001540:	20000800 	.word	0x20000800
+ 8001544:	10624dd3 	.word	0x10624dd3
+	...
 
 08001550 <dcmi_lld_stop_stream.part.0>:
  8001550:	b530      	push	{r4, r5, lr}

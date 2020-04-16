@@ -215,10 +215,10 @@ void p_control(void){
 
 
 	float x_goal = 50, y_goal = 50;
-	float trans_speed = 10;
+	float trans_speed = 100;
 	float theta_goal = 0;
 
-	while(abs(x_goal-pos_x)>1 && abs(y_goal-pos_y)>1){
+	while(fabs(x_goal-pos_x)>1 && fabs(y_goal-pos_y)>1){
 
 
 		step_l_mem = step_l;

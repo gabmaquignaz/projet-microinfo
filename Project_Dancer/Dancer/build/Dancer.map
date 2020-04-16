@@ -7368,9 +7368,9 @@ destructors     0x00000000080001c0        0x0
                 0x00000000080012e0                __stack_chk_fail
  *fill*         0x000000000800130c        0x4 
  .text.p_control
-                0x0000000008001310      0x23c build/obj/trajectoire.o
+                0x0000000008001310      0x238 build/obj/trajectoire.o
                 0x0000000008001310                p_control
- *fill*         0x000000000800154c        0x4 
+ *fill*         0x0000000008001548        0x8 
  .text.dcmi_lld_stop_stream.part.0
                 0x0000000008001550       0x4c build/obj/dcmi_lld.o
  *fill*         0x000000000800159c        0x4 
@@ -9628,66 +9628,66 @@ OUTPUT(build/Dancer.elf elf32-littlearm)
  .debug_ranges  0x0000000000002f48       0xf8 build/obj/serial_lld.o
  .debug_ranges  0x0000000000003040       0x28 build/obj/board.o
 
-.debug_line     0x0000000000000000    0x22125
+.debug_line     0x0000000000000000    0x22122
  .debug_line    0x0000000000000000      0xa4e build/obj/main.o
- .debug_line    0x0000000000000a4e      0xb9a build/obj/trajectoire.o
- .debug_line    0x00000000000015e8      0xac6 build/obj/dcmi_lld.o
- .debug_line    0x00000000000020ae      0xa59 build/obj/memory_protection.o
- .debug_line    0x0000000000002b07      0xaa5 build/obj/motors.o
- .debug_line    0x00000000000035ac      0x846 build/obj/panic.o
- .debug_line    0x0000000000003df2      0x449 build/obj/malloc_lock.o
- .debug_line    0x000000000000423b      0xa12 build/obj/newlib_syscalls.o
- .debug_line    0x0000000000004c4d       0x98 build/obj/crt1.o
- .debug_line    0x0000000000004ce5      0x249 build/obj/vectors.o
- .debug_line    0x0000000000004f2e      0x66d build/obj/chsys.o
- .debug_line    0x000000000000559b      0x568 build/obj/chdebug.o
- .debug_line    0x0000000000005b03      0x418 build/obj/chvt.o
- .debug_line    0x0000000000005f1b      0x725 build/obj/chschd.o
- .debug_line    0x0000000000006640      0x9f4 build/obj/chthreads.o
- .debug_line    0x0000000000007034      0x46e build/obj/chtm.o
- .debug_line    0x00000000000074a2      0x408 build/obj/chstats.o
- .debug_line    0x00000000000078aa      0x4d4 build/obj/chregistry.o
- .debug_line    0x0000000000007d7e      0x764 build/obj/chmtx.o
- .debug_line    0x00000000000084e2      0x839 build/obj/chevents.o
- .debug_line    0x0000000000008d1b      0x71f build/obj/chqueues.o
- .debug_line    0x000000000000943a      0x4c8 build/obj/chmemcore.o
- .debug_line    0x0000000000009902      0x534 build/obj/chheap.o
- .debug_line    0x0000000000009e36      0x3c8 build/obj/chcore_v7m.o
- .debug_line    0x000000000000a1fe      0x911 build/obj/hal.o
- .debug_line    0x000000000000ab0f      0xac1 build/obj/hal_mmcsd.o
- .debug_line    0x000000000000b5d0      0xba7 build/obj/adc.o
- .debug_line    0x000000000000c177      0xba5 build/obj/can.o
- .debug_line    0x000000000000cd1c      0xbc4 build/obj/dac.o
- .debug_line    0x000000000000d8e0      0xa68 build/obj/ext.o
- .debug_line    0x000000000000e348      0xb35 build/obj/gpt.o
- .debug_line    0x000000000000ee7d      0xb24 build/obj/i2c.o
- .debug_line    0x000000000000f9a1      0xa14 build/obj/i2s.o
- .debug_line    0x00000000000103b5      0xc1c build/obj/pwm.o
- .debug_line    0x0000000000010fd1      0xcc6 build/obj/sdc.o
- .debug_line    0x0000000000011c97      0xa8e build/obj/serial.o
- .debug_line    0x0000000000012725      0xc62 build/obj/serial_usb.o
- .debug_line    0x0000000000013387      0xded build/obj/spi.o
- .debug_line    0x0000000000014174      0x921 build/obj/st.o
- .debug_line    0x0000000000014a95      0xda7 build/obj/usb.o
- .debug_line    0x000000000001583c      0x8b7 build/obj/nvic.o
- .debug_line    0x00000000000160f3      0xad3 build/obj/stm32_dma.o
- .debug_line    0x0000000000016bc6      0x8a2 build/obj/hal_lld.o
- .debug_line    0x0000000000017468      0xc15 build/obj/adc_lld.o
- .debug_line    0x000000000001807d      0xa14 build/obj/ext_lld_isr.o
- .debug_line    0x0000000000018a91      0xc74 build/obj/can_lld.o
- .debug_line    0x0000000000019705      0x8da build/obj/ext_lld.o
- .debug_line    0x0000000000019fdf      0xd16 build/obj/sdc_lld.o
- .debug_line    0x000000000001acf5      0xa5e build/obj/dac_lld.o
- .debug_line    0x000000000001b753      0x8b4 build/obj/pal_lld.o
- .debug_line    0x000000000001c007      0xcea build/obj/i2c_lld.o
- .debug_line    0x000000000001ccf1      0xf95 build/obj/usb_lld.o
- .debug_line    0x000000000001dc86      0x985 build/obj/i2s_lld.o
- .debug_line    0x000000000001e60b      0xaa4 build/obj/spi_lld.o
- .debug_line    0x000000000001f0af      0x9b9 build/obj/gpt_lld.o
- .debug_line    0x000000000001fa68      0xaa9 build/obj/pwm_lld.o
- .debug_line    0x0000000000020511      0x915 build/obj/st_lld.o
- .debug_line    0x0000000000020e26      0xa62 build/obj/serial_lld.o
- .debug_line    0x0000000000021888      0x89d build/obj/board.o
+ .debug_line    0x0000000000000a4e      0xb97 build/obj/trajectoire.o
+ .debug_line    0x00000000000015e5      0xac6 build/obj/dcmi_lld.o
+ .debug_line    0x00000000000020ab      0xa59 build/obj/memory_protection.o
+ .debug_line    0x0000000000002b04      0xaa5 build/obj/motors.o
+ .debug_line    0x00000000000035a9      0x846 build/obj/panic.o
+ .debug_line    0x0000000000003def      0x449 build/obj/malloc_lock.o
+ .debug_line    0x0000000000004238      0xa12 build/obj/newlib_syscalls.o
+ .debug_line    0x0000000000004c4a       0x98 build/obj/crt1.o
+ .debug_line    0x0000000000004ce2      0x249 build/obj/vectors.o
+ .debug_line    0x0000000000004f2b      0x66d build/obj/chsys.o
+ .debug_line    0x0000000000005598      0x568 build/obj/chdebug.o
+ .debug_line    0x0000000000005b00      0x418 build/obj/chvt.o
+ .debug_line    0x0000000000005f18      0x725 build/obj/chschd.o
+ .debug_line    0x000000000000663d      0x9f4 build/obj/chthreads.o
+ .debug_line    0x0000000000007031      0x46e build/obj/chtm.o
+ .debug_line    0x000000000000749f      0x408 build/obj/chstats.o
+ .debug_line    0x00000000000078a7      0x4d4 build/obj/chregistry.o
+ .debug_line    0x0000000000007d7b      0x764 build/obj/chmtx.o
+ .debug_line    0x00000000000084df      0x839 build/obj/chevents.o
+ .debug_line    0x0000000000008d18      0x71f build/obj/chqueues.o
+ .debug_line    0x0000000000009437      0x4c8 build/obj/chmemcore.o
+ .debug_line    0x00000000000098ff      0x534 build/obj/chheap.o
+ .debug_line    0x0000000000009e33      0x3c8 build/obj/chcore_v7m.o
+ .debug_line    0x000000000000a1fb      0x911 build/obj/hal.o
+ .debug_line    0x000000000000ab0c      0xac1 build/obj/hal_mmcsd.o
+ .debug_line    0x000000000000b5cd      0xba7 build/obj/adc.o
+ .debug_line    0x000000000000c174      0xba5 build/obj/can.o
+ .debug_line    0x000000000000cd19      0xbc4 build/obj/dac.o
+ .debug_line    0x000000000000d8dd      0xa68 build/obj/ext.o
+ .debug_line    0x000000000000e345      0xb35 build/obj/gpt.o
+ .debug_line    0x000000000000ee7a      0xb24 build/obj/i2c.o
+ .debug_line    0x000000000000f99e      0xa14 build/obj/i2s.o
+ .debug_line    0x00000000000103b2      0xc1c build/obj/pwm.o
+ .debug_line    0x0000000000010fce      0xcc6 build/obj/sdc.o
+ .debug_line    0x0000000000011c94      0xa8e build/obj/serial.o
+ .debug_line    0x0000000000012722      0xc62 build/obj/serial_usb.o
+ .debug_line    0x0000000000013384      0xded build/obj/spi.o
+ .debug_line    0x0000000000014171      0x921 build/obj/st.o
+ .debug_line    0x0000000000014a92      0xda7 build/obj/usb.o
+ .debug_line    0x0000000000015839      0x8b7 build/obj/nvic.o
+ .debug_line    0x00000000000160f0      0xad3 build/obj/stm32_dma.o
+ .debug_line    0x0000000000016bc3      0x8a2 build/obj/hal_lld.o
+ .debug_line    0x0000000000017465      0xc15 build/obj/adc_lld.o
+ .debug_line    0x000000000001807a      0xa14 build/obj/ext_lld_isr.o
+ .debug_line    0x0000000000018a8e      0xc74 build/obj/can_lld.o
+ .debug_line    0x0000000000019702      0x8da build/obj/ext_lld.o
+ .debug_line    0x0000000000019fdc      0xd16 build/obj/sdc_lld.o
+ .debug_line    0x000000000001acf2      0xa5e build/obj/dac_lld.o
+ .debug_line    0x000000000001b750      0x8b4 build/obj/pal_lld.o
+ .debug_line    0x000000000001c004      0xcea build/obj/i2c_lld.o
+ .debug_line    0x000000000001ccee      0xf95 build/obj/usb_lld.o
+ .debug_line    0x000000000001dc83      0x985 build/obj/i2s_lld.o
+ .debug_line    0x000000000001e608      0xaa4 build/obj/spi_lld.o
+ .debug_line    0x000000000001f0ac      0x9b9 build/obj/gpt_lld.o
+ .debug_line    0x000000000001fa65      0xaa9 build/obj/pwm_lld.o
+ .debug_line    0x000000000002050e      0x915 build/obj/st_lld.o
+ .debug_line    0x0000000000020e23      0xa62 build/obj/serial_lld.o
+ .debug_line    0x0000000000021885      0x89d build/obj/board.o
 
 .debug_str      0x0000000000000000     0x708a
  .debug_str     0x0000000000000000     0x22dc build/obj/main.o

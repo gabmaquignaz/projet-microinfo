@@ -64,13 +64,13 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING
  21 .debug_ranges 00003068  00000000  00000000  000ee64a  2**0
                   CONTENTS, READONLY, DEBUGGING
- 22 .debug_line   00022125  00000000  00000000  000f16b2  2**0
+ 22 .debug_line   00022122  00000000  00000000  000f16b2  2**0
                   CONTENTS, READONLY, DEBUGGING
- 23 .debug_str    0000708a  00000000  00000000  001137d7  2**0
+ 23 .debug_str    0000708a  00000000  00000000  001137d4  2**0
                   CONTENTS, READONLY, DEBUGGING
- 24 .debug_frame  00006d2c  00000000  00000000  0011a864  2**2
+ 24 .debug_frame  00006d2c  00000000  00000000  0011a860  2**2
                   CONTENTS, READONLY, DEBUGGING
- 25 .debug_loc    0001108b  00000000  00000000  00121590  2**0
+ 25 .debug_loc    0001108b  00000000  00000000  0012158c  2**0
                   CONTENTS, READONLY, DEBUGGING
 SYMBOL TABLE:
 08000000 l    d  startup	00000000 startup
@@ -786,7 +786,7 @@ e000ed04 l       *ABS*	00000000 SCB_ICSR
 08005a80 g     F .text	00000050 Vector154
 10000000 g       .ram4	00000000 __ram4_free__
 08001cb0 g     F .text	00000030 left_motor_get_pos
-08001310 g     F .text	0000023c p_control
+08001310 g     F .text	00000238 p_control
 20020000 g       *ABS*	00000000 __ram0_end__
 08007e10 g     F .text	00000050 i2s_lld_init
 08006a40 g     F .text	0000002c sdc_lld_stop_clk
