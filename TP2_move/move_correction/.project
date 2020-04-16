@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>TP2_Move</name>
+	<name>TP2_Move_correction</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -29,11 +29,6 @@
 			<name>ST</name>
 			<type>2</type>
 			<locationURI>PARENT-1-PROJECT_LOC/ST</locationURI>
-		</link>
-		<link>
-			<name>move_correction</name>
-			<type>2</type>
-			<location>/Users/maximepoffet/Library/Mobile Documents/com~apple~CloudDocs/1_MAXIME/8_GITHUB/projet-microinfo/TP2_move/move_correction</location>
 		</link>
 	</linkedResources>
 </projectDescription>

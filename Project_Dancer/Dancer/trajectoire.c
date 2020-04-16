@@ -10,10 +10,11 @@
 #include <trajectoire.h>
 #include <motors.h>
 
+#define PI					3.14159265
 #define NB_POS				5
 #define WHEEL_DISTANCE      	5.35f    				// [cm]
 #define WHEEL_PERIMETER     	13 						// [cm]
-#define PI					3.14159265
+#define WHEEL_RADIUS			(13/2*PI)
 #define PERIMETER_EPUCK     (PI * WHEEL_DISTANCE)
 #define INTERVAL_TEMPS		2 						// [s]
 #define INTERVAL_COURT		0.1
@@ -43,6 +44,84 @@ float angle_from_three_points(float x1, float y1, float x2, float y2, float x3, 
 	if (angle<-PI) angle += 2*PI;
 
 	return (angle);
+}
+
+//not finished, no motor control yet
+void convert_pos_step(void){
+
+	//provisoire, entrée des données
+	//p0
+	pos_pol[0] = 10;
+	pos_pol[1] = 10;
+	//p1
+	pos_pol[2] = 0;
+	pos_pol[3] = 10;
+	//p2
+	pos_pol[4] = -10;
+	pos_pol[5] = 10;
+	//p3
+	pos_pol[6] = -10;
+	pos_pol[7] = 0;
+	//p4
+	pos_pol[8] = 0;
+	pos_pol[9] = 0;
+
+	//convert from cartesian (x,y) to (distance, angle)
+
+	float x_mem;
+
+	for(uint8_t i = NB_POS-1; i>1; i--){
+
+		x_mem = pos_pol[2*i];
+
+		//distance between two consecutive points
+		pos_pol[2*i] = sqrt((pos_pol[2*i]-pos_pol[2*(i-1)])*(pos_pol[2*i]-pos_pol[2*(i-1)])
+							+(pos_pol[2*i+1]-pos_pol[2*(i-1)+1])*(pos_pol[2*i+1]-pos_pol[2*(i-1)+1]));
+
+		//angle between two consecutive vectors
+		pos_pol[2*i+1] = angle_from_three_points(pos_pol[2*(i-2)], pos_pol[2*(i-2)+1],
+												pos_pol[2*(i-1)], pos_pol[2*(i-1)+1],
+												x_mem, pos_pol[2*i+1]);
+
+	}
+	//first two sections from origin
+	x_mem = pos_pol[2];
+	pos_pol[2] = sqrt(pos_pol[2]*pos_pol[2]+pos_pol[3]*pos_pol[3]);
+	pos_pol[3] = angle_from_three_points(OX, OY, pos_pol[0], pos_pol[1], x_mem, pos_pol[3]);
+
+	x_mem = pos_pol[0];
+	pos_pol[0] = sqrt(pos_pol[0]*pos_pol[0]+pos_pol[1]*pos_pol[1]);
+	pos_pol[1] = angle_from_three_points(ORIX, ORIY, OX, OY, x_mem, pos_pol[1]);
+
+
+	for(uint8_t i = 0; i < NB_POS; i++){
+		//Conversion from cm and ° to step
+		pos_pol[2*i] *= NSTEP_ONE_TURN/(WHEEL_PERIMETER);
+		pos_pol[2*i+1] *= WHEEL_DISTANCE*NSTEP_ONE_TURN/(2*WHEEL_PERIMETER);
+	}
+
+
+	//drive
+	for(uint8_t i = 0 ; i < NB_POS ; i++){
+
+		//be sure that the motors are initialized
+
+		if (abs(pos_pol[2*i+1])>0){
+			//rotation
+			left_motor_set_speed(-pos_pol[2*i+1]);
+			right_motor_set_speed(pos_pol[2*i+1]);
+			chThdSleepMilliseconds(1000*INTERVAL_TEMPS);
+		}
+
+		//forward
+		left_motor_set_speed(pos_pol[2*i]);
+		right_motor_set_speed(pos_pol[2*i]);
+		chThdSleepMilliseconds(1000*INTERVAL_TEMPS);
+	}
+
+	left_motor_set_speed(0);
+	right_motor_set_speed(0);
+
 }
 
 void convert_pos(void){
@@ -123,9 +202,62 @@ void convert_pos(void){
 
 }
 
+void p_control(void){
+
+
+	float pos_x = 0, pos_y = 0, pos_theta = PI/2;
+	float step_l = 0, step_r = 0;
+	float step_l_mem = 0, step_r_mem = 0;
+	float speed_l = 0, speed_r = 0;
+	//float speed_x = 0, speed_y = 0, speed_theta = 0;
+	float rot_speed = 0;
+	float K = 50;
+
+
+	float x_goal = 50, y_goal = 50;
+	float trans_speed = 10;
+	float theta_goal = 0;
+
+	while(abs(x_goal-pos_x)>1 && abs(y_goal-pos_y)>1){
+
+
+		step_l_mem = step_l;
+		step_r_mem = step_r;
+		step_l = (left_motor_get_pos()/NSTEP_ONE_TURN)*2*PI;
+		step_r = (right_motor_get_pos()/NSTEP_ONE_TURN)*2*PI;
+
+		pos_x = pos_x + cos(pos_theta)*(WHEEL_RADIUS/2)*(step_l + step_r - step_l_mem - step_r_mem);
+		pos_y = pos_y + sin(pos_theta)*(WHEEL_RADIUS/2)*(step_l + step_r - step_l_mem - step_r_mem);
+		pos_theta = pos_theta + (WHEEL_RADIUS/WHEEL_DISTANCE)*(-step_l + step_r + step_l_mem - step_r_mem);
+
+		theta_goal = atan2(y_goal-pos_y, x_goal-pos_x);
+		rot_speed = K*(theta_goal-pos_theta);
+
+		speed_r = (2*trans_speed + rot_speed*WHEEL_DISTANCE)/(2*WHEEL_RADIUS);
+		speed_l = (2*trans_speed - rot_speed*WHEEL_DISTANCE)/(2*WHEEL_RADIUS);
+
+
+		left_motor_set_speed((speed_l*NSTEP_ONE_TURN)/(WHEEL_RADIUS*2*PI));
+		right_motor_set_speed((speed_r*NSTEP_ONE_TURN)/(WHEEL_RADIUS*2*PI));
+
+	}
+
+}
+
 
 //************** NOT USED FOR THE MOMENT *****************
 void interpolate(void){
+
+	/*
+	float pos_x = 0, pos_y = 0, pos_theta = PI/2;
+	float step_l = 0, step_r = 0;
+	float step_l_mem = 0, step_r_mem = 0;
+	float speed_l = 0, speed_r = 0;
+	float speed_x = 0, speed_y = 0, speed_theta = 0;
+	float rot_speed = 0, trans_speed = 0;
+	float theta_goal = 0;
+	*/
+
 
 	int n = NB_POS-1, i, j;
 
@@ -188,10 +320,42 @@ void interpolate(void){
 
 	for(i=0; i<n-1; i++){
 		for(int t = INTERVAL_COURT; t<INTERVAL_TEMPS; t+=INTERVAL_COURT){
+
+			/*
+			 *
+			//dead reckoning
+			step_l_mem = step_l;
+			step_r_mem = step_r;
+			step_l = (left_motor_get_pos()/NSTEP_ONE_TURN)*2*PI;
+			step_r = (right_motor_get_pos()/NSTEP_ONE_TURN)*2*PI;
+
+			pos_x = pos_x + cos(pos_theta)*(WHEEL_RADIUS/2)*(step_l + step_r - step_l_mem - step_r_mem);
+			pos_y = pos_y + sin(pos_theta)*(WHEEL_RADIUS/2)*(step_l + step_r - step_l_mem - step_r_mem);
+			pos_theta = pos_theta + (WHEEL_RADIUS/WHEEL_DISTANCE)*(-step_l + step_r + step_l_mem - step_r_mem);
+
+			speed_x = (WHEEL_RADIUS/2)*(speed_r + speed_l)*cos(pos_theta);
+			speed_y = (WHEEL_RADIUS/2)*(speed_r + speed_l)*sin(pos_theta);
+			speed_theta = (WHEEL_RADIUS/WHEEL_DISTANCE)*(speed_r - speed_l);
+
+			trans_speed = (WHEEL_RADIUS/2)*(speed_r + speed_l); 				//we want it to be cst
+			rot_speed = (WHEEL_RADIUS/WHEEL_DISTANCE)*(speed_r - speed_l);
+
+
+			//P controller
+			theta_goal = atan2()
+
+
+			speed_r = (2*trans_speed + rot_speed*WHEEL_DISTANCE)/(2*WHEEL_RADIUS);
+			speed_l = (2*trans_speed - rot_speed*WHEEL_DISTANCE)/(2*WHEEL_RADIUS);
+
 			//ax[i]+bx[i]*xnew+cx[i]*xnew**2+dx[i]*xnew**3
+
+			*/
 
 		}
 	}
 }
+
+
 
 

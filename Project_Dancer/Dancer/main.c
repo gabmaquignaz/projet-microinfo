@@ -21,7 +21,8 @@ int main(void)
     mpu_init();
     motors_init();
 
-    convert_pos();
+    //convert_pos();
+    p_control();
 
     /* Infinite loop. */
     while (1) {

@@ -9,5 +9,6 @@
 #define TRAJECTOIRE_H_
 
 void convert_pos(void);
+void p_control(void);
 
 #endif /* TRAJECTOIRE_H_ */
