@@ -37,6 +37,7 @@ enum Ref_color {R, G, B};
 enum Obj_or_back	 {OBJ, BACK};
 #define TOF_MAX_DIST					100
 #define TOF_MIN_DIST					60
+enum Vision_init_state {WAIT_OBJECT, WAIT_DONT_MOVE, GET_COLOR, WAIT_CENTER, GET_SIZE_DIST};
 
 enum Line_detector_state {SEARCH_BEGIN, SEARCH_END, FINISHED};
 #define DETECT_TRESH				30
@@ -45,6 +46,7 @@ enum Line_detector_state {SEARCH_BEGIN, SEARCH_END, FINISHED};
 static float hor_dist = 0.0;
 static float real_dist = 0.0;
 static float size2dist_conv = 1.0;
+static uint16_t distance_mm_calib = 0;
 
 
 
@@ -185,9 +187,6 @@ void read_image(uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float w_r,
 
 bool dist_measure (uint8_t* image, uint16_t size){
 
-	//error: conversion uninitialized
-	if (!size2dist_conv) return false;
-
 	//state of the object detector, starts by searching for the beginning of the object
 	uint8_t state = SEARCH_BEGIN;
 
@@ -229,9 +228,13 @@ bool dist_measure (uint8_t* image, uint16_t size){
 	if (state != FINISHED) return false;
 
 
-	uint16_t size_obj_pix = end-begin;
-	real_dist = size2dist_conv/size_obj_pix;
-	hor_dist = (size_obj_pix - size)/2 + begin;
+	uint16_t size_pix = end-begin;
+	uint16_t hor_pos_pix = (size_pix - size)/2 + begin;
+	//if conversion uninitialized compute it, else compute distances
+	if (!size2dist_conv) size2dist_conv = size_obj_pix*distance_mm_calib;
+	else{
+	}
+
 	return true;
 }
 
@@ -250,9 +253,10 @@ void vision_init (uint8_t* r_ptr, uint8_t* g_ptr, uint8_t* b_ptr){
     //start ToF (also starts I2C);
 	VL53L0X_start();
 	uint16_t tof_dist_calib_mm = 0;
+	//!(tof_dist_calib_mm < TOF_MAX_DIST && tof_dist_calib_mm > TOF_MIN_DIST)
 	do{
-		//show ready with LEDs
-	} while (!(tof_dist_calib_mm < TOF_MAX_DIST && tof_dist_calib_mm > TOF_MIN_DIST));
+
+
 }
 
 
