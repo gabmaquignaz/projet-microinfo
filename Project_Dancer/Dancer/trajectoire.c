@@ -106,17 +106,7 @@ void convert_pos_step(void){
 
 		//be sure that the motors are initialized
 
-		if (abs(pos_pol[2*i+1])>0){
-			//rotation
-			left_motor_set_speed(-pos_pol[2*i+1]);
-			right_motor_set_speed(pos_pol[2*i+1]);
-			chThdSleepMilliseconds(1000*INTERVAL_TEMPS);
-		}
 
-		//forward
-		left_motor_set_speed(pos_pol[2*i]);
-		right_motor_set_speed(pos_pol[2*i]);
-		chThdSleepMilliseconds(1000*INTERVAL_TEMPS);
 	}
 
 	left_motor_set_speed(0);
@@ -215,8 +205,9 @@ void p_control(void){
 
 
 	float x_goal = 50, y_goal = 50;
-	float trans_speed = 100;
+	float trans_speed = 50;
 	float theta_goal = 0;
+	float delta_theta = 0;
 
 	while(fabs(x_goal-pos_x)>1 && fabs(y_goal-pos_y)>1){
 
@@ -231,7 +222,12 @@ void p_control(void){
 		pos_theta = pos_theta + (WHEEL_RADIUS/WHEEL_DISTANCE)*(-step_l + step_r + step_l_mem - step_r_mem);
 
 		theta_goal = atan2(y_goal-pos_y, x_goal-pos_x);
-		rot_speed = K*(theta_goal-pos_theta);
+		delta_theta = theta_goal-pos_theta;
+
+		if (delta_theta > PI) delta_theta = -(2*PI-delta_theta);
+		if (delta_theta < - PI) delta_theta = 2*PI+delta_theta;
+
+		rot_speed = K*delta_theta;
 
 		speed_r = (2*trans_speed + rot_speed*WHEEL_DISTANCE)/(2*WHEEL_RADIUS);
 		speed_l = (2*trans_speed - rot_speed*WHEEL_DISTANCE)/(2*WHEEL_RADIUS);
@@ -241,6 +237,8 @@ void p_control(void){
 		right_motor_set_speed((speed_r*NSTEP_ONE_TURN)/(WHEEL_RADIUS*2*PI));
 
 	}
+	left_motor_set_speed(0);
+	right_motor_set_speed(0);
 
 }
 
