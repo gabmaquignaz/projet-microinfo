@@ -233,8 +233,8 @@ void p_control(void){
 		speed_l = (2*trans_speed - rot_speed*WHEEL_DISTANCE)/(2*WHEEL_RADIUS);
 
 
-		left_motor_set_speed((speed_l*NSTEP_ONE_TURN)/(WHEEL_RADIUS*2*PI));
-		right_motor_set_speed((speed_r*NSTEP_ONE_TURN)/(WHEEL_RADIUS*2*PI));
+		left_motor_set_speed((speed_l*NSTEP_ONE_TURN)/(2*PI));
+		right_motor_set_speed((speed_r*NSTEP_ONE_TURN)/(2*PI));
 
 	}
 	left_motor_set_speed(0);

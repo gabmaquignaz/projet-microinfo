@@ -7368,9 +7368,9 @@ destructors     0x00000000080001c0        0x0
                 0x00000000080012e0                __stack_chk_fail
  *fill*         0x000000000800130c        0x4 
  .text.p_control
-                0x0000000008001310      0x278 build/obj/trajectoire.o
+                0x0000000008001310      0x274 build/obj/trajectoire.o
                 0x0000000008001310                p_control
- *fill*         0x0000000008001588        0x8 
+ *fill*         0x0000000008001584        0xc 
  .text.dcmi_lld_stop_stream.part.0
                 0x0000000008001590       0x4c build/obj/dcmi_lld.o
  *fill*         0x00000000080015dc        0x4 
