@@ -37,7 +37,10 @@ enum Ref_color {R, G, B};
 enum Obj_or_back	 {OBJ, BACK};
 #define TOF_MAX_DIST					100
 #define TOF_MIN_DIST					60
-enum Vision_init_state {WAIT_OBJECT, WAIT_DONT_MOVE, GET_COLOR, WAIT_CENTER, GET_SIZE_DIST};
+#define MOVE_TRESH					10
+#define MEAN_RANGE					10
+#define D_LENS						722.55
+enum Vision_init_state {WAIT_OBJECT, CALIB, INIT_DONE};
 
 enum Line_detector_state {SEARCH_BEGIN, SEARCH_END, FINISHED};
 #define DETECT_TRESH				30
@@ -45,17 +48,17 @@ enum Line_detector_state {SEARCH_BEGIN, SEARCH_END, FINISHED};
 
 static float hor_dist = 0.0;
 static float real_dist = 0.0;
-static float size2dist_conv = 1.0;
+static float size_obj_mm = 0.0;
 static uint16_t distance_mm_calib = 0;
 
 
 
 //detection functions
-void read_image(uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float w_r, float w_g, float w_b);
+void create_image(uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float w_r, float w_g, float w_b);
 bool dist_measure (uint8_t* image, uint16_t size);
 
 //calibration functions
-//size2dist
+void vision_init (uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float* w_r_ptr, float* w_g_ptr, float* w_b_ptr);
 void calib_colors(uint8_t* r_ptr, uint8_t* g_ptr, uint8_t* b_ptr, bool obj_or_back);
 bool compute_weights (uint8_t r_obj, uint8_t g_obj, uint8_t b_obj, uint8_t r_back, uint8_t g_back, uint8_t b_back,float* w_r_ptr, float* w_g_ptr, float* w_b_ptr);
 
@@ -110,41 +113,28 @@ static THD_FUNCTION(ProcessImage, arg) {
     (void)arg;
 
 	uint8_t image[IMAGE_BUFFER_SIZE] = {0};
-	uint8_t* img_buff_ptr;
-	float w_r, w_g, w_b; //weights used to detect the desired color in the image
-	bool first_try = true;
-//
-//
-//	chThdSleepMilliseconds(3000);
-//
-//	do{
-//		if (first_try) first_try = false;
-//		else{
-//			chprintf((BaseSequentialStream *) &SDU1,"Error : object too dark or not distinct enough.\nWEIGHTS : R = %.2f, G = %.2f, B = %.2f\n\n",w_r,w_g,w_b);
-//			chThdSleepMilliseconds(3000);
-//		}
-//		calib_colors(&r_obj, &g_obj, &b_obj, OBJ);
-//	}
-//	while(!compute_weights (r_obj, g_obj, b_obj, r_back, g_back, b_back, &w_r, &w_g, &w_b));
-//
-//
+	uint8_t* img_buff_ptr = NULL;
+	float w_r = 0; float w_g = 0; float w_b = 0; //weights used to detect the desired color in the image
+
+	vision_init (image,  IMAGE_BUFFER_SIZE, img_buff_ptr, &w_r, &w_g, &w_b);
+
 //	chprintf((BaseSequentialStream *) &SDU1,"OBJCET : R = %d, G = %d, B = %d\n"
 //											"BACKGROUND : R = %d, G = %d, B = %d\n"
 //											"WEIGHTS : R = %.2f, G = %.2f, B = %.2f\n\n",
 //												r_obj, g_obj, b_obj,r_back,g_back,b_back, w_r, w_g, w_b);
-
-
 	while(1){
 	    	//waits until an image has been captured
 		chBSemWait(&image_ready_sem);
 		//gets the pointer to the array filled with the last image in RGB565
 		img_buff_ptr = dcmi_get_last_image_ptr();
 
-		read_image(image, IMAGE_BUFFER_SIZE, img_buff_ptr, w_r, w_g, w_b);
+		create_image(image, IMAGE_BUFFER_SIZE, img_buff_ptr, w_r, w_g, w_b);
 
 //		SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
 		if(dist_measure(image, IMAGE_BUFFER_SIZE)) chprintf((BaseSequentialStream *) &SDU1, "r = %.3f, x = %.3f\n", real_dist, hor_dist);
-		else chprintf((BaseSequentialStream *) &SDU1, "Error !");
+		else {
+			//show "recognition error" with LEDS
+		}
 	}
 }
 
@@ -169,7 +159,7 @@ void process_image_start(void){
 
 
 //*************** intermediate level object recognition functions ***************
-void read_image(uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float w_r, float w_g, float w_b){
+void create_image(uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float w_r, float w_g, float w_b){
 	for(uint16_t i = 0; i < size; i++){
 		//multiply red and blue (5bit) by 2 to have the same range as green (6 bit)
 		uint16_t rgb = ((img_buff_ptr[2*i] << 8) + img_buff_ptr[2*i+1]);
@@ -228,11 +218,13 @@ bool dist_measure (uint8_t* image, uint16_t size){
 	if (state != FINISHED) return false;
 
 
-	uint16_t size_pix = end-begin;
-	uint16_t hor_pos_pix = (size_pix - size)/2 + begin;
+	uint16_t size_obj_pix = end-begin;
+	uint16_t hor_pos_pix = (size_obj_pix - size)/2 + begin;
 	//if conversion uninitialized compute it, else compute distances
-	if (!size2dist_conv) size2dist_conv = size_obj_pix*distance_mm_calib;
+	if (!size_obj_mm) size_obj_mm = size_obj_pix*distance_mm_calib/D_LENS;
 	else{
+		hor_dist = size_obj_mm*hor_pos_pix/size_obj_pix;
+		real_dist = size_obj_mm*sqrt(hor_pos_pix*hor_pos_pix+D_LENS*D_LENS)/size_obj_pix;
 	}
 
 	return true;
@@ -243,20 +235,75 @@ bool dist_measure (uint8_t* image, uint16_t size){
 
 //*************** intermediate level calibration functions ***************
 
-void vision_init (uint8_t* r_ptr, uint8_t* g_ptr, uint8_t* b_ptr){
+void vision_init (uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float* w_r_ptr, float* w_g_ptr, float* w_b_ptr){
 	//background identification
-	uint8_t r_back, g_back, b_back; //average color values
+	uint8_t r_back, g_back, b_back, r_obj, g_obj, b_obj; //average color values
 	calib_colors(&r_back, &g_back, &b_back, BACK);
 
 	//Ready for object identification
+	VL53L0X_start(); //start ToF (also starts I2C)
+	uint16_t tof_dist, ref_dist;
+	uint16_t mean = 0;
+	uint8_t state = WAIT_OBJECT;
 
-    //start ToF (also starts I2C);
-	VL53L0X_start();
-	uint16_t tof_dist_calib_mm = 0;
-	//!(tof_dist_calib_mm < TOF_MAX_DIST && tof_dist_calib_mm > TOF_MIN_DIST)
-	do{
+	while (state != INIT_DONE){
+		switch(state){
 
+			case WAIT_OBJECT :
+				for(uint8_t i = 0; i < MEAN_RANGE; i++){
+					uint16_t curent = VL53L0X_get_dist_mm();
+					mean += curent;
+					chThdSleepMilliseconds(100);
+				}
+				mean /= MEAN_RANGE;
 
+				if(mean < TOF_MAX_DIST && mean > TOF_MIN_DIST){
+					state = CALIB;
+					ref_dist = mean;
+				}
+
+				mean = 0;
+				chThdSleepMilliseconds(100);
+				break;
+
+			case CALIB :
+				//control if the user moved
+				tof_dist = VL53L0X_get_dist_mm();
+				if(abs(tof_dist-ref_dist) > MOVE_TRESH){
+					//show "you moved" with LEDs
+					state = WAIT_OBJECT;
+					break;
+				}
+
+				 // measure object color then try to compute weights
+				calib_colors(&r_obj, &g_obj, &b_obj, OBJ);
+				if(!compute_weights (r_obj, g_obj, b_obj, r_back, g_back, b_back, w_r_ptr, w_g_ptr, w_b_ptr)){
+					//show "Object too dark or not distinct enough" with LED's
+					state = WAIT_OBJECT;
+					break;
+				}
+
+				//measure precisely distance and control if the user moved
+				for(uint8_t i = 0; i < 5*MEAN_RANGE; i++){
+					uint16_t curent = VL53L0X_get_dist_mm();
+					mean += curent;
+					chThdSleepMilliseconds(100);
+				}
+				distance_mm_calib /= (5*MEAN_RANGE);
+				if(abs(distance_mm_calib-ref_dist) > MOVE_TRESH){
+					//show "you moved" with LEDs
+					state = WAIT_OBJECT;
+					break;
+				}
+
+				create_image(image, size, img_buff_ptr, *w_r_ptr, *w_g_ptr, *w_b_ptr);
+				dist_measure(image, size); // first call initializes object real size;
+
+				state = INIT_DONE;
+				chThdSleepMilliseconds(100);
+				break;
+		}
+	}
 }
 
 
