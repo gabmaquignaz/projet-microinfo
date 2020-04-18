@@ -48,24 +48,9 @@ int main(void)
 	po8030_start();
 	process_image_start();
 
-    uint16_t sum = 0;
-    float mean = 0;
 
     //Infinite loop
     while (1) {
-//    		uint16_t dist = VL53L0X_get_dist_mm();
-//    		chprintf((BaseSequentialStream *)&SDU1, "%d\n ", dist);
-
-//    		for(uint8_t i = 0; i < MEAN_RANGE; i++){
-//    			uint16_t curent = VL53L0X_get_dist_mm();
-//    			sum+= curent;
-//    			chThdSleepMilliseconds(100);
-//    		}
-//    		mean = (float)sum/MEAN_RANGE;
-//    	 	chprintf((BaseSequentialStream *)&SDU1, "-> Dist = %.1f mm\n", mean);
-//
-//    	 	sum = 0;
-//    	 	mean = 0;
 
         chThdSleepMilliseconds(100);
     }

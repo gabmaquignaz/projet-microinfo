@@ -34,21 +34,22 @@ enum Ref_color {R, G, B};
 #define NB_SAMPLES_CALIB				20			//take 20 successive measurements
 #define WIDTH_SAMPLES_CALIB			20			//20 pixels-wide zone
 #define START_CALIB					((IMAGE_BUFFER_SIZE-WIDTH_SAMPLES_CALIB)/2 ) //always center the zone
-enum Obj_or_back	 {OBJ, BACK};
-#define TOF_MAX_DIST					80
-#define TOF_MIN_DIST					40
+enum Obj_or_back	 					{OBJ, BACK};
+
+#define TOF_MAX_DIST					90
+#define TOF_MIN_DIST					50
 #define MOVE_TRESH					10
-#define MEAN_RANGE					10
+#define DIST_MEAN_RANGE				10
+
 #define D_LENS						772.55f
-enum Vision_init_state {WAIT_OBJECT, CALIB, INIT_DONE};
+enum Vision_init_state 				{WAIT_OBJECT, CALIB, INIT_DONE};
+enum Line_detector_state 			{SEARCH_BEGIN, SEARCH_END, FINISHED};
+#define DETECT_TRESH					20
+#define MIN_OBJ_SIZE 				15
 
-enum Line_detector_state {SEARCH_BEGIN, SEARCH_END, FINISHED};
-#define DETECT_TRESH				200
-#define MIN_OBJ_SIZE 			20
-
-static float hor_dist = 0.0;
-static float real_dist = 0.0;
-static float size_obj_mm = 0.0;
+static int16_t hor_dist = 0;
+static uint16_t real_dist = 0;
+static uint16_t size_obj_mm = 0;
 static uint16_t distance_mm_calib = 0;
 
 
@@ -81,10 +82,9 @@ void SendUint8ToComputer(uint8_t* data, uint16_t size)
 //semaphore
 static BSEMAPHORE_DECL(image_ready_sem, TRUE);
 
+
 static THD_WORKING_AREA(waCaptureImage, 256);
 static THD_FUNCTION(CaptureImage, arg) {
-
-
     chRegSetThreadName(__FUNCTION__);
     (void)arg;
 
@@ -123,17 +123,18 @@ static THD_FUNCTION(ProcessImage, arg) {
 		chBSemWait(&image_ready_sem);
 		//gets the pointer to the array filled with the last image in RGB565
 		img_buff_ptr = dcmi_get_last_image_ptr();
-
 		create_image(image, IMAGE_BUFFER_SIZE, img_buff_ptr, w_r, w_g, w_b);
+//		SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
 
-		SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
-		if(dist_measure(image, IMAGE_BUFFER_SIZE)) chprintf((BaseSequentialStream *) &SDU1, "r = %.2f, x = %.2f\n", real_dist, hor_dist);
+		if(dist_measure(image, IMAGE_BUFFER_SIZE)){
+			chBSemSignal(&dist_ready_sem);
+			chprintf((BaseSequentialStream *) &SDU1, "r = %d, x = %d\n", real_dist, hor_dist);
+		}
 		else {
 			//show "recognition error" with LEDS
-			chprintf((BaseSequentialStream *) &SDU1, "ERROR");
 		}
-		chThdSleepMilliseconds(500);
 
+		chThdSleepMilliseconds(500);
 	}
 }
 
@@ -183,18 +184,24 @@ bool dist_measure (uint8_t* image, uint16_t size){
 	uint16_t begin = 0;
 	uint16_t end = 0;
 
-	for (uint16_t i = 1; i < size; i ++){
+	float mean = 0.0;
+	for(uint16_t k = 0; k < size; k++){
+		mean += image[k];
+	}
+	mean /= size;
+
+	for (uint16_t i = 0; i < size; i ++){
 		switch(state){
 
 			case SEARCH_BEGIN :
-				if (image[i] > DETECT_TRESH){
+				if (image[i]-mean > DETECT_TRESH){
 					begin = i;
 					state = SEARCH_END;
 				}
 				break;
 
 			case SEARCH_END :
-				if (image[i]  < DETECT_TRESH){
+				if (image[i]-mean < DETECT_TRESH){
 					end = i;
 					if (end-begin < MIN_OBJ_SIZE){
 						//ignore if object is too small, may be a glitch or an unwanted reflect
@@ -223,10 +230,13 @@ bool dist_measure (uint8_t* image, uint16_t size){
 	int16_t hor_pos_pix = (size_obj_pix - size)/2 + begin;
 
 	//if real size of object uninitialized, compute it, else compute distances
-	if (!size_obj_mm) size_obj_mm = (float)distance_mm_calib*(float)size_obj_pix/D_LENS;
+	if (!size_obj_mm){
+		float size_dist_ratio = (float)size_obj_pix/D_LENS;
+		size_obj_mm = distance_mm_calib*(size_dist_ratio/(1-size_dist_ratio/2));
+	}
 	else{
-		hor_dist = size_obj_mm*hor_pos_pix/size_obj_pix;
-		real_dist = size_obj_mm*sqrt(hor_pos_pix*hor_pos_pix+D_LENS*D_LENS)/size_obj_pix;
+		hor_dist = (size_obj_mm*hor_pos_pix)/size_obj_pix;
+		real_dist = (size_obj_mm*sqrt(hor_pos_pix*hor_pos_pix+D_LENS*D_LENS))/size_obj_pix;
 	}
 
 	return true;
@@ -253,12 +263,12 @@ void vision_init (uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float* w
 		switch(state){
 
 			case WAIT_OBJECT :
-				for(uint8_t i = 0; i < MEAN_RANGE; i++){
+				for(uint8_t i = 0; i < DIST_MEAN_RANGE; i++){
 					uint16_t curent = VL53L0X_get_dist_mm();
 					mean += curent;
 					chThdSleepMilliseconds(100);
 				}
-				mean /= MEAN_RANGE;
+				mean /= DIST_MEAN_RANGE;
 				chprintf((BaseSequentialStream *) &SDU1, "Dist : %d\n", mean);
 				if(mean < TOF_MAX_DIST && mean > TOF_MIN_DIST){
 					chprintf((BaseSequentialStream *) &SDU1, "OK\n\n");
@@ -284,6 +294,10 @@ void vision_init (uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float* w
 				calib_colors(&r_obj, &g_obj, &b_obj, OBJ);
 				if(!compute_weights (r_obj, g_obj, b_obj, r_back, g_back, b_back, w_r_ptr, w_g_ptr, w_b_ptr)){
 					//show "Object too dark or not distinct enough" with LED's
+					chprintf((BaseSequentialStream *) &SDU1,"OBJCET : R = %d, G = %d, B = %d\n"
+																				"BACKGROUND : R = %d, G = %d, B = %d\n"
+																				"WEIGHTS : R = %.2f, G = %.2f, B = %.2f\n\n",
+																					r_obj, g_obj, b_obj,r_back,g_back,b_back, *w_r_ptr, *w_g_ptr, *w_b_ptr);
 					chprintf((BaseSequentialStream *) &SDU1, "Object too dark or not distinct enough.\n\n");
 					state = WAIT_OBJECT;
 					break;
@@ -294,13 +308,13 @@ void vision_init (uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float* w
 																r_obj, g_obj, b_obj,r_back,g_back,b_back, *w_r_ptr, *w_g_ptr, *w_b_ptr);
 
 				//measure precisely distance and control if the user moved
-				for(uint8_t i = 0; i < 5*MEAN_RANGE; i++){
+				for(uint8_t i = 0; i < 5*DIST_MEAN_RANGE; i++){
 					uint16_t curent = VL53L0X_get_dist_mm();
 					mean += curent;
 					chThdSleepMilliseconds(100);
 				}
 
-				distance_mm_calib = mean/(5*MEAN_RANGE);
+				distance_mm_calib = mean/(5*DIST_MEAN_RANGE);
 				chprintf((BaseSequentialStream *) &SDU1, "Calibration : %d\n", distance_mm_calib);
 
 				if(abs(distance_mm_calib-ref_dist) > MOVE_TRESH){
@@ -315,8 +329,14 @@ void vision_init (uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float* w
 				//gets the pointer to the array filled with the last image in RGB565
 				img_buff_ptr = dcmi_get_last_image_ptr();
 				create_image(image, size, img_buff_ptr, *w_r_ptr, *w_g_ptr, *w_b_ptr);
-				dist_measure(image, size); // first call initializes object real size;
-				chprintf((BaseSequentialStream *) &SDU1, "object size : %f", size_obj_mm);
+
+
+				if(!dist_measure(image, size)){
+					//show "No object found" with LEDs
+					state = WAIT_OBJECT;
+					break;
+				}
+				chprintf((BaseSequentialStream *) &SDU1, "object size : %d\n", size_obj_mm);
 
 				state = INIT_DONE;
 				chThdSleepMilliseconds(100);
