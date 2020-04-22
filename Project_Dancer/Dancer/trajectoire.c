@@ -9,6 +9,7 @@
 #include <math.h>
 #include <trajectoire.h>
 #include <motors.h>
+//#include <vision.h>
 
 #define PI					3.14159265
 #define NB_POS				5
@@ -30,6 +31,47 @@ static float pos_car_x[NB_POS] = {0};
 static float pos_car_y[NB_POS] = {0};
 static float cx[NB_POS], bx[NB_POS-1], dx[NB_POS-1];
 static float cy[NB_POS], by[NB_POS-1], dy[NB_POS-1];
+
+static THD_WORKING_AREA(waTrajectoire, 256);
+static THD_FUNCTION(Trajectoire, arg) {
+
+	chRegSetThreadName(__FUNCTION__);
+	(void)arg;
+
+	while(1){
+		//waits until an position has been captured
+		//chBSemWait(&dist_ready_sem);
+
+
+
+
+		/*
+		//gets the pointer to the array filled with the last image in RGB565
+		img_buff_ptr = dcmi_get_last_image_ptr();
+
+		for(uint16_t i = 0; i < IMAGE_BUFFER_SIZE; i++){
+
+			// ---Version plus clean---
+			//stick the two 8-bit ints together in a 16-bit int,
+			//select only green with a mask,
+			//shift right and put the value in an 8-bit int
+
+			uint16_t green_select = (((img_buff_ptr[2*i] << 8) + img_buff_ptr[2*i+1]) & GREEN) >> 5;
+			image[i] = (uint8_t) green_select;
+		}
+		//measure line
+		line_position (image, IMAGE_BUFFER_SIZE);
+
+		//Send the data
+		SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
+		*/
+
+	}
+
+}
+
+
+
 
 float angle_from_three_points(float x1, float y1, float x2, float y2, float x3, float y3){
 
@@ -192,56 +234,6 @@ void convert_pos(void){
 
 }
 
-void p_control(void){
-
-
-	float pos_x = 0, pos_y = 0, pos_theta = PI/2;
-	float step_l = 0, step_r = 0;
-	float step_l_mem = 0, step_r_mem = 0;
-	float speed_l = 0, speed_r = 0;
-	//float speed_x = 0, speed_y = 0, speed_theta = 0;
-	float rot_speed = 0;
-	float K = 50;
-
-
-	float x_goal = 50, y_goal = 50;
-	float trans_speed = 50;
-	float theta_goal = 0;
-	float delta_theta = 0;
-
-	while(fabs(x_goal-pos_x)>1 && fabs(y_goal-pos_y)>1){
-
-
-		step_l_mem = step_l;
-		step_r_mem = step_r;
-		step_l = (left_motor_get_pos()/NSTEP_ONE_TURN)*2*PI;
-		step_r = (right_motor_get_pos()/NSTEP_ONE_TURN)*2*PI;
-
-		pos_x = pos_x + cos(pos_theta)*(WHEEL_RADIUS/2)*(step_l + step_r - step_l_mem - step_r_mem);
-		pos_y = pos_y + sin(pos_theta)*(WHEEL_RADIUS/2)*(step_l + step_r - step_l_mem - step_r_mem);
-		pos_theta = pos_theta + (WHEEL_RADIUS/WHEEL_DISTANCE)*(-step_l + step_r + step_l_mem - step_r_mem);
-
-		theta_goal = atan2(y_goal-pos_y, x_goal-pos_x);
-		delta_theta = theta_goal-pos_theta;
-
-		if (delta_theta > PI) delta_theta = -(2*PI-delta_theta);
-		if (delta_theta < - PI) delta_theta = 2*PI+delta_theta;
-
-		rot_speed = K*delta_theta;
-
-		speed_r = (2*trans_speed + rot_speed*WHEEL_DISTANCE)/(2*WHEEL_RADIUS);
-		speed_l = (2*trans_speed - rot_speed*WHEEL_DISTANCE)/(2*WHEEL_RADIUS);
-
-
-		left_motor_set_speed((speed_l*NSTEP_ONE_TURN)/(2*PI));
-		right_motor_set_speed((speed_r*NSTEP_ONE_TURN)/(2*PI));
-
-	}
-	left_motor_set_speed(0);
-	right_motor_set_speed(0);
-
-}
-
 
 //************** NOT USED FOR THE MOMENT *****************
 void interpolate(void){
@@ -352,6 +344,10 @@ void interpolate(void){
 
 		}
 	}
+}
+
+void trajectoire_start(void){
+	chThdCreateStatic(waTrajectoire, sizeof(waTrajectoire), NORMALPRIO, Trajectoire, NULL);
 }
 
 

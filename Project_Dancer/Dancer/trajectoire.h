@@ -10,5 +10,6 @@
 
 void convert_pos(void);
 void p_control(void);
+void trajectoire_start(void);
 
 #endif /* TRAJECTOIRE_H_ */
