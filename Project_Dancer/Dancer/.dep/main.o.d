@@ -145,18 +145,6 @@ build/obj/main.o: main.c \
  ../../lib/e-puck2_main-processor/src/parameter/parameter.h \
  process_image.h trajectoire.h \
  ../../lib/e-puck2_main-processor/src/motors.h
- ../../lib/e-puck2_main-processor/src/sensors/VL53L0X/VL53L0X.h \
- ../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/vl53l0x_api.h \
- ../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/vl53l0x_api_strings.h \
- ../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/vl53l0x_def.h \
- ../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/vl53l0x_device.h \
- ../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/vl53l0x_types.h \
- ../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/../../platform/inc/vl53l0x_platform.h \
- ../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/../../platform/inc/../../core/inc/vl53l0x_def.h \
- ../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/../../platform/inc/vl53l0x_platform_log.h \
- ../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/../../platform/inc/vl53l0x_i2c_platform.h \
- ../../lib/e-puck2_main-processor/ChibiOS//os/hal/lib/streams/chprintf.h \
- ../../lib/e-puck2_main-processor/src/usbcfg.h vision.h
 
 /Applications/Eclipse_e-puck2.app/Contents/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/stdio.h:
 
@@ -453,28 +441,3 @@ process_image.h:
 trajectoire.h:
 
 ../../lib/e-puck2_main-processor/src/motors.h:
-../../lib/e-puck2_main-processor/src/sensors/VL53L0X/VL53L0X.h:
-
-../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/vl53l0x_api.h:
-
-../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/vl53l0x_api_strings.h:
-
-../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/vl53l0x_def.h:
-
-../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/vl53l0x_device.h:
-
-../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/vl53l0x_types.h:
-
-../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/../../platform/inc/vl53l0x_platform.h:
-
-../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/../../platform/inc/../../core/inc/vl53l0x_def.h:
-
-../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/../../platform/inc/vl53l0x_platform_log.h:
-
-../../lib/e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/../../platform/inc/vl53l0x_i2c_platform.h:
-
-../../lib/e-puck2_main-processor/ChibiOS//os/hal/lib/streams/chprintf.h:
-
-../../lib/e-puck2_main-processor/src/usbcfg.h:
-
-vision.h:

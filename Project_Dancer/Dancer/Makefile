@@ -13,12 +13,9 @@ CSRC += ./main.c \
 		./process_image.c \
 		./trajectoire.c \
 		
-		./vision.c \
 
 #Header folders to include
 INCDIR += 
-
-
 
 #Jump to the main Makefile
 include $(GLOBAL_PATH)/Makefile
