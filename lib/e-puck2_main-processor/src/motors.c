@@ -228,6 +228,7 @@ void motor_set_speed(struct stepper_motor_s *m, int speed)
     pwmChangePeriod(m->timer, interval);
 }
 
+
 /*************************END INTERNAL FUNCTIONS**********************************/
 
 
