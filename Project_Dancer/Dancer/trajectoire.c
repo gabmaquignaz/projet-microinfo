@@ -9,7 +9,7 @@
 #include <math.h>
 #include <trajectoire.h>
 #include <motors.h>
-#include <vision.h>
+//#include <vision.h>
 
 #define PI					3.14159265
 #define NB_POS				5
@@ -41,10 +41,10 @@ static THD_FUNCTION(Trajectoire, arg) {
 	for(uint16_t i = 0; i< NB_POS; i++){
 
 		//waits until an position has been captured
-		chBSemWait(&dist_ready_sem);
+		//chBSemWait(&dist_ready_sem);
 
-		pos_car_x[i] = get_hor_dist_mm();
-		pos_car_y[i] = sqrt(get_real_dist_mm()*get_real_dist_mm()-pos_car_x[i]*pos_car_x[i]);
+		//pos_car_x[i] = get_hor_dist_mm();
+		//pos_car_y[i] = sqrt(get_real_dist_mm()*get_real_dist_mm()-pos_car_x[i]*pos_car_x[i]);
 
 
 	}
