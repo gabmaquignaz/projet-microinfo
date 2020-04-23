@@ -9,7 +9,7 @@
 #include <math.h>
 #include <trajectoire.h>
 #include <motors.h>
-//#include <vision.h>
+#include <vision.h>
 
 #define PI					3.14159265
 #define NB_POS				5
@@ -38,36 +38,18 @@ static THD_FUNCTION(Trajectoire, arg) {
 	chRegSetThreadName(__FUNCTION__);
 	(void)arg;
 
-	while(1){
+	for(uint16_t i = 0; i< NB_POS; i++){
+
 		//waits until an position has been captured
-		//chBSemWait(&dist_ready_sem);
+		chBSemWait(&dist_ready_sem);
 
+		pos_car_x[i] = get_hor_dist_mm();
+		pos_car_y[i] = sqrt(get_real_dist_mm()*get_real_dist_mm()-pos_car_x[i]*pos_car_x[i]);
 
-
-
-		/*
-		//gets the pointer to the array filled with the last image in RGB565
-		img_buff_ptr = dcmi_get_last_image_ptr();
-
-		for(uint16_t i = 0; i < IMAGE_BUFFER_SIZE; i++){
-
-			// ---Version plus clean---
-			//stick the two 8-bit ints together in a 16-bit int,
-			//select only green with a mask,
-			//shift right and put the value in an 8-bit int
-
-			uint16_t green_select = (((img_buff_ptr[2*i] << 8) + img_buff_ptr[2*i+1]) & GREEN) >> 5;
-			image[i] = (uint8_t) green_select;
-		}
-		//measure line
-		line_position (image, IMAGE_BUFFER_SIZE);
-
-		//Send the data
-		SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
-		*/
 
 	}
 
+	convert_pos();
 }
 
 
@@ -347,7 +329,7 @@ void interpolate(void){
 }
 
 void trajectoire_start(void){
-	chThdCreateStatic(waTrajectoire, sizeof(waTrajectoire), NORMALPRIO, Trajectoire, NULL);
+	chThdCreateStatic(waTrajectoire, sizeof(waTrajectoire), HIGHPRIO, Trajectoire, NULL);
 }
 
 
