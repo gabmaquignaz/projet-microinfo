@@ -8,7 +8,6 @@
 #include "hal.h"
 #include "memory_protection.h"
 #include <main.h>
-#include <process_image.h>
 #include <trajectoire.h>
 #include <motors.h>
 
