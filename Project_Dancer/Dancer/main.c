@@ -1,6 +1,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #include <math.h>
 
@@ -10,10 +11,17 @@
 #include <main.h>
 #include <trajectoire.h>
 #include <motors.h>
+#include <button.h>
+
+#define CLICKDELAY		100
+#define DOUBLEDELAY		1000
 
 
 int main(void)
 {
+	systime_t time;
+	bool doubleclick = false;
+
 
     halInit();
     chSysInit();
@@ -21,10 +29,31 @@ int main(void)
     motors_init();
 
 
+
     /* Infinite loop. */
     while (1) {
     	//waits 1 second
-        chThdSleepMilliseconds(1000);
+        //chThdSleepMilliseconds(10);
+
+        if(button_get_state()){
+        		time = chVTGetSystemTime();
+        		doubleclick = false;
+        		while(true){
+        			if (button_get_state() && chVTGetSystemTime()-time > CLICKDELAY){
+        				doubleclick = true;
+        			}
+        			if (chVTGetSystemTime()-time > DOUBLEDELAY) break;
+        		}
+
+        		if (doubleclick){
+        			//time to shazam
+        		}
+        		else{
+        			//time to save a new song
+        		}
+
+        }
+
     }
 }
 
