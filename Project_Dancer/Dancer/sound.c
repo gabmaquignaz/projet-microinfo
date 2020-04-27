@@ -28,11 +28,12 @@ enum Mic {R,L,B,F};
 
 #define WAIT_FFT 			1 //one in N set of 1024 samples is used
 #define FREQ_MIN_DIST 		5
+#define PEAK_MIN_H			500
 
 
 void processAudioData(int16_t *data, uint16_t num_samples);
 void doFFT_optimized(uint16_t size, float* complex_buffer);
-uint8_t find_smallest (float* micOutput, uint16_t* sample);
+uint8_t find_replace (float* micOutput, uint16_t* sample);
 void extract_freq_id (float* micOutput, uint16_t* sample);
 void do_bbl_sort(uint16_t* sample);
 
@@ -57,7 +58,13 @@ static THD_FUNCTION(CaptureSound, arg) {
    for (uint8_t i = 0; i < NB_SAMPLES; i++){
 	   chBSemWait(&FFT_ready_sem);
 	   extract_freq_id(micFront_output, song_data[i]);
-	   chprintf((BaseSequentialStream *) &SDU1, "%d %d %d %d %d\n", song_data[i][0], song_data[i][1], song_data[i][2], song_data[i][3], song_data[i][4]);
+   }
+
+   for (uint8_t i = 0; i < NB_SAMPLES; i++){
+	   for(uint8_t j = 0; j < FREQ_ID_SIZE; j++){
+   		   chprintf((BaseSequentialStream *) &SDU1, "%d ", song_data[i][j]);
+   	   }
+	   chprintf((BaseSequentialStream *) &SDU1, "\n");
    }
 
    while (1) {
@@ -108,24 +115,16 @@ void doFFT_optimized(uint16_t size, float* complex_buffer){
 
 void extract_freq_id (float* micOutput,  uint16_t* sample){
 	//a sample contains the indexes in the output tab (i.e. the frequency value) of the five highest freqs
-	uint8_t index_smallest = 0;
+	uint8_t index_replace_next = 0;
 
-	for(uint16_t i = 0; i < FFT_SIZE/2; i++){
+	for(uint16_t i = 1; i < FFT_SIZE/2-1; i++){
 
-		//find the index of the smallest of the five freqs
-		//if its intensity is smaller than that of freq of index i, replace it
-		index_smallest = find_smallest(micOutput, sample);
-
-		//found a frequency that has higher intensity than the fifth highest found yet
-		if (micOutput[i] > micOutput[ sample[index_smallest] ]){
-
-			//if the new frequency is too close to one already existing, ignore it
-			bool same_freq = false;
-			for(uint8_t j = 0; j < FREQ_ID_SIZE; j++){
-				if(i-sample[j] < FREQ_MIN_DIST) same_freq = true;
-			}
-			if(!same_freq) sample[index_smallest] = i;
-
+		//find a peak and ignore it if it's not high enough
+		if((micOutput[i]-micOutput[i-1]) > 0 && (micOutput[i+1]-micOutput[i]) < 0 && micOutput[i] > PEAK_MIN_H){
+			//find the next freq of the sample to replace
+			index_replace_next = find_replace(micOutput, sample);
+			//the new peak is higher than the one at index_replace_next or the peak is at zero
+			if((micOutput[i] > micOutput[sample[index_replace_next]]) || !sample[index_replace_next]) sample[index_replace_next] = i;
 		}
 	}
 
@@ -134,7 +133,7 @@ void extract_freq_id (float* micOutput,  uint16_t* sample){
 }
 
 void do_bbl_sort(uint16_t* sample){
-	//sort the five freqs by peak value
+	//bubble sort the elements of the sample
 	for(uint8_t i = 0; i < FREQ_ID_SIZE-1; i++){
 		for(uint8_t j = 0 ; j < FREQ_ID_SIZE-i-1; j++){
 			if(sample[j] > sample[j+1]){
@@ -146,12 +145,12 @@ void do_bbl_sort(uint16_t* sample){
 	}
 }
 
-uint8_t find_smallest (float* micOutput, uint16_t* sample){
+uint8_t find_replace (float* micOutput, uint16_t* sample){
 	//a sample contains the indexes in the output tab (i.e. the frequency value) of the five highest freqs
 	uint8_t index_smallest = 0;
-	uint16_t i;
-	for(i = 1; i < FREQ_ID_SIZE; i++){
-			if(micOutput[sample[i]] < micOutput[sample[index_smallest]]) index_smallest = i;
+	for(uint8_t i = 1; i < FREQ_ID_SIZE; i++){
+		if(!sample[i]) return i; // a freq other than the first one is still initialized at zero and should be replaced next
+		if(micOutput[sample[i]] < micOutput[sample[index_smallest]]) index_smallest = i;
 	}
 	return index_smallest;
 

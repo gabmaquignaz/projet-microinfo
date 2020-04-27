@@ -2887,7 +2887,7 @@ Disassembly of section .text:
  8002282:	8823      	ldrh	r3, [r4, #0]
  8002284:	3301      	adds	r3, #1
  8002286:	b29b      	uxth	r3, r3
- 8002288:	2b04      	cmp	r3, #4
+ 8002288:	2b09      	cmp	r3, #9
  800228a:	8023      	strh	r3, [r4, #0]
  800228c:	d808      	bhi.n	80022a0 <processAudioData+0xd0>
  800228e:	2300      	movs	r3, #0
