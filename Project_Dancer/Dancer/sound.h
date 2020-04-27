@@ -2,7 +2,7 @@
  * audio.h
  *
  *  Created on: 25 Apr 2020
- *      Author: gabmac
+ *      Author: Gabriel Maquignaz
  */
 
 #ifndef AUDIO_H_
