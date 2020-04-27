@@ -11,15 +11,14 @@
 #include <main.h>
 #include <usbcfg.h>
 #include <chprintf.h>
-#include <stdlib.h>
 
-#include <motors.h>
 #include <audio/microphone.h>
 #include <arm_math.h>
 #include <arm_const_structs.h>
+#include <sound.h>
 
 enum Mic {R,L,B,F};
-#define NB_SAMPLES_ONE_MIC	160
+
 #define FFT_SIZE 			1024
 
 //fifty samples composed of the five stronger frequencies are stored
@@ -27,13 +26,15 @@ enum Mic {R,L,B,F};
 #define NB_SAMPLES			50
 #define FREQ_ID_SIZE 		5
 
+#define WAIT_FFT 			1 //one in N set of 1024 samples is used
+#define FREQ_MIN_DIST 		5
 
 
-void doFFT_optimized(uint16_t size, float* complex_buffer);
 void processAudioData(int16_t *data, uint16_t num_samples);
+void doFFT_optimized(uint16_t size, float* complex_buffer);
 uint8_t find_smallest (float* micOutput, uint16_t* sample);
-void extract_freq_id (float* micOutput,  uint16_t* sample);
-int cmpfunc (const void * a, const void * b);
+void extract_freq_id (float* micOutput, uint16_t* sample);
+void do_bbl_sort(uint16_t* sample);
 
 
 
@@ -44,52 +45,57 @@ static float micFront_cmplx_input[2 * FFT_SIZE];
 static float micFront_output[FFT_SIZE]; //Array containing the computed magnitude of the complex numbers
 
 
-
-
 static THD_WORKING_AREA(waCaptureSound, 1024);
 static THD_FUNCTION(CaptureSound, arg) {
     chRegSetThreadName(__FUNCTION__);
     (void)arg;
 
    uint16_t song_data [NB_SAMPLES][FREQ_ID_SIZE] = {0};
+
    mic_start(&processAudioData);
 
+   for (uint8_t i = 0; i < NB_SAMPLES; i++){
+	   chBSemWait(&FFT_ready_sem);
+	   extract_freq_id(micFront_output, song_data[i]);
+	   chprintf((BaseSequentialStream *) &SDU1, "%d %d %d %d %d\n", song_data[i][0], song_data[i][1], song_data[i][2], song_data[i][3], song_data[i][4]);
+   }
+
    while (1) {
-	   for (uint8_t i = 0; i < NB_SAMPLES; i++){
-		   chBSemWait(&FFT_ready_sem);
-		   extract_freq(micFront_output, song_data[i]);
-		   chprintf((BaseSequentialStream *) &SDU1, "%d %d %d %d %d\n", song_data[i][0], song_data[i][1], song_data[i][2], song_data[i][3], song_data[i][4]);
-	   }
-	   chThdSleepMilliseconds(5000);
+	   chThdSleepMilliseconds(1000);
    }
 }
 
 
 
 
+void sound_start(void){
+	chThdCreateStatic(waCaptureSound, sizeof(waCaptureSound), NORMALPRIO, CaptureSound, NULL);
+}
 
-
-/*
-*	Callback called when the demodulation of the four microphones is done.
-*	We get 160 samples per mic every 10ms (16kHz)
-*/
-
+//Fonction adaptée du cours MICRO-315 (TP5_Noisy), F. Mondada, E. Ferragni
 void processAudioData(int16_t *data, uint16_t num_samples){
-	static uint16_t counter = 0;
-	if (num_samples != 640) //error
+	static uint16_t samples_counter = 0;
+	static uint8_t wait_counter = 0;
 
-	for(uint8_t i = 0; i < NB_SAMPLES_ONE_MIC; i++){
+	for(uint16_t i = 0; i < num_samples; i+=4){
 		//Only use front mic
-		micFront_cmplx_input[2*counter] = (float)data[4*i+F];
-		micFront_cmplx_input[2*counter+1] = 0;
-		counter ++;
+		micFront_cmplx_input[2*samples_counter] = (float)data[i+F];
+		micFront_cmplx_input[2*samples_counter+1] = 0;
 
-		if (counter >= FFT_SIZE) {
+		samples_counter ++;
 
-			doFFT_optimized(FFT_SIZE, micFront_cmplx_input);
-			arm_cmplx_mag_f32(micFront_cmplx_input, micFront_output, FFT_SIZE);
-			chBSemSignal(&FFT_ready_sem);
-			counter = 0;
+		if (samples_counter >= FFT_SIZE) {
+
+			wait_counter ++;
+
+			if (wait_counter >= WAIT_FFT){
+				doFFT_optimized(FFT_SIZE, micFront_cmplx_input);
+				arm_cmplx_mag_f32(micFront_cmplx_input, micFront_output, FFT_SIZE);
+				chBSemSignal(&FFT_ready_sem);
+				wait_counter = 0;
+			}
+
+			samples_counter = 0;
 			break;
 		}
 	}
@@ -110,13 +116,34 @@ void extract_freq_id (float* micOutput,  uint16_t* sample){
 		//if its intensity is smaller than that of freq of index i, replace it
 		index_smallest = find_smallest(micOutput, sample);
 
+		//found a frequency that has higher intensity than the fifth highest found yet
 		if (micOutput[i] > micOutput[ sample[index_smallest] ]){
-			sample[index_smallest] = i;
+
+			//if the new frequency is too close to one already existing, ignore it
+			bool same_freq = false;
+			for(uint8_t j = 0; j < FREQ_ID_SIZE; j++){
+				if(i-sample[j] < FREQ_MIN_DIST) same_freq = true;
+			}
+			if(!same_freq) sample[index_smallest] = i;
+
 		}
 	}
 
-	//quick sort the five higher frequencies
-	qsort(sample, FREQ_ID_SIZE, sizeof(uint16_t), cmpfunc);
+	//sort the frequency in ascending order
+	do_bbl_sort(sample);
+}
+
+void do_bbl_sort(uint16_t* sample){
+	//sort the five freqs by peak value
+	for(uint8_t i = 0; i < FREQ_ID_SIZE-1; i++){
+		for(uint8_t j = 0 ; j < FREQ_ID_SIZE-i-1; j++){
+			if(sample[j] > sample[j+1]){
+				uint16_t swap = sample[j];
+				sample[j] = sample[j+1];
+				sample[j+1] = swap;
+			}
+		}
+	}
 }
 
 uint8_t find_smallest (float* micOutput, uint16_t* sample){
@@ -126,10 +153,6 @@ uint8_t find_smallest (float* micOutput, uint16_t* sample){
 	for(i = 1; i < FREQ_ID_SIZE; i++){
 			if(micOutput[sample[i]] < micOutput[sample[index_smallest]]) index_smallest = i;
 	}
-	return i;
-}
+	return index_smallest;
 
-
-int cmpfunc (const void * a, const void * b){
-   return ( *(int*)a - *(int*)b );
 }

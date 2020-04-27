@@ -9,7 +9,7 @@
 #define AUDIO_H_
 
 
-
+void sound_start(void);
 
 
 #endif /* AUDIO_H_ */

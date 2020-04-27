@@ -74,16 +74,11 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 		if (counter >= FFT_SIZE) {
 			sent ++;
 
-			if (sent >=100){
+			if (sent >=5){
 
 				doFFT_optimized(FFT_SIZE, micFront_cmplx_input);
 
 				arm_cmplx_mag_f32(micFront_cmplx_input, micFront_output, FFT_SIZE);
-
-				for (uint16_t j = 0; j < FFT_SIZE/2; j++){
-					chprintf((BaseSequentialStream *) &SDU1, "%d : %.2f\n", j, micFront_output[j]);
-				}
-				chprintf((BaseSequentialStream *) &SDU1, "---------------------------------");
 
 				chBSemSignal(&sendToComputer_sem);
 				sent = 0;
