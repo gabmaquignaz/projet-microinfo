@@ -26,16 +26,18 @@ enum Mic {R,L,B,F};
 #define NB_SAMPLES			50
 #define SAMPLE_SIZE 			5
 #define OFFSET_MAX			20 //At least (NB_SAMPLES-OFFSET_MAX) must be used for a match
-#define MATCH_TOL 			2 // frequency difference tolerance to count as a match
+#define MATCH_F_TOL 			2 // frequency difference tolerance to count as a match
+#define MATCH_TRESH			30
 
-#define WAIT_FFT 			1 //one in N set of 1024 samples is used
-#define PEAK_H_MIN			500
+#define WAIT_FFT 			2 //one in N set of 1024 samples is used
+#define PEAK_H_MIN			1200
 
 
 void processAudioData(int16_t *data, uint16_t num_samples);
 
 float match_song (uint16_t measured_song [NB_SAMPLES][SAMPLE_SIZE], uint16_t ref_song [NB_SAMPLES][SAMPLE_SIZE]);
 uint8_t match_sample (uint16_t measured_sample [SAMPLE_SIZE], uint16_t ref_sample [SAMPLE_SIZE]);
+uint8_t fit_value (uint8_t fit_ratio);
 
 void doFFT_optimized(uint16_t size, float* complex_buffer);
 
@@ -76,15 +78,21 @@ static THD_FUNCTION(CaptureSound, arg) {
 	   extract_freq_id(micFront_output, ref_song[i]);
    }
 
-   for (uint8_t i = 0; i < NB_SAMPLES; i++){
-	   for(uint8_t j = 0; j < SAMPLE_SIZE; j++){
-   		   chprintf((BaseSequentialStream *) &SDU1, "%d ", ref_song[i][j]);
-   	   }
-	   chprintf((BaseSequentialStream *) &SDU1, "\n");
-   }
-   chprintf((BaseSequentialStream *) &SDU1, "\n\n\n");
+//   for (uint8_t i = 0; i < NB_SAMPLES; i++){
+//	   for(uint8_t j = 0; j < SAMPLE_SIZE; j++){
+//   		   chprintf((BaseSequentialStream *) &SDU1, "%d ", ref_song[i][j]);
+//   	   }
+//	   chprintf((BaseSequentialStream *) &SDU1, "\n");
+//   }
+//   chprintf((BaseSequentialStream *) &SDU1, "\n\n\n");
 
    while (1) {
+
+	   for (uint8_t i = 0; i < NB_SAMPLES; i++){
+	  	   for(uint8_t j = 0; j < SAMPLE_SIZE; j++){
+	  	measured_song[i][j] = 0;
+	  	   }
+	    }
 	   chThdSleepMilliseconds(5000);
 	  chprintf((BaseSequentialStream *) &SDU1, "3\n");
 	  chThdSleepMilliseconds(1000);
@@ -99,20 +107,23 @@ static THD_FUNCTION(CaptureSound, arg) {
 	   	   extract_freq_id(micFront_output, measured_song[i]);
 	   }
 
-	   for (uint8_t i = 0; i < NB_SAMPLES; i++){
-		   for(uint8_t j = 0; j < SAMPLE_SIZE; j++){
-				   chprintf((BaseSequentialStream *) &SDU1, "%d ", measured_song[i][j]);
-			   }
-		   chprintf((BaseSequentialStream *) &SDU1, "\n");
-	   }
+//	   for (uint8_t i = 0; i < NB_SAMPLES; i++){
+//		   for(uint8_t j = 0; j < SAMPLE_SIZE; j++){
+//				   chprintf((BaseSequentialStream *) &SDU1, "%d ", measured_song[i][j]);
+//			   }
+//		   chprintf((BaseSequentialStream *) &SDU1, "\n");
+//	   }
+	   float match = match_song(measured_song, ref_song);
+	   if (match > MATCH_TRESH) chprintf((BaseSequentialStream *) &SDU1, "SUCCESS ");
+	   else chprintf((BaseSequentialStream *) &SDU1, "FAILED ");
+	   chprintf((BaseSequentialStream *) &SDU1, "(%.2f)\n", match);
 
-	   chprintf((BaseSequentialStream *) &SDU1, "MATCH : %.2f\n\n", match_song(measured_song, ref_song));
    }
 }
 
 
 
-//*************** high level interaction functions (visible by other files) ***************
+//*************** High level interaction functions (visible by other files) ***************
 
 void sound_start(void){
 	chThdCreateStatic(waCaptureSound, sizeof(waCaptureSound), NORMALPRIO, CaptureSound, NULL);
@@ -143,12 +154,21 @@ float match_song (uint16_t measured_song [NB_SAMPLES][SAMPLE_SIZE], uint16_t ref
 			mean += match_sample(measured_song[i-offset], ref_song[i]);
 		}
 		mean /= (end-start);
+//		chprintf((BaseSequentialStream *) &SDU1, "%d)  %.2f\n", offset, mean);
 		if(mean > best_avrg_match) best_avrg_match = mean;
 	}
 	return best_avrg_match;
 }
 
 uint8_t match_sample (uint16_t measured [SAMPLE_SIZE], uint16_t ref [SAMPLE_SIZE]){
+
+	//verify that the reference is not full of zeros (filtered noise)
+	bool empty_ref = true;
+	for(int8_t i = 0; i < SAMPLE_SIZE; i++){
+		if(ref[i]) empty_ref = false;
+	}
+	if(empty_ref) return 0;
+
 
 	uint8_t match_counter = 0;
 	uint8_t best_match = 0;
@@ -166,13 +186,22 @@ uint8_t match_sample (uint16_t measured [SAMPLE_SIZE], uint16_t ref [SAMPLE_SIZE
 			if(abs(measured[i]-ref[j]) < abs(measured[i]-ref[best_match]) && !used[j]) best_match = j;
 		}
 
-		if(abs(measured[i]-ref[best_match]) <= MATCH_TOL){
+		if(abs(measured[i]-ref[best_match]) <= MATCH_F_TOL){
 			//it's a match !
 			match_counter ++;
 			used[best_match] = true;
 		}
 	}
-	return match_counter;
+
+	uint8_t fit_ratio = 100*match_counter/SAMPLE_SIZE;
+	return fit_value(fit_ratio);
+}
+
+
+//Goodness of fit function, input: fit ratio (0 -> 1) between two samples
+//uses a second order polynomial to return a value between 0 and ~150
+uint8_t fit_value (uint8_t fit_ratio){
+	return (0.015*fit_ratio*fit_ratio-0.03*fit_ratio);
 }
 
 
@@ -210,7 +239,7 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 
 
 
-//*************** low level: complex analysis functions ***************
+//*************** Low level: complex analysis functions ***************
 
 //optimized FFT provided by ARM
 void doFFT_optimized(uint16_t size, float* complex_buffer){
@@ -220,7 +249,7 @@ void doFFT_optimized(uint16_t size, float* complex_buffer){
 
 
 
-//*************** low level: frequency recognition functions ***************
+//*************** Low level: frequency recognition functions ***************
 
 //Searches the FFT for peaks and store the five stronger freqs in sample
 void extract_freq_id (float* micOutput,  uint16_t* sample){
@@ -238,9 +267,6 @@ void extract_freq_id (float* micOutput,  uint16_t* sample){
 			if((micOutput[i] > micOutput[sample[index_replace_next]]) || !sample[index_replace_next]) sample[index_replace_next] = i;
 		}
 	}
-
-	//sort the frequency in ascending order
-	do_bbl_sort(sample);
 }
 
 
@@ -254,18 +280,4 @@ uint8_t find_replace (float* micOutput, uint16_t* sample){
 	}
 	return index_smallest;
 
-}
-
-
-//bubble sort the elements of the sample
-void do_bbl_sort(uint16_t* sample){
-	for(uint8_t i = 0; i < SAMPLE_SIZE-1; i++){
-		for(uint8_t j = 0 ; j < SAMPLE_SIZE-i-1; j++){
-			if(sample[j] > sample[j+1]){
-				uint16_t swap = sample[j];
-				sample[j] = sample[j+1];
-				sample[j+1] = swap;
-			}
-		}
-	}
 }
