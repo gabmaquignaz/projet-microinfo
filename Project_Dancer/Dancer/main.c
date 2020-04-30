@@ -21,8 +21,8 @@
 #include <chprintf.h>
 
 
-#define CLICKDELAY		100000 //0.1s
-#define DOUBLEDELAY		1000000 //1s
+#define CLICKDELAY		1000 //0.1s
+#define DOUBLEDELAY		10000 //1s
 
 static void serial_start(void)
 {
@@ -41,7 +41,7 @@ static void timer12_start(void){
     //timer 12 is a 16 bit timer so we can measure time
     //to about 65ms with a 1Mhz counter
     static const GPTConfig gpt12cfg = {
-        1000000,        /* 1MHz timer clock in order to measure uS.*/
+        10000,        /* 1MHz timer clock in order to measure uS.*/
         NULL,           /* Timer callback.*/
         0,
         0
@@ -54,7 +54,6 @@ static void timer12_start(void){
 
 int main(void)
 {
-	systime_t time;
 	bool doubleclick = false;
 
 
@@ -76,9 +75,16 @@ int main(void)
 //        chThdSleepMilliseconds(500);
 
         if(button_get_state()){
+
+        		while (button_get_state()){
+        			chThdSleepMilliseconds(10);
+        		}
+
         		GPTD12.tim->CNT = 0;
         		doubleclick = false;
+
         		while(true){
+//        			chprintf((BaseSequentialStream *) &SDU1, "%d\n", GPTD12.tim->CNT);
         			if (button_get_state() && GPTD12.tim->CNT > CLICKDELAY){
         				doubleclick = true;
         			}
@@ -93,15 +99,15 @@ int main(void)
         		}
         		else{
         			//time to save a new song
-        			set_led(1, 2);
-				set_led(3, 2);
-				set_led(5, 2);
-				set_led(7, 2);
+        			set_led(LED1, 2);
+				set_led(LED3, 2);
+				set_led(LED5, 2);
+				set_led(LED7, 2);
 				chThdSleepMilliseconds(1000);
-				set_led(1, 0);
-				set_led(3, 0);
-				set_led(5, 0);
-				set_led(7, 0);
+				set_led(LED1, 0);
+				set_led(LED3, 0);
+				set_led(LED5, 0);
+				set_led(LED7, 0);
 
         		}
 
