@@ -8,10 +8,11 @@
 #include "ch.h"
 #include "hal.h"
 #include "memory_protection.h"
-#include <main.h>
-#include <trajectoire.h>
-#include <motors.h>
-#include <button.h>
+#include "main.h"
+#include "trajectoire.h"
+#include "motors.h"
+#include "button.h"
+#include "leds.h"
 
 #define CLICKDELAY		100
 #define DOUBLEDELAY		1000
@@ -47,9 +48,14 @@ int main(void)
 
         		if (doubleclick){
         			//time to shazam
+        			set_body_led(1);
         		}
         		else{
         			//time to save a new song
+        			set_led(1, 1);
+				set_led(3, 1);
+				set_led(5, 1);
+				set_led(7, 1);
         		}
 
         }
