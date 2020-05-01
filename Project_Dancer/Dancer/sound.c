@@ -28,6 +28,8 @@ enum Mic {R,L,B,F};
 #define OFFSET_MAX			20 //At least (NB_SAMPLES-OFFSET_MAX) must be used for a match
 #define MATCH_F_TOL 			2 // frequency difference tolerance to count as a match
 #define MATCH_TRESH			30
+#define QUAD_COEFF			0.015
+#define LIN_COEFF			(-0.03)
 
 #define WAIT_FFT 			2 //one in N set of 1024 samples is used
 #define PEAK_H_MIN			1200
@@ -93,6 +95,8 @@ static THD_FUNCTION(CaptureSound, arg) {
 	  	measured_song[i][j] = 0;
 	  	   }
 	    }
+
+
 	   chThdSleepMilliseconds(5000);
 	  chprintf((BaseSequentialStream *) &SDU1, "3\n");
 	  chThdSleepMilliseconds(1000);
@@ -201,7 +205,7 @@ uint8_t match_sample (uint16_t measured [SAMPLE_SIZE], uint16_t ref [SAMPLE_SIZE
 //Goodness of fit function, input: fit ratio (0 -> 1) between two samples
 //uses a second order polynomial to return a value between 0 and ~150
 uint8_t fit_value (uint8_t fit_ratio){
-	return (0.015*fit_ratio*fit_ratio-0.03*fit_ratio);
+	return (QUAD_COEFF*fit_ratio*fit_ratio+LIN_COEFF*fit_ratio);
 }
 
 
