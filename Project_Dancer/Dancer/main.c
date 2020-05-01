@@ -44,7 +44,7 @@ int main(void)
     usb_start();
 
     //start mics and sound recognition
-    sound_start();
+//    sound_start();
 
     //starts camera and image processing
 //  	dcmi_start();
