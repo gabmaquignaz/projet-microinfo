@@ -9070,8 +9070,7 @@ destructors     0x00000000080001c0        0x0
                 0x000000002000b578     0x2000 build/obj/audio_processing.o
  .bss.micRight_output
                 0x000000002000d578     0x1000 build/obj/audio_processing.o
- .bss.sent      0x000000002000e578        0x1 build/obj/audio_processing.o
- *fill*         0x000000002000e579        0x1 
+ .bss.sent      0x000000002000e578        0x2 build/obj/audio_processing.o
  .bss.dummytx   0x000000002000e57a        0x2 build/obj/spi3_slave_lld.o
  .bss.DCMID     0x000000002000e57c       0x14 build/obj/dcmi_lld.o
                 0x000000002000e57c                DCMID

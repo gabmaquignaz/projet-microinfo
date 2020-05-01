@@ -139,7 +139,7 @@ static THD_FUNCTION(ProcessImage, arg) {
 }
 
 
-//*************** high level interaction functions (visible by other files) ***************
+//*************** high level: interaction functions (visible by other files) ***************
 
 uint16_t get_real_dist_mm(void){
 	return real_dist;
@@ -158,7 +158,7 @@ void process_image_start(void){
 
 
 
-//*************** intermediate level object recognition functions ***************
+//*************** intermediate level: object recognition functions ***************
 void create_image(uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float w_r, float w_g, float w_b){
 	for(uint16_t i = 0; i < size; i++){
 		//multiply red and blue (5bit) by 2 to have the same range as green (6 bit)
@@ -245,7 +245,7 @@ bool dist_measure (uint8_t* image, uint16_t size){
 
 
 
-//*************** intermediate level calibration functions ***************
+//*************** intermediate level: calibration functions ***************
 
 void vision_init (uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float* w_r_ptr, float* w_g_ptr, float* w_b_ptr){
 
@@ -486,7 +486,7 @@ bool compute_weights (uint8_t r_obj, uint8_t g_obj, uint8_t b_obj, uint8_t r_bac
 
 
 
-//*************** low level linear algebra functions ***************
+//*************** low level: linear algebra functions ***************
 
 void do_gauss (float matrix [M][N]){
 	//i represents line, j represents columns

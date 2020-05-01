@@ -2884,11 +2884,11 @@ Disassembly of section .text:
  800227c:	d3bd      	bcc.n	80021fa <processAudioData+0x2a>
  800227e:	4c27      	ldr	r4, [pc, #156]	; (800231c <processAudioData+0x14c>)
  8002280:	802a      	strh	r2, [r5, #0]
- 8002282:	7823      	ldrb	r3, [r4, #0]
+ 8002282:	8823      	ldrh	r3, [r4, #0]
  8002284:	3301      	adds	r3, #1
- 8002286:	b2db      	uxtb	r3, r3
- 8002288:	2b04      	cmp	r3, #4
- 800228a:	7023      	strb	r3, [r4, #0]
+ 8002286:	b29b      	uxth	r3, r3
+ 8002288:	2b09      	cmp	r3, #9
+ 800228a:	8023      	strh	r3, [r4, #0]
  800228c:	d808      	bhi.n	80022a0 <processAudioData+0xd0>
  800228e:	2300      	movs	r3, #0
  8002290:	802b      	strh	r3, [r5, #0]
@@ -2928,7 +2928,7 @@ Disassembly of section .text:
  80022ec:	d304      	bcc.n	80022f8 <processAudioData+0x128>
  80022ee:	2300      	movs	r3, #0
  80022f0:	f383 8811 	msr	BASEPRI, r3
- 80022f4:	7023      	strb	r3, [r4, #0]
+ 80022f4:	8023      	strh	r3, [r4, #0]
  80022f6:	e7ca      	b.n	800228e <processAudioData+0xbe>
  80022f8:	480c      	ldr	r0, [pc, #48]	; (800232c <processAudioData+0x15c>)
  80022fa:	f001 fb79 	bl	80039f0 <chSysHalt>

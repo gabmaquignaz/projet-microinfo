@@ -30,7 +30,7 @@ static float micBack_output[FFT_SIZE];
 
 
 static uint16_t counter = 0;
-static uint8_t sent = 0;
+static uint16_t sent = 0;
 
 /*
 *	Callback called when the demodulation of the four microphones is done.
@@ -74,14 +74,13 @@ void processAudioData(int16_t *data, uint16_t num_samples){
 		if (counter >= FFT_SIZE) {
 			sent ++;
 
-			if (sent >=5){
+			if (sent >=10){
 
 				doFFT_optimized(FFT_SIZE, micFront_cmplx_input);
 
 				arm_cmplx_mag_f32(micFront_cmplx_input, micFront_output, FFT_SIZE);
 
 				chBSemSignal(&sendToComputer_sem);
-
 				sent = 0;
 
 //				sound_remote(micFront_output);

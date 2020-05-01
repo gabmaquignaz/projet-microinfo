@@ -144,7 +144,7 @@ e000ed04 l       *ABS*	00000000 SCB_ICSR
 2000a578 l     O .bss	00001000 micLeft_output
 2000d578 l     O .bss	00001000 micRight_output
 20002574 l     O .bss	00000002 counter
-2000e578 l     O .bss	00000001 sent
+2000e578 l     O .bss	00000002 sent
 20000b10 l     O .data	0000000c sendToComputer_sem
 08010590 l     O .text	0000000c __func__.7153
 00000000 l    df *ABS*	00000000 communications.c
