@@ -3,26 +3,23 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#include <math.h>
 
 #include "ch.h"
 #include "hal.h"
 #include "memory_protection.h"
 #include "usbcfg.h"
+#include "motors.h"
+
 #include "main.h"
 #include "trajectoire.h"
-#include "motors.h"
-#include "button.h"
-#include "leds.h"
-#include "spi_comm.h"
 #include "sound.h"
+#include "vision.h"
+#include "user_button.h"
 
+#include "chprintf.h"
 
-#include <chprintf.h>
+enum Main_states {WAIT, REC_SONG, REC_TRAJ, SHAZAM, DANCE};
 
-
-#define CLICKDELAY		1000 //0.1s
-#define DOUBLEDELAY		10000 //1s
 
 static void serial_start(void)
 {
@@ -36,83 +33,66 @@ static void serial_start(void)
 	sdStart(&SD3, &ser_cfg); // UART3.
 }
 
-static void timer12_start(void){
-    //General Purpose Timer configuration
-    //timer 12 is a 16 bit timer so we can measure time
-    //to about 65ms with a 1Mhz counter
-    static const GPTConfig gpt12cfg = {
-        10000,        /* 1MHz timer clock in order to measure uS.*/
-        NULL,           /* Timer callback.*/
-        0,
-        0
-    };
-
-    gptStart(&GPTD12, &gpt12cfg);
-    //let the timer count to max value
-    gptStartContinuous(&GPTD12, 0xFFFF);
-}
-
-int main(void)
-{
-	bool doubleclick = false;
 
 
-    halInit();
+int main(void){
+
+	halInit();
     chSysInit();
     mpu_init();
 
+    //starts trajectory control and motors
     motors_init();
+    trajectoire_start();
 
-    spi_comm_start();
+    //start user button
+    button_start();
+    bool double_click = false;
+
+    //start communication with computer
     usb_start();
     serial_start();
-    timer12_start();
+    chThdSleepMilliseconds(2000);
+
+    //starts vision
+    dcmi_start();
+	po8030_start();
+	process_image_start();
+
+	//Main finite-state machine
+	uint8_t main_state = WAIT;
 
 
 
     /* Infinite loop. */
     while (1) {
-    		//waits 1 second
-//        chThdSleepMilliseconds(500);
+//    	//waits 1 second
+       chThdSleepMilliseconds(1000);
 
-        if(button_get_state()){
+		switch (main_state){
 
-        		while (button_get_state()){
-        			chThdSleepMilliseconds(10);
-        		}
+			case WAIT:
+				double_click = wait_click();
+//				if(double_click) main_state = REC_SONG;
+//				else main_state = SHAZAM;
+				main_state = REC_TRAJ;
+				break;
 
-        		GPTD12.tim->CNT = 0;
-        		doubleclick = false;
+			case REC_SONG:
+				break;
 
-        		while(true){
-//        			chprintf((BaseSequentialStream *) &SDU1, "%d\n", GPTD12.tim->CNT);
-        			if (button_get_state() && GPTD12.tim->CNT > CLICKDELAY){
-        				doubleclick = true;
-        			}
-        			if (GPTD12.tim->CNT > DOUBLEDELAY) break;
-        		}
+			case REC_TRAJ:
+				chprintf((BaseSequentialStream *) &SDU1,"rec_traj\n");
+				signal_rec_traj_sem();
+				main_state = DANCE;
+				break;
 
-        		if (doubleclick){
-        			//time to shazam
-        			set_body_led(2);
-        			chThdSleepMilliseconds(1000);
-        			set_body_led(0);
-        		}
-        		else{
-        			//time to save a new song
-        			set_led(LED1, 2);
-				set_led(LED3, 2);
-				set_led(LED5, 2);
-				set_led(LED7, 2);
-				chThdSleepMilliseconds(1000);
-				set_led(LED1, 0);
-				set_led(LED3, 0);
-				set_led(LED5, 0);
-				set_led(LED7, 0);
+			case SHAZAM:
+				break;
 
-        		}
-
-        }
+			case DANCE:
+				break;
+		}
     }
 }
 

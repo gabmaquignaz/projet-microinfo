@@ -15,7 +15,11 @@
 
 #include <main.h>
 #include <camera/po8030.h>
-#include"sensors/VL53L0X/VL53L0X.h"
+#include "sensors/VL53L0X/VL53L0X.h"
+#include "camera/dcmi_camera.h"
+#include "msgbus/messagebus.h"
+#include "parameter/parameter.h"
+#include "trajectoire.h"
 
 #include <vision.h>
 
@@ -54,6 +58,7 @@ static uint16_t distance_mm_calib = 0;
 
 
 
+
 //detection functions
 void create_image(uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float w_r, float w_g, float w_b);
 bool dist_measure (uint8_t* image, uint16_t size);
@@ -81,6 +86,7 @@ void SendUint8ToComputer(uint8_t* data, uint16_t size)
 
 //semaphore
 static BSEMAPHORE_DECL(image_ready_sem, TRUE);
+
 
 
 static THD_WORKING_AREA(waCaptureImage, 256);
@@ -116,6 +122,9 @@ static THD_FUNCTION(ProcessImage, arg) {
 	uint8_t* img_buff_ptr = NULL;
 	float w_r = 0; float w_g = 0; float w_b = 0; //weights used to detect the desired color in the image
 
+	chprintf((BaseSequentialStream *) &SDU1, "started process image\n");
+	chBSemWait(&rec_traj_ready_sem);
+	chprintf((BaseSequentialStream *) &SDU1, "started vision init \n");
 	vision_init (image,  IMAGE_BUFFER_SIZE, img_buff_ptr, &w_r, &w_g, &w_b);
 
 	while(1){
@@ -127,14 +136,14 @@ static THD_FUNCTION(ProcessImage, arg) {
 //		SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
 
 		if(dist_measure(image, IMAGE_BUFFER_SIZE)){
-			chBSemSignal(&dist_ready_sem);
+			signal_dist_ready_sem();
 			chprintf((BaseSequentialStream *) &SDU1, "r = %d, x = %d\n", real_dist, hor_dist);
 		}
 		else {
 			//show "recognition error" with LEDS
 		}
 
-		chThdSleepMilliseconds(500);
+		chThdSleepMilliseconds(100);
 	}
 }
 
@@ -154,6 +163,10 @@ uint16_t get_hor_dist_mm(void){
 void process_image_start(void){
 	chThdCreateStatic(waProcessImage, sizeof(waProcessImage), NORMALPRIO, ProcessImage, NULL);
 	chThdCreateStatic(waCaptureImage, sizeof(waCaptureImage), NORMALPRIO, CaptureImage, NULL);
+}
+
+void signal_rec_traj_sem(void){
+	chBSemSignal(&rec_traj_ready_sem);
 }
 
 

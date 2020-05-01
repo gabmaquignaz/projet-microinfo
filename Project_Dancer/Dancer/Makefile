@@ -13,6 +13,7 @@ CSRC += ./main.c \
 		./trajectoire.c \
 		./vision.c \
 		./sound.c \
+		./user_button.c \
 		
 
 #Header folders to include

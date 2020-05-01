@@ -5,6 +5,7 @@
  *  		Author: maximepoffet
  */
 
+#include "ch.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -12,8 +13,11 @@
 #include <motors.h>
 #include <vision.h>
 
+#include "chprintf.h"
+#include "usbcfg.h"
+
 #define PI					3.14159265
-#define NB_POS				200
+#define NB_POS				100
 #define WHEEL_DISTANCE      	5.35f    				// [cm]
 #define WHEEL_PERIMETER     	13 						// [cm]
 #define WHEEL_RADIUS			(13/2*PI)
@@ -43,15 +47,20 @@ static THD_FUNCTION(Trajectoire, arg) {
 
 		//waits until an position has been captured
 		chBSemWait(&dist_ready_sem);
-
+		chprintf((BaseSequentialStream *) &SDU1,"position saved\n");
 		pos_car_x[i] = get_hor_dist_mm();
 		pos_car_y[i] = sqrt(get_real_dist_mm()*get_real_dist_mm()-pos_car_x[i]*pos_car_x[i]);
 
 	}
-
+	chprintf((BaseSequentialStream *) &SDU1,"done\n");
+	chThdSleepMilliseconds(2000);
 	convert_pos();
 }
 
+
+void signal_dist_ready_sem(void){
+	chBSemSignal(&dist_ready_sem);
+}
 
 
 
@@ -71,7 +80,7 @@ float angle_from_three_points(float x1, float y1, float x2, float y2, float x3, 
 }
 
 void dance(void){
-
+	chprintf((BaseSequentialStream *) &SDU1,"DANCING !\n");
 	//drive
 	for(uint8_t i = 0 ; i < NB_POS ; i++){
 
