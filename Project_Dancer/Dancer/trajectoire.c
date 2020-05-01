@@ -2,22 +2,23 @@
  * trajectoire.c
  *
  *  Created on: 6 Apr 2020
- *      Author: maximepoffet
+ *  		Author: maximepoffet
  */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <trajectoire.h>
 #include <motors.h>
-//#include <vision.h>
+#include <vision.h>
 
 #define PI					3.14159265
-#define NB_POS				5
+#define NB_POS				200
 #define WHEEL_DISTANCE      	5.35f    				// [cm]
 #define WHEEL_PERIMETER     	13 						// [cm]
 #define WHEEL_RADIUS			(13/2*PI)
 #define PERIMETER_EPUCK     (PI * WHEEL_DISTANCE)
-#define INTERVAL_TEMPS		2 						// [s]
+#define INTERVAL_TEMPS		0.2 						// [s]
 #define INTERVAL_COURT		0.1
 #define NSTEP_ONE_TURN		1000
 #define OX					0
@@ -41,11 +42,10 @@ static THD_FUNCTION(Trajectoire, arg) {
 	for(uint16_t i = 0; i< NB_POS; i++){
 
 		//waits until an position has been captured
-		//chBSemWait(&dist_ready_sem);
+		chBSemWait(&dist_ready_sem);
 
-		//pos_car_x[i] = get_hor_dist_mm();
-		//pos_car_y[i] = sqrt(get_real_dist_mm()*get_real_dist_mm()-pos_car_x[i]*pos_car_x[i]);
-
+		pos_car_x[i] = get_hor_dist_mm();
+		pos_car_y[i] = sqrt(get_real_dist_mm()*get_real_dist_mm()-pos_car_x[i]*pos_car_x[i]);
 
 	}
 
@@ -70,128 +70,7 @@ float angle_from_three_points(float x1, float y1, float x2, float y2, float x3, 
 	return (angle);
 }
 
-//not finished, no motor control yet
-void convert_pos_step(void){
-
-	//provisoire, entrée des données
-	//p0
-	pos_pol[0] = 10;
-	pos_pol[1] = 10;
-	//p1
-	pos_pol[2] = 0;
-	pos_pol[3] = 10;
-	//p2
-	pos_pol[4] = -10;
-	pos_pol[5] = 10;
-	//p3
-	pos_pol[6] = -10;
-	pos_pol[7] = 0;
-	//p4
-	pos_pol[8] = 0;
-	pos_pol[9] = 0;
-
-	//convert from cartesian (x,y) to (distance, angle)
-
-	float x_mem;
-
-	for(uint8_t i = NB_POS-1; i>1; i--){
-
-		x_mem = pos_pol[2*i];
-
-		//distance between two consecutive points
-		pos_pol[2*i] = sqrt((pos_pol[2*i]-pos_pol[2*(i-1)])*(pos_pol[2*i]-pos_pol[2*(i-1)])
-							+(pos_pol[2*i+1]-pos_pol[2*(i-1)+1])*(pos_pol[2*i+1]-pos_pol[2*(i-1)+1]));
-
-		//angle between two consecutive vectors
-		pos_pol[2*i+1] = angle_from_three_points(pos_pol[2*(i-2)], pos_pol[2*(i-2)+1],
-												pos_pol[2*(i-1)], pos_pol[2*(i-1)+1],
-												x_mem, pos_pol[2*i+1]);
-
-	}
-	//first two sections from origin
-	x_mem = pos_pol[2];
-	pos_pol[2] = sqrt(pos_pol[2]*pos_pol[2]+pos_pol[3]*pos_pol[3]);
-	pos_pol[3] = angle_from_three_points(OX, OY, pos_pol[0], pos_pol[1], x_mem, pos_pol[3]);
-
-	x_mem = pos_pol[0];
-	pos_pol[0] = sqrt(pos_pol[0]*pos_pol[0]+pos_pol[1]*pos_pol[1]);
-	pos_pol[1] = angle_from_three_points(ORIX, ORIY, OX, OY, x_mem, pos_pol[1]);
-
-
-	for(uint8_t i = 0; i < NB_POS; i++){
-		//Conversion from cm and ° to step
-		pos_pol[2*i] *= NSTEP_ONE_TURN/(WHEEL_PERIMETER);
-		pos_pol[2*i+1] *= WHEEL_DISTANCE*NSTEP_ONE_TURN/(2*WHEEL_PERIMETER);
-	}
-
-
-	//drive
-	for(uint8_t i = 0 ; i < NB_POS ; i++){
-
-		//be sure that the motors are initialized
-
-
-	}
-
-	left_motor_set_speed(0);
-	right_motor_set_speed(0);
-
-}
-
-void convert_pos(void){
-
-	//provisoire, entrée des données
-	//p0
-	pos_pol[0] = 10;
-	pos_pol[1] = 10;
-	//p1
-	pos_pol[2] = 0;
-	pos_pol[3] = 10;
-	//p2
-	pos_pol[4] = -10;
-	pos_pol[5] = 10;
-	//p3
-	pos_pol[6] = -10;
-	pos_pol[7] = 0;
-	//p4
-	pos_pol[8] = 0;
-	pos_pol[9] = 0;
-
-	//convert from cartesian (x,y) to (distance, angle)
-
-	float x_mem;
-
-	for(uint8_t i = NB_POS-1; i>1; i--){
-
-		x_mem = pos_pol[2*i];
-
-		//distance between two consecutive points
-		pos_pol[2*i] = sqrt((pos_pol[2*i]-pos_pol[2*(i-1)])*(pos_pol[2*i]-pos_pol[2*(i-1)])
-							+(pos_pol[2*i+1]-pos_pol[2*(i-1)+1])*(pos_pol[2*i+1]-pos_pol[2*(i-1)+1]));
-
-		//angle between two consecutive vectors
-		pos_pol[2*i+1] = angle_from_three_points(pos_pol[2*(i-2)], pos_pol[2*(i-2)+1],
-												pos_pol[2*(i-1)], pos_pol[2*(i-1)+1],
-												x_mem, pos_pol[2*i+1]);
-
-	}
-	//first two sections from origin
-	x_mem = pos_pol[2];
-	pos_pol[2] = sqrt(pos_pol[2]*pos_pol[2]+pos_pol[3]*pos_pol[3]);
-	pos_pol[3] = angle_from_three_points(OX, OY, pos_pol[0], pos_pol[1], x_mem, pos_pol[3]);
-
-	x_mem = pos_pol[0];
-	pos_pol[0] = sqrt(pos_pol[0]*pos_pol[0]+pos_pol[1]*pos_pol[1]);
-	pos_pol[1] = angle_from_three_points(ORIX, ORIY, OX, OY, x_mem, pos_pol[1]);
-
-
-	//***Ajouté par Gab***
-	for(uint8_t i = 0; i < NB_POS; i++){
-		//Conversion from cm and ° to step/s
-		pos_pol[2*i] *= NSTEP_ONE_TURN/(WHEEL_PERIMETER*INTERVAL_TEMPS);
-		pos_pol[2*i+1] *= WHEEL_DISTANCE*NSTEP_ONE_TURN/(2*WHEEL_PERIMETER*INTERVAL_TEMPS);
-	}
-
+void dance(void){
 
 	//drive
 	for(uint8_t i = 0 ; i < NB_POS ; i++){
@@ -216,6 +95,50 @@ void convert_pos(void){
 
 }
 
+void convert_pos(void){
+
+	//convert from cartesian (x,y) to (distance, angle)
+
+	float x_mem;
+
+	for(uint8_t i = NB_POS-1; i>1; i--){
+
+		x_mem = pos_pol[2*i];
+
+		//distance between two consecutive points
+		pos_pol[2*i] = sqrt((pos_pol[2*i]-pos_pol[2*(i-1)])*(pos_pol[2*i]-pos_pol[2*(i-1)])
+							+(pos_pol[2*i+1]-pos_pol[2*(i-1)+1])*(pos_pol[2*i+1]-pos_pol[2*(i-1)+1]));
+
+		//angle between two consecutive vectors
+		pos_pol[2*i+1] = angle_from_three_points(pos_pol[2*(i-2)], pos_pol[2*(i-2)+1],
+												pos_pol[2*(i-1)], pos_pol[2*(i-1)+1],
+												x_mem, pos_pol[2*i+1]);
+
+	}
+	//first two sections from origin
+	x_mem = pos_pol[2];
+	pos_pol[2] = sqrt(pos_pol[2]*pos_pol[2]+pos_pol[3]*pos_pol[3]);
+	pos_pol[3] = angle_from_three_points(OX, OY, pos_pol[0], pos_pol[1], x_mem, pos_pol[3]);
+
+	x_mem = pos_pol[0];
+	pos_pol[0] = sqrt(pos_pol[0]*pos_pol[0]+pos_pol[1]*pos_pol[1]);
+	pos_pol[1] = angle_from_three_points(ORIX, ORIY, OX, OY, x_mem, pos_pol[1]);
+
+
+	for(uint8_t i = 0; i < NB_POS; i++){
+		//Conversion from cm and ° to step/s
+		pos_pol[2*i] *= NSTEP_ONE_TURN/(WHEEL_PERIMETER*INTERVAL_TEMPS);
+		pos_pol[2*i+1] *= WHEEL_DISTANCE*NSTEP_ONE_TURN/(2*WHEEL_PERIMETER*INTERVAL_TEMPS);
+	}
+
+	dance();
+
+}
+
+
+void trajectoire_start(void){
+	chThdCreateStatic(waTrajectoire, sizeof(waTrajectoire), HIGHPRIO, Trajectoire, NULL);
+}
 
 //************** NOT USED FOR THE MOMENT *****************
 void interpolate(void){
@@ -328,9 +251,7 @@ void interpolate(void){
 	}
 }
 
-void trajectoire_start(void){
-	chThdCreateStatic(waTrajectoire, sizeof(waTrajectoire), HIGHPRIO, Trajectoire, NULL);
-}
+
 
 
 

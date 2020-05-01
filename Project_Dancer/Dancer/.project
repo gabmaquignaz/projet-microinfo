@@ -24,6 +24,13 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>lib</name>
+			<type>2</type>
+			<location>/Users/gabmac/Documents/GitHub/projet-microinfo/lib</location>
+		</link>
+	</linkedResources>
 	<variableList>
 		<variable>
 			<name>copy_PARENT</name>
