@@ -14,6 +14,7 @@ CSRC += ./main.c \
 		./vision.c \
 		./sound.c \
 		./user_button.c \
+		./blinking_leds.c \
 		
 
 #Header folders to include

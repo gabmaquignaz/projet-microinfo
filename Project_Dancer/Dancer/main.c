@@ -15,10 +15,11 @@
 #include "sound.h"
 #include "vision.h"
 #include "user_button.h"
+#include "blinking_leds.h"
 
 #include "chprintf.h"
 
-enum Main_states {WAIT, REC_SONG, REC_TRAJ, SHAZAM, DANCE};
+
 
 
 static void serial_start(void)
@@ -73,8 +74,16 @@ int main(void){
 
 			case WAIT:
 				double_click = wait_click();
-//				if(double_click) main_state = REC_SONG;
-//				else main_state = SHAZAM;
+
+				if(double_click){
+					blinking(REC_SONG);
+					main_state = REC_SONG;
+				}
+				else {
+					blinking(SHAZAM);
+					main_state = SHAZAM;
+				}
+
 				main_state = REC_TRAJ;
 				break;
 
