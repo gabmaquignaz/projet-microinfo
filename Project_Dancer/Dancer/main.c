@@ -77,11 +77,11 @@ int main(void){
 
 				if(double_click){
 					blinking(REC_SONG);
-					main_state = REC_SONG;
+					//main_state = REC_SONG;
 				}
 				else {
 					blinking(SHAZAM);
-					main_state = SHAZAM;
+					//main_state = SHAZAM;
 				}
 
 				main_state = REC_TRAJ;
