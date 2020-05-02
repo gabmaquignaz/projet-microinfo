@@ -31,11 +31,14 @@
 #define ORIY					-1
 
 
-static float pos_pol[2*NB_POS] = {0};
+static float positions[2*NB_POS] = {0};
+
+//------ not used (interpolation) ------
 static float pos_car_x[NB_POS] = {0};
 static float pos_car_y[NB_POS] = {0};
 static float cx[NB_POS], bx[NB_POS-1], dx[NB_POS-1];
 static float cy[NB_POS], by[NB_POS-1], dy[NB_POS-1];
+//--------------------------------------
 
 static THD_WORKING_AREA(waTrajectoire, 256);
 static THD_FUNCTION(Trajectoire, arg) {
@@ -48,8 +51,9 @@ static THD_FUNCTION(Trajectoire, arg) {
 		//waits until an position has been captured
 		chBSemWait(&dist_ready_sem);
 		chprintf((BaseSequentialStream *) &SDU1,"position saved\n");
-		pos_car_x[i] = get_hor_dist_mm();
-		pos_car_y[i] = sqrt(get_real_dist_mm()*get_real_dist_mm()-pos_car_x[i]*pos_car_x[i]);
+
+		positions[2*i] = get_hor_dist_mm();
+		positions[2*i+1] = sqrt(get_real_dist_mm()*get_real_dist_mm()-positions[2*i]*positions[2*i+1]);
 
 	}
 	chprintf((BaseSequentialStream *) &SDU1,"done\n");
@@ -81,21 +85,22 @@ float angle_from_three_points(float x1, float y1, float x2, float y2, float x3, 
 
 void dance(void){
 	chprintf((BaseSequentialStream *) &SDU1,"DANCING !\n");
+
 	//drive
 	for(uint8_t i = 0 ; i < NB_POS ; i++){
 
 		//be sure that the motors are initialized
 
-		if (abs(pos_pol[2*i+1])>0){
+		if (abs(positions[2*i+1])>0){
 			//rotation
-			left_motor_set_speed(-pos_pol[2*i+1]);
-			right_motor_set_speed(pos_pol[2*i+1]);
+			left_motor_set_speed(-positions[2*i+1]);
+			right_motor_set_speed(positions[2*i+1]);
 			chThdSleepMilliseconds(1000*INTERVAL_TEMPS);
 		}
 
 		//forward
-		left_motor_set_speed(pos_pol[2*i]);
-		right_motor_set_speed(pos_pol[2*i]);
+		left_motor_set_speed(positions[2*i]);
+		right_motor_set_speed(positions[2*i]);
 		chThdSleepMilliseconds(1000*INTERVAL_TEMPS);
 	}
 
@@ -112,32 +117,32 @@ void convert_pos(void){
 
 	for(uint8_t i = NB_POS-1; i>1; i--){
 
-		x_mem = pos_pol[2*i];
+		x_mem = positions[2*i];
 
 		//distance between two consecutive points
-		pos_pol[2*i] = sqrt((pos_pol[2*i]-pos_pol[2*(i-1)])*(pos_pol[2*i]-pos_pol[2*(i-1)])
-							+(pos_pol[2*i+1]-pos_pol[2*(i-1)+1])*(pos_pol[2*i+1]-pos_pol[2*(i-1)+1]));
+		positions[2*i] = sqrt((positions[2*i]-positions[2*(i-1)])*(positions[2*i]-positions[2*(i-1)])
+							+(positions[2*i+1]-positions[2*(i-1)+1])*(positions[2*i+1]-positions[2*(i-1)+1]));
 
 		//angle between two consecutive vectors
-		pos_pol[2*i+1] = angle_from_three_points(pos_pol[2*(i-2)], pos_pol[2*(i-2)+1],
-												pos_pol[2*(i-1)], pos_pol[2*(i-1)+1],
-												x_mem, pos_pol[2*i+1]);
+		positions[2*i+1] = angle_from_three_points(positions[2*(i-2)], positions[2*(i-2)+1],
+												positions[2*(i-1)], positions[2*(i-1)+1],
+												x_mem, positions[2*i+1]);
 
 	}
 	//first two sections from origin
-	x_mem = pos_pol[2];
-	pos_pol[2] = sqrt(pos_pol[2]*pos_pol[2]+pos_pol[3]*pos_pol[3]);
-	pos_pol[3] = angle_from_three_points(OX, OY, pos_pol[0], pos_pol[1], x_mem, pos_pol[3]);
+	x_mem = positions[2];
+	positions[2] = sqrt(positions[2]*positions[2]+positions[3]*positions[3]);
+	positions[3] = angle_from_three_points(OX, OY, positions[0], positions[1], x_mem, positions[3]);
 
-	x_mem = pos_pol[0];
-	pos_pol[0] = sqrt(pos_pol[0]*pos_pol[0]+pos_pol[1]*pos_pol[1]);
-	pos_pol[1] = angle_from_three_points(ORIX, ORIY, OX, OY, x_mem, pos_pol[1]);
+	x_mem = positions[0];
+	positions[0] = sqrt(positions[0]*positions[0]+positions[1]*positions[1]);
+	positions[1] = angle_from_three_points(ORIX, ORIY, OX, OY, x_mem, positions[1]);
 
 
 	for(uint8_t i = 0; i < NB_POS; i++){
 		//Conversion from cm and ° to step/s
-		pos_pol[2*i] *= NSTEP_ONE_TURN/(WHEEL_PERIMETER*INTERVAL_TEMPS);
-		pos_pol[2*i+1] *= WHEEL_DISTANCE*NSTEP_ONE_TURN/(2*WHEEL_PERIMETER*INTERVAL_TEMPS);
+		positions[2*i] *= NSTEP_ONE_TURN/(WHEEL_PERIMETER*INTERVAL_TEMPS);
+		positions[2*i+1] *= WHEEL_DISTANCE*NSTEP_ONE_TURN/(2*WHEEL_PERIMETER*INTERVAL_TEMPS);
 	}
 
 	dance();
@@ -149,7 +154,9 @@ void trajectoire_start(void){
 	chThdCreateStatic(waTrajectoire, sizeof(waTrajectoire), HIGHPRIO, Trajectoire, NULL);
 }
 
-//************** NOT USED FOR THE MOMENT *****************
+
+
+//--------------- NOT USED FOR THE MOMENT -----------------
 void interpolate(void){
 
 	/*
