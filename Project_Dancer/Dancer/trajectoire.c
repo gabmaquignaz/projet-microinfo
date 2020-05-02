@@ -53,7 +53,7 @@ static THD_FUNCTION(Trajectoire, arg) {
 		chprintf((BaseSequentialStream *) &SDU1,"position saved\n");
 
 		positions[2*i] = get_hor_dist_mm();
-		positions[2*i+1] = sqrt(get_real_dist_mm()*get_real_dist_mm()-positions[2*i]*positions[2*i+1]);
+		positions[2*i+1] = sqrt(get_real_dist_mm()*get_real_dist_mm()-positions[2*i]*positions[2*i]);
 
 	}
 	chprintf((BaseSequentialStream *) &SDU1,"done\n");
