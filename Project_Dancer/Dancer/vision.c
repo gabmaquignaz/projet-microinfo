@@ -143,10 +143,8 @@ static THD_FUNCTION(ProcessImage, arg) {
 	//Tabs for moving average of RD and HD
 	int16_t mov_avrg_r_tab [MOV_AVRG_SIZE] = {0};
 	uint8_t oldest_val_r = 0;
-
 	int16_t mov_avrg_h_tab [MOV_AVRG_SIZE] = {0};
 	uint8_t oldest_val_h = 0;
-
 
 	uint8_t avrg_count = 0;
 
@@ -168,7 +166,7 @@ static THD_FUNCTION(ProcessImage, arg) {
 			if(avrg_count < MOV_AVRG_SIZE-1) avrg_count++;
 			else {
 				chprintf((BaseSequentialStream *) &SDU1,"%d %d\n", real_dist, hor_dist);
-				chBSemSignal(&image_ready_sem);
+				signal_dist_ready_sem();
 			}
 		}
 		else {

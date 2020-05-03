@@ -41,9 +41,9 @@ int main(void){
     chSysInit();
     mpu_init();
 
-//    //starts trajectory control and motors
-//    motors_init();
-//    trajectoire_start();
+    //starts trajectory control and motors
+    motors_init();
+    trajectoire_start();
 
     //start user button
     button_start();
@@ -57,7 +57,7 @@ int main(void){
     //starts vision
     dcmi_start();
 	po8030_start();
-	po8030_set_awb(0); // disable auto white balance for color recognition
+	po8030_set_awb(false); //disable auto white balance for color recognition
 	process_image_start();
 
 	//Main finite-state machine
@@ -83,7 +83,7 @@ int main(void){
 				break;
 
 			case REC_TRAJ:
-				chprintf((BaseSequentialStream *) &SDU1,"rec_traj\n");
+				chprintf((BaseSequentialStream *) &SD3,"rec_traj\n");
 				signal_rec_traj_sem();
 				main_state = DANCE;
 				break;
