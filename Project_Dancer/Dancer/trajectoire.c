@@ -29,6 +29,7 @@
 #define OY					0
 #define ORIX					0
 #define ORIY					-1
+#define MIN_DIST				5
 
 
 static float positions[2*NB_POS] = {0};
@@ -52,8 +53,15 @@ static THD_FUNCTION(Trajectoire, arg) {
 		chBSemWait(&dist_ready_sem);
 		chprintf((BaseSequentialStream *) &SD3,"position saved\n");
 
+
 		positions[2*i] = get_hor_dist_mm();
 		positions[2*i+1] = sqrt(get_real_dist_mm()*get_real_dist_mm()-positions[2*i]*positions[2*i]);
+
+		//filter all positions to close from the last one
+		if (sqrt(pow((positions[2*(i-1)]-positions[2*i]), 2)
+				+ pow((positions[2*(i-1)+1]-positions[2*i+1]), 2)) < MIN_DIST){
+			i--;
+		}
 
 	}
 	chprintf((BaseSequentialStream *) &SD3,"done\n");
