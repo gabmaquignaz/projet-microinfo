@@ -9,6 +9,7 @@
 #include "hal.h"
 #include "button.h"
 #include "spi_comm.h"
+#include "blinking_leds.h"
 
 #define CLICKDELAY		1000 //0.1s
 #define DOUBLEDELAY		10000 //1s
@@ -44,6 +45,8 @@ bool wait_click(void){
 	//wait for click
 	while(!button_get_state()){
 		chThdSleepMilliseconds(100);
+
+
 	}
 
 	//Wait for release
