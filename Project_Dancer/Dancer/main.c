@@ -41,9 +41,9 @@ int main(void){
     chSysInit();
     mpu_init();
 
-    //starts trajectory control and motors
-    motors_init();
-    trajectoire_start();
+//    //starts trajectory control and motors
+//    motors_init();
+//    trajectoire_start();
 
     //start user button
     button_start();
@@ -57,6 +57,7 @@ int main(void){
     //starts vision
     dcmi_start();
 	po8030_start();
+	po8030_set_awb(0); // disable auto white balance for color recognition
 	process_image_start();
 
 	//Main finite-state machine

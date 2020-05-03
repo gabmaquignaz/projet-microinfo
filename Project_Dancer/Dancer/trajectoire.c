@@ -50,13 +50,13 @@ static THD_FUNCTION(Trajectoire, arg) {
 
 		//waits until an position has been captured
 		chBSemWait(&dist_ready_sem);
-		chprintf((BaseSequentialStream *) &SDU1,"position saved\n");
+		chprintf((BaseSequentialStream *) &SD3,"position saved\n");
 
 		positions[2*i] = get_hor_dist_mm();
 		positions[2*i+1] = sqrt(get_real_dist_mm()*get_real_dist_mm()-positions[2*i]*positions[2*i]);
 
 	}
-	chprintf((BaseSequentialStream *) &SDU1,"done\n");
+	chprintf((BaseSequentialStream *) &SD3,"done\n");
 	chThdSleepMilliseconds(2000);
 	convert_pos();
 }
@@ -84,7 +84,7 @@ float angle_from_three_points(float x1, float y1, float x2, float y2, float x3, 
 }
 
 void dance(void){
-	chprintf((BaseSequentialStream *) &SDU1,"DANCING !\n");
+	chprintf((BaseSequentialStream *) &SD3,"DANCING !\n");
 
 	//drive
 	for(uint8_t i = 0 ; i < NB_POS ; i++){

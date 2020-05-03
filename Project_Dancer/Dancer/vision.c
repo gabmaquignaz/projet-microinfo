@@ -48,20 +48,29 @@ enum Obj_or_back	 					{OBJ, BACK};
 #define D_LENS						772.55f
 enum Vision_init_state 				{WAIT_OBJECT, CALIB, INIT_DONE};
 enum Line_detector_state 			{SEARCH_BEGIN, SEARCH_END, FINISHED};
-#define DETECT_TRESH					20
-#define MIN_OBJ_SIZE 				15
+#define DETECT_TRESH					50
+#define MIN_OBJ_SIZE 				50
+#define MAX_DELTA_SIZE				30 //maximum variation of size between two samples
 
+#define MOV_AVRG_SIZE				20
+enum Dist {RD, HD};
+
+
+//values obtained after moving average, used by trajectoire.c
 static int16_t hor_dist = 0;
-static uint16_t real_dist = 0;
+static int16_t real_dist = 0;
+
 static uint16_t size_obj_mm = 0;
 static uint16_t distance_mm_calib = 0;
 
 
 
 
+
 //detection functions
 void create_image(uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float w_r, float w_g, float w_b);
-bool dist_measure (uint8_t* image, uint16_t size);
+bool dist_measure (uint8_t* image, uint16_t size, bool first_call, int16_t* r_h_tab);
+int16_t mov_avrg(int16_t value, int16_t* val_tab, uint8_t* oldest_val_ptr);
 
 //calibration functions
 void vision_init (uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float* w_r_ptr, float* w_g_ptr, float* w_b_ptr);
@@ -112,7 +121,7 @@ static THD_FUNCTION(CaptureImage, arg) {
 }
 
 
-static THD_WORKING_AREA(waProcessImage, 1024);
+static THD_WORKING_AREA(waProcessImage, 2048);
 static THD_FUNCTION(ProcessImage, arg) {
 
     chRegSetThreadName(__FUNCTION__);
@@ -127,23 +136,45 @@ static THD_FUNCTION(ProcessImage, arg) {
 	chprintf((BaseSequentialStream *) &SDU1, "started vision init \n");
 	vision_init (image,  IMAGE_BUFFER_SIZE, img_buff_ptr, &w_r, &w_g, &w_b);
 
+	//Array containing instant value of RD (real distance) and HD (horizontal distance)
+	//Allows dist_measure to return both at the same time
+	int16_t r_h_tab[2];
+
+	//Tabs for moving average of RD and HD
+	int16_t mov_avrg_r_tab [MOV_AVRG_SIZE] = {0};
+	uint8_t oldest_val_r = 0;
+
+	int16_t mov_avrg_h_tab [MOV_AVRG_SIZE] = {0};
+	uint8_t oldest_val_h = 0;
+
+
+	uint8_t avrg_count = 0;
+
 	while(1){
 	    	//waits until an image has been captured
 		chBSemWait(&image_ready_sem);
 		//gets the pointer to the array filled with the last image in RGB565
 		img_buff_ptr = dcmi_get_last_image_ptr();
 		create_image(image, IMAGE_BUFFER_SIZE, img_buff_ptr, w_r, w_g, w_b);
-//		SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
+		SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
 
-		if(dist_measure(image, IMAGE_BUFFER_SIZE)){
-			signal_dist_ready_sem();
-			chprintf((BaseSequentialStream *) &SDU1, "r = %d, x = %d\n", real_dist, hor_dist);
+
+		if(dist_measure(image, IMAGE_BUFFER_SIZE, false, r_h_tab)){
+			//do moving average with iterative method
+			real_dist += mov_avrg(r_h_tab[RD], mov_avrg_r_tab, &oldest_val_r);
+			hor_dist += mov_avrg(r_h_tab[HD], mov_avrg_h_tab, &oldest_val_h);
+
+			//verify that all the value of the average tab were initialized before sending the first averaged value
+			if(avrg_count < MOV_AVRG_SIZE-1) avrg_count++;
+			else {
+				chprintf((BaseSequentialStream *) &SDU1,"%d %d\n", real_dist, hor_dist);
+				chBSemSignal(&image_ready_sem);
+			}
 		}
 		else {
 			//show "recognition error" with LEDS
 		}
-
-		chThdSleepMilliseconds(100);
+		chThdSleepMilliseconds(10);
 	}
 }
 
@@ -172,6 +203,17 @@ void signal_rec_traj_sem(void){
 
 
 //*************** intermediate level: object recognition functions ***************
+
+int16_t mov_avrg(int16_t value, int16_t* val_tab, uint8_t* oldest_val_ptr){
+	int16_t diff = 10*(float)(value-val_tab[*oldest_val_ptr])/MOV_AVRG_SIZE;
+	val_tab[*oldest_val_ptr	] = value;
+	(*oldest_val_ptr) ++;
+	*oldest_val_ptr= (*oldest_val_ptr)%MOV_AVRG_SIZE;
+	return diff;
+}
+
+
+
 void create_image(uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float w_r, float w_g, float w_b){
 	for(uint16_t i = 0; i < size; i++){
 		//multiply red and blue (5bit) by 2 to have the same range as green (6 bit)
@@ -188,15 +230,19 @@ void create_image(uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float w_
 }
 
 
-bool dist_measure (uint8_t* image, uint16_t size){
+bool dist_measure (uint8_t* image, uint16_t size, bool first_call, int16_t* r_h_tab){
 
 	//state of the object detector, starts by searching for the beginning of the object
 	uint8_t state = SEARCH_BEGIN;
+
+	uint16_t size_obj_pix = 0;
+	int16_t hor_pos_pix = 0;
 
 	//start and stop of the vertical object between 0 and <size>
 	uint16_t begin = 0;
 	uint16_t end = 0;
 
+	//mean value of the whole image
 	float mean = 0.0;
 	for(uint16_t k = 0; k < size; k++){
 		mean += image[k];
@@ -216,13 +262,16 @@ bool dist_measure (uint8_t* image, uint16_t size){
 			case SEARCH_END :
 				if (image[i]-mean < DETECT_TRESH){
 					end = i;
-					if (end-begin < MIN_OBJ_SIZE){
+					size_obj_pix = end-begin;
+					if (size_obj_pix < MIN_OBJ_SIZE){
 						//ignore if object is too small, may be a glitch or an unwanted reflect
 						begin = 0;
 						end = 0;
 						state = SEARCH_BEGIN;
 					}
+					//found an object
 					else {
+						hor_pos_pix = (size_obj_pix - size)/2 + begin;
 						state = FINISHED;
 					}
 				}
@@ -232,6 +281,7 @@ bool dist_measure (uint8_t* image, uint16_t size){
 				break;
 		}
 	}
+
 	//error: no object found or object not entirely visible
 	if (state != FINISHED) {
 		chprintf((BaseSequentialStream *) &SDU1,"No object found\n");
@@ -239,19 +289,15 @@ bool dist_measure (uint8_t* image, uint16_t size){
 	}
 
 
-	uint16_t size_obj_pix = end-begin;
-	int16_t hor_pos_pix = (size_obj_pix - size)/2 + begin;
-
 	//if real size of object uninitialized, compute it, else compute distances
-	if (!size_obj_mm){
+	if (first_call){
 		float size_dist_ratio = (float)size_obj_pix/D_LENS;
 		size_obj_mm = distance_mm_calib*(size_dist_ratio/(1-size_dist_ratio/2));
 	}
-	else{
-		hor_dist = (size_obj_mm*hor_pos_pix)/size_obj_pix;
-		real_dist = (size_obj_mm*sqrt(hor_pos_pix*hor_pos_pix+D_LENS*D_LENS))/size_obj_pix;
+	else {
+		r_h_tab[HD] = (size_obj_mm*hor_pos_pix)/size_obj_pix;
+		r_h_tab[RD] = (size_obj_mm*sqrt(hor_pos_pix*hor_pos_pix+D_LENS*D_LENS))/size_obj_pix;
 	}
-
 	return true;
 }
 
@@ -344,7 +390,7 @@ void vision_init (uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float* w
 				create_image(image, size, img_buff_ptr, *w_r_ptr, *w_g_ptr, *w_b_ptr);
 
 
-				if(!dist_measure(image, size)){
+				if(!dist_measure(image, size, true, NULL)){
 					//show "No object found" with LEDs
 					state = WAIT_OBJECT;
 					break;
