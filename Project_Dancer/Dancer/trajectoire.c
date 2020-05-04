@@ -18,8 +18,8 @@
 
 #define PI					3.14159265
 #define NB_POS				100
-#define WHEEL_DISTANCE      	5.35f    				// [cm]
-#define WHEEL_PERIMETER     	13 						// [cm]
+#define WHEEL_DISTANCE      	53.5f    				// [mm]
+#define WHEEL_PERIMETER     	130 						// [mm]
 #define WHEEL_RADIUS			(13/2*PI)
 #define PERIMETER_EPUCK     (PI * WHEEL_DISTANCE)
 #define INTERVAL_TEMPS		0.2 						// [s]
@@ -50,6 +50,7 @@ static THD_FUNCTION(Trajectoire, arg) {
 
 	for(uint16_t i = 0; i< NB_POS; i++){
 
+
 		//waits until an position has been captured
 		chBSemWait(&dist_ready_sem);
 		chprintf((BaseSequentialStream *) &SD3,"position saved\n");
@@ -58,15 +59,15 @@ static THD_FUNCTION(Trajectoire, arg) {
 		positions[2*i] = get_hor_dist_mm();
 		positions[2*i+1] = sqrt(get_real_dist_mm()*get_real_dist_mm()-positions[2*i]*positions[2*i]);
 
-		//filter all positions to close from the last one
-		/*
+		//filter all positions too close from the last one
 		if (sqrt(pow((positions[2*(i-1)]-positions[2*i]), 2)
 				+ pow((positions[2*(i-1)+1]-positions[2*i+1]), 2)) < MIN_DIST){
 			i--;
 		}
-		*/
+
 
 	}
+	chThdSleepMilliseconds(5000);
 	chprintf((BaseSequentialStream *) &SD3,"done\n");
 	chThdSleepMilliseconds(2000);
 	convert_pos();
@@ -77,7 +78,13 @@ void signal_dist_ready_sem(void){
 	chBSemSignal(&dist_ready_sem);
 }
 
-
+float vect_to_angle(float vx, float vy){
+	if(!vx){
+		if(vy > 0) return PI/2;
+		else return -PI/2;
+	}
+	else return atan2(vy, vx);
+}
 
 float angle_from_three_points(float x1, float y1, float x2, float y2, float x3, float y3){
 
@@ -86,11 +93,12 @@ float angle_from_three_points(float x1, float y1, float x2, float y2, float x3, 
 	float v2x = x3-x2;
 	float v2y = y3-y2;
 
+	float angle1 = vect_to_angle(v1x, v1y);
+	float angle2 = vect_to_angle(v2x, v2y);
 
-	float angle = atan2(v2y, v2x)-atan2(v1y, v1x);
+	float angle = angle2 - angle1;
 	if (angle>PI) angle -= 2*PI;
 	if (angle<-PI) angle += 2*PI;
-
 	return (angle);
 }
 
@@ -106,6 +114,9 @@ void dance(void){
 			//right_motor_set_speed(positions[2*i+1]);
 			//chThdSleepMilliseconds(1000*INTERVAL_TEMPS);
 
+			left_motor_set_pos(0);
+			right_motor_set_pos(0);
+
 			if (positions[2*i+1]>0){
 				//counter-clockwise rotation
 				left_motor_set_speed(-ROTATION_SPEED);
@@ -116,13 +127,18 @@ void dance(void){
 				left_motor_set_speed(ROTATION_SPEED);
 				right_motor_set_speed(-ROTATION_SPEED);
 			}
-			chThdSleepMilliseconds(1000*abs(positions[2*i+1]));
+
+			while (abs(left_motor_get_pos()) < abs(positions[2*i+1]) || abs(right_motor_get_pos()) < abs(positions[2*i+1]));
 		}
 
 		//forward
-		left_motor_set_speed(positions[2*i]);
-		right_motor_set_speed(positions[2*i]);
-		chThdSleepMilliseconds(1000*INTERVAL_TEMPS);
+		left_motor_set_pos(0);
+		right_motor_set_pos(0);
+
+		left_motor_set_speed(ROTATION_SPEED);
+		right_motor_set_speed(ROTATION_SPEED);
+
+		while (left_motor_get_pos() < positions[2*i] || right_motor_get_pos() < positions[2*i]);
 	}
 
 	left_motor_set_speed(0);
@@ -152,7 +168,7 @@ void convert_pos(void){
 	}
 	//first two sections from origin
 	x_mem = positions[2];
-	positions[2] = sqrt(positions[2]*positions[2]+positions[3]*positions[3]);
+	positions[2] = sqrt((positions[2]-positions[0])*(positions[2]-positions[0])+(positions[3]-positions[1])*(positions[3]-positions[1]));
 	positions[3] = angle_from_three_points(OX, OY, positions[0], positions[1], x_mem, positions[3]);
 
 	x_mem = positions[0];
@@ -161,12 +177,13 @@ void convert_pos(void){
 
 
 	for(uint8_t i = 0; i < NB_POS; i++){
-		//Conversion from [cm] to [step/s] for a defined time interval
-		positions[2*i] *= NSTEP_ONE_TURN/(WHEEL_PERIMETER*INTERVAL_TEMPS);
+		//Conversion from [mm] to [steps]
+		positions[2*i] *= NSTEP_ONE_TURN/(WHEEL_PERIMETER);
 		//positions[2*i+1] *= WHEEL_DISTANCE*NSTEP_ONE_TURN/(2*WHEEL_PERIMETER*INTERVAL_TEMPS);
 
-		//Conversion from [radians] to [s] at a defined speed
-		positions[2*i+1] *= WHEEL_DISTANCE*NSTEP_ONE_TURN/(2*WHEEL_PERIMETER*ROTATION_SPEED);
+		//Conversion from [radians] to [steps]
+		positions[2*i+1] *=WHEEL_DISTANCE*NSTEP_ONE_TURN/(2*WHEEL_PERIMETER);
+
 	}
 
 	dance();

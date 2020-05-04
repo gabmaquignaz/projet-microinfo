@@ -25,19 +25,30 @@ enum Mic {R,L,B,F};
 //frequency are refered to by their index i in the micOutput array, conversion to [Hz] is useless
 #define NB_SAMPLES			50
 #define SAMPLE_SIZE 			5
+typedef uint16_t song[NB_SAMPLES][SAMPLE_SIZE];
+
 #define OFFSET_MAX			20 //At least (NB_SAMPLES-OFFSET_MAX) must be used for a match
 #define MATCH_F_TOL 			2 // frequency difference tolerance to count as a match
-#define MATCH_TRESH			30
+#define MATCH_TRESH			30 //match score required to pass the test
+#define PEAK_H_MIN			1200
+
 #define QUAD_COEFF			0.015
 #define LIN_COEFF			(-0.03)
 
 #define WAIT_FFT 			2 //one in N set of 1024 samples is used
-#define PEAK_H_MIN			1200
+
+#define NUM_MEM_SONG			3//number of memorized songs
+enum States {REF, MATCH};
+
+
+
+
+static BSEMAPHORE_DECL(FFT_ready_sem, TRUE);
 
 
 void processAudioData(int16_t *data, uint16_t num_samples);
 
-float match_song (uint16_t measured_song [NB_SAMPLES][SAMPLE_SIZE], uint16_t ref_song [NB_SAMPLES][SAMPLE_SIZE]);
+float match_song (song measured_song, song ref_song);
 uint8_t match_sample (uint16_t measured_sample [SAMPLE_SIZE], uint16_t ref_sample [SAMPLE_SIZE]);
 uint8_t fit_value (uint8_t fit_ratio);
 
@@ -49,79 +60,118 @@ void do_bbl_sort(uint16_t* sample);
 
 
 
-
-static BSEMAPHORE_DECL(FFT_ready_sem, TRUE);
-
 static float micFront_cmplx_input[2 * FFT_SIZE];
 static float micFront_output[FFT_SIZE]; //Array containing the computed magnitude of the complex numbers
+static uint8_t state = REF;
+static int8_t match_result = -1;
 
-//???taille WA???
+
 static THD_WORKING_AREA(waCaptureSound, 2048);
 static THD_FUNCTION(CaptureSound, arg) {
     chRegSetThreadName(__FUNCTION__);
     (void)arg;
 
-   uint16_t ref_song [NB_SAMPLES][SAMPLE_SIZE] = {0};
-   uint16_t measured_song [NB_SAMPLES][SAMPLE_SIZE] = {0};
+   song ref_songs[NUM_MEM_SONG];
+   uint8_t song_count = 0;
+   song measured_song = {0};
 
    mic_start(&processAudioData);
 
-   chThdSleepMilliseconds(5000);
-   	  chprintf((BaseSequentialStream *) &SDU1, "3\n");
-   	  chThdSleepMilliseconds(1000);
-   	  chprintf((BaseSequentialStream *) &SDU1, "2\n");
-   	  chThdSleepMilliseconds(1000);
-   	  chprintf((BaseSequentialStream *) &SDU1, "1\n");
-   	  chThdSleepMilliseconds(1000);
-   	  chprintf((BaseSequentialStream *) &SDU1, "GO\n");
 
-   for (uint8_t i = 0; i < NB_SAMPLES; i++){
-	   chBSemWait(&FFT_ready_sem);
-	   extract_freq_id(micFront_output, ref_song[i]);
-   }
+   while (true) {
 
-//   for (uint8_t i = 0; i < NB_SAMPLES; i++){
-//	   for(uint8_t j = 0; j < SAMPLE_SIZE; j++){
-//   		   chprintf((BaseSequentialStream *) &SDU1, "%d ", ref_song[i][j]);
-//   	   }
-//	   chprintf((BaseSequentialStream *) &SDU1, "\n");
-//   }
-//   chprintf((BaseSequentialStream *) &SDU1, "\n\n\n");
+		chBSemWait(&start_sound_rec_sem);
+		switch(state){
+			case REF:
 
-   while (1) {
+				if(song_count == NUM_MEM_SONG){
+					//error: cannot memorize more songs
+					break;
+				}
+				else {
 
-	   for (uint8_t i = 0; i < NB_SAMPLES; i++){
-	  	   for(uint8_t j = 0; j < SAMPLE_SIZE; j++){
-	  	measured_song[i][j] = 0;
-	  	   }
-	    }
+					chThdSleepMilliseconds(5000);
+					chprintf((BaseSequentialStream *) &SDU1, "3\n");
+					chThdSleepMilliseconds(1000);
+					chprintf((BaseSequentialStream *) &SDU1, "2\n");
+					chThdSleepMilliseconds(1000);
+					chprintf((BaseSequentialStream *) &SDU1, "1\n");
+					chThdSleepMilliseconds(1000);
+					chprintf((BaseSequentialStream *) &SDU1, "GO\n");
+
+					for (uint8_t i = 0; i < NB_SAMPLES; i++){
+					chBSemWait(&FFT_ready_sem);
+					extract_freq_id(micFront_output, ref_songs[song_count][i]);
+					}
+					song_count ++;
+
+//					//PRINTF POUR VOIR LES MESURES
+//					for (uint8_t i = 0; i < NB_SAMPLES; i++){
+//						for(uint8_t j = 0; j < SAMPLE_SIZE; j++){
+//						   chprintf((BaseSequentialStream *) &SDU1, "%d ", ref_songs[song_count][i][j]);
+//						}
+//						chprintf((BaseSequentialStream *) &SDU1, "\n");
+//					}
+//					chprintf((BaseSequentialStream *) &SDU1, "\n\n\n");
+
+					break;
+
+				}
+
+			case MATCH:
+
+				if(song_count == 0){
+					//error: not reference song to compare
+					break;
+				}
+				else{
+				   for (uint8_t i = 0; i < NB_SAMPLES; i++){
+				  	   for(uint8_t j = 0; j < SAMPLE_SIZE; j++){
+				  	measured_song[i][j] = 0;
+				  	   }
+				    }
+
+				  chThdSleepMilliseconds(5000);
+				  chprintf((BaseSequentialStream *) &SDU1, "3\n");
+				  chThdSleepMilliseconds(1000);
+				  chprintf((BaseSequentialStream *) &SDU1, "2\n");
+				  chThdSleepMilliseconds(1000);
+				  chprintf((BaseSequentialStream *) &SDU1, "1\n");
+				  chThdSleepMilliseconds(1000);
+				  chprintf((BaseSequentialStream *) &SDU1, "GO\n");
+
+				   for (uint8_t i = 0; i < NB_SAMPLES; i++){
+				   	   chBSemWait(&FFT_ready_sem);
+				   	   extract_freq_id(micFront_output, measured_song[i]);
+				   }
 
 
-	   chThdSleepMilliseconds(5000);
-	  chprintf((BaseSequentialStream *) &SDU1, "3\n");
-	  chThdSleepMilliseconds(1000);
-	  chprintf((BaseSequentialStream *) &SDU1, "2\n");
-	  chThdSleepMilliseconds(1000);
-	  chprintf((BaseSequentialStream *) &SDU1, "1\n");
-	  chThdSleepMilliseconds(1000);
-	  chprintf((BaseSequentialStream *) &SDU1, "GO\n");
+//				   //PRINTF POUR VOIR LES MESURES
+//				   for (uint8_t i = 0; i < NB_SAMPLES; i++){
+//					   for(uint8_t j = 0; j < SAMPLE_SIZE; j++){
+//							   chprintf((BaseSequentialStream *) &SDU1, "%d ", measured_song[i][j]);
+//						   }
+//					   chprintf((BaseSequentialStream *) &SDU1, "\n");
+//				   }
 
-	   for (uint8_t i = 0; i < NB_SAMPLES; i++){
-	   	   chBSemWait(&FFT_ready_sem);
-	   	   extract_freq_id(micFront_output, measured_song[i]);
-	   }
+				   float match = 0.0;
+				   match_result = -1;
+				   for(uint8_t i = 0; i < song_count; i++){
+					   match = match_song(measured_song, ref_songs[i]);
+					   if (match > MATCH_TRESH){
+						   chprintf((BaseSequentialStream *) &SDU1, "SUCCESS ");
+						   match_result = i;
+						   break;
+					   }
+					   else {
+						   chprintf((BaseSequentialStream *) &SDU1, "FAILED ");
+					   }
 
-//	   for (uint8_t i = 0; i < NB_SAMPLES; i++){
-//		   for(uint8_t j = 0; j < SAMPLE_SIZE; j++){
-//				   chprintf((BaseSequentialStream *) &SDU1, "%d ", measured_song[i][j]);
-//			   }
-//		   chprintf((BaseSequentialStream *) &SDU1, "\n");
-//	   }
-	   float match = match_song(measured_song, ref_song);
-	   if (match > MATCH_TRESH) chprintf((BaseSequentialStream *) &SDU1, "SUCCESS ");
-	   else chprintf((BaseSequentialStream *) &SDU1, "FAILED ");
-	   chprintf((BaseSequentialStream *) &SDU1, "(%.2f)\n", match);
-
+					   chprintf((BaseSequentialStream *) &SDU1, "(%.2f)\n", match);
+					   break;
+				   }
+				}
+		}
    }
 }
 
@@ -138,7 +188,7 @@ void sound_start(void){
 //*************** Intermediate level: Match testing functions ***************
 
 //computes a match score between a reference song and a measured song
-float match_song (uint16_t measured_song [NB_SAMPLES][SAMPLE_SIZE], uint16_t ref_song [NB_SAMPLES][SAMPLE_SIZE]){
+float match_song (song measured_song, song ref_song){
 	float best_avrg_match = 0;
 	//Try match with different offsets, equivalent to a correlation between two discrete signals
 	for(int8_t offset = -OFFSET_MAX; offset <= OFFSET_MAX; offset++){

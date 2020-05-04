@@ -58,12 +58,11 @@ int main(void){
     //starts vision
     dcmi_start();
 	po8030_start();
-	po8030_set_awb(false); //disable auto white balance for color recognition
 	process_image_start();
 
-	//start leds
-	set_blinking_state(NO_LED);
-	blinking_start();
+//	//start leds
+//	set_blinking_state(NO_LED);
+//	blinking_start();
 
 
 	//Main finite-state machine

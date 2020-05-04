@@ -41,7 +41,7 @@ enum Ref_color {R, G, B};
 enum Obj_or_back	 					{OBJ, BACK};
 
 #define TOF_MAX_DIST					90
-#define TOF_MIN_DIST					50
+#define TOF_MIN_DIST					40
 #define MOVE_TRESH					10
 #define DIST_MEAN_RANGE				10
 
@@ -53,7 +53,7 @@ enum Line_detector_state 			{SEARCH_BEGIN, SEARCH_END, FINISHED};
 #define MAX_DELTA_SIZE				30 //maximum variation of size between two samples
 
 #define MOV_AVRG_SIZE				20
-#define TRAJ_SCALE					5
+#define TRAJ_SCALE					3
 
 
 //values obtained after moving average, used by trajectoire.c
@@ -154,7 +154,7 @@ static THD_FUNCTION(ProcessImage, arg) {
 		//gets the pointer to the array filled with the last image in RGB565
 		img_buff_ptr = dcmi_get_last_image_ptr();
 		create_image(image, IMAGE_BUFFER_SIZE, img_buff_ptr, w_r, w_g, w_b);
-//		SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
+		SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
 
 
 		if(dist_measure(image, IMAGE_BUFFER_SIZE, false, &inst_real_dist, &inst_hor_dist)){
