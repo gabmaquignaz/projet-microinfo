@@ -15,10 +15,11 @@
 #include "sound.h"
 #include "vision.h"
 #include "user_button.h"
+#include "blinking_leds.h"
 
 #include "chprintf.h"
 
-enum Main_states {WAIT, REC_SONG, REC_TRAJ, SHAZAM, DANCE};
+
 
 
 static void serial_start(void)
@@ -60,6 +61,11 @@ int main(void){
 	po8030_set_awb(false); //disable auto white balance for color recognition
 	process_image_start();
 
+	//start leds
+	set_blinking_state(NO_LED);
+	blinking_start();
+
+
 	//Main finite-state machine
 	uint8_t main_state = WAIT;
 
@@ -74,8 +80,14 @@ int main(void){
 
 			case WAIT:
 				double_click = wait_click();
-//				if(double_click) main_state = REC_SONG;
-//				else main_state = SHAZAM;
+
+				if(double_click){
+					//main_state = REC_SONG;
+				}
+				else {
+					//main_state = SHAZAM;
+				}
+
 				main_state = REC_TRAJ;
 				break;
 
