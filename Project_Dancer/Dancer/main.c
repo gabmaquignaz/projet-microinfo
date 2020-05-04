@@ -60,6 +60,11 @@ int main(void){
 	po8030_start();
 	process_image_start();
 
+	//start leds
+	set_blinking_state(NO_LED);
+	blinking_start();
+
+
 	//Main finite-state machine
 	uint8_t main_state = WAIT;
 
@@ -76,11 +81,9 @@ int main(void){
 				double_click = wait_click();
 
 				if(double_click){
-					blinking(REC_SONG);
 					//main_state = REC_SONG;
 				}
 				else {
-					blinking(SHAZAM);
 					//main_state = SHAZAM;
 				}
 
