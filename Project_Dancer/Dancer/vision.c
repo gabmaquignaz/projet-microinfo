@@ -53,7 +53,7 @@ enum Line_detector_state 			{SEARCH_BEGIN, SEARCH_END, FINISHED};
 #define MAX_DELTA_SIZE				30 //maximum variation of size between two samples
 
 #define MOV_AVRG_SIZE				20
-enum Dist {RD, HD};
+#define TRAJ_SCALE					5
 
 
 //values obtained after moving average, used by trajectoire.c
@@ -69,7 +69,7 @@ static uint16_t distance_mm_calib = 0;
 
 //detection functions
 void create_image(uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float w_r, float w_g, float w_b);
-bool dist_measure (uint8_t* image, uint16_t size, bool first_call, int16_t* r_h_tab);
+bool dist_measure (uint8_t* image, uint16_t size, bool first_call, int16_t* real_dist_ptr, int16_t* hor_dist_ptr);
 int16_t mov_avrg(int16_t value, int16_t* val_tab, uint8_t* oldest_val_ptr);
 
 //calibration functions
@@ -131,14 +131,14 @@ static THD_FUNCTION(ProcessImage, arg) {
 	uint8_t* img_buff_ptr = NULL;
 	float w_r = 0; float w_g = 0; float w_b = 0; //weights used to detect the desired color in the image
 
-	chprintf((BaseSequentialStream *) &SDU1, "started process image\n");
+	chprintf((BaseSequentialStream *) &SD3, "started process image\n");
 	chBSemWait(&rec_traj_ready_sem);
-	chprintf((BaseSequentialStream *) &SDU1, "started vision init \n");
+	chprintf((BaseSequentialStream *) &SD3, "started vision init \n");
 	vision_init (image,  IMAGE_BUFFER_SIZE, img_buff_ptr, &w_r, &w_g, &w_b);
 
-	//Array containing instant value of RD (real distance) and HD (horizontal distance)
-	//Allows dist_measure to return both at the same time
-	int16_t r_h_tab[2];
+	//Instant values of distances
+	int16_t inst_real_dist = 0;
+	int16_t inst_hor_dist = 0;
 
 	//Tabs for moving average of RD and HD
 	int16_t mov_avrg_r_tab [MOV_AVRG_SIZE] = {0};
@@ -154,18 +154,18 @@ static THD_FUNCTION(ProcessImage, arg) {
 		//gets the pointer to the array filled with the last image in RGB565
 		img_buff_ptr = dcmi_get_last_image_ptr();
 		create_image(image, IMAGE_BUFFER_SIZE, img_buff_ptr, w_r, w_g, w_b);
-		SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
+//		SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
 
 
-		if(dist_measure(image, IMAGE_BUFFER_SIZE, false, r_h_tab)){
+		if(dist_measure(image, IMAGE_BUFFER_SIZE, false, &inst_real_dist, &inst_hor_dist)){
 			//do moving average with iterative method
-			real_dist += mov_avrg(r_h_tab[RD], mov_avrg_r_tab, &oldest_val_r);
-			hor_dist += mov_avrg(r_h_tab[HD], mov_avrg_h_tab, &oldest_val_h);
+			real_dist += mov_avrg(inst_real_dist, mov_avrg_r_tab, &oldest_val_r);
+			hor_dist += mov_avrg(inst_hor_dist, mov_avrg_h_tab, &oldest_val_h);
 
 			//verify that all the value of the average tab were initialized before sending the first averaged value
 			if(avrg_count < MOV_AVRG_SIZE-1) avrg_count++;
 			else {
-				chprintf((BaseSequentialStream *) &SDU1,"%d %d\n", real_dist, hor_dist);
+				chprintf((BaseSequentialStream *) &SD3,"%d %d\n", real_dist, hor_dist);
 				signal_dist_ready_sem();
 			}
 		}
@@ -203,7 +203,7 @@ void signal_rec_traj_sem(void){
 //*************** intermediate level: object recognition functions ***************
 
 int16_t mov_avrg(int16_t value, int16_t* val_tab, uint8_t* oldest_val_ptr){
-	int16_t diff = 10*(float)(value-val_tab[*oldest_val_ptr])/MOV_AVRG_SIZE;
+	int16_t diff = TRAJ_SCALE*(value-val_tab[*oldest_val_ptr])/MOV_AVRG_SIZE;
 	val_tab[*oldest_val_ptr	] = value;
 	(*oldest_val_ptr) ++;
 	*oldest_val_ptr= (*oldest_val_ptr)%MOV_AVRG_SIZE;
@@ -228,7 +228,7 @@ void create_image(uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float w_
 }
 
 
-bool dist_measure (uint8_t* image, uint16_t size, bool first_call, int16_t* r_h_tab){
+bool dist_measure (uint8_t* image, uint16_t size, bool first_call, int16_t* real_dist_ptr, int16_t* hor_dist_ptr){
 
 	//state of the object detector, starts by searching for the beginning of the object
 	uint8_t state = SEARCH_BEGIN;
@@ -282,7 +282,7 @@ bool dist_measure (uint8_t* image, uint16_t size, bool first_call, int16_t* r_h_
 
 	//error: no object found or object not entirely visible
 	if (state != FINISHED) {
-		chprintf((BaseSequentialStream *) &SDU1,"No object found\n");
+		chprintf((BaseSequentialStream *) &SD3,"No object found\n");
 		return false;
 	}
 
@@ -293,8 +293,8 @@ bool dist_measure (uint8_t* image, uint16_t size, bool first_call, int16_t* r_h_
 		size_obj_mm = distance_mm_calib*(size_dist_ratio/(1-size_dist_ratio/2));
 	}
 	else {
-		r_h_tab[HD] = (size_obj_mm*hor_pos_pix)/size_obj_pix;
-		r_h_tab[RD] = (size_obj_mm*sqrt(hor_pos_pix*hor_pos_pix+D_LENS*D_LENS))/size_obj_pix;
+		*hor_dist_ptr = (size_obj_mm*hor_pos_pix)/size_obj_pix;
+		*real_dist_ptr = (size_obj_mm*sqrt(hor_pos_pix*hor_pos_pix+D_LENS*D_LENS))/size_obj_pix;
 	}
 	return true;
 }
@@ -326,9 +326,9 @@ void vision_init (uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float* w
 					chThdSleepMilliseconds(100);
 				}
 				mean /= DIST_MEAN_RANGE;
-				chprintf((BaseSequentialStream *) &SDU1, "Dist : %d\n", mean);
+				chprintf((BaseSequentialStream *) &SD3, "Dist : %d\n", mean);
 				if(mean < TOF_MAX_DIST && mean > TOF_MIN_DIST){
-					chprintf((BaseSequentialStream *) &SDU1, "OK\n\n");
+					chprintf((BaseSequentialStream *) &SD3, "OK\n\n");
 					state = CALIB;
 					ref_dist = mean;
 				}
@@ -342,7 +342,7 @@ void vision_init (uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float* w
 				tof_dist = VL53L0X_get_dist_mm();
 				if(abs(tof_dist-ref_dist) > MOVE_TRESH){
 					//show "you moved" with LEDs
-					chprintf((BaseSequentialStream *) &SDU1, "MOVED !\n\n");
+					chprintf((BaseSequentialStream *) &SD3, "MOVED !\n\n");
 					state = WAIT_OBJECT;
 					break;
 				}
@@ -351,15 +351,15 @@ void vision_init (uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float* w
 				calib_colors(&r_obj, &g_obj, &b_obj, OBJ);
 				if(!compute_weights (r_obj, g_obj, b_obj, r_back, g_back, b_back, w_r_ptr, w_g_ptr, w_b_ptr)){
 					//show "Object too dark or not distinct enough" with LED's
-					chprintf((BaseSequentialStream *) &SDU1,"OBJCET : R = %d, G = %d, B = %d\n"
+					chprintf((BaseSequentialStream *) &SD3,"OBJCET : R = %d, G = %d, B = %d\n"
 																				"BACKGROUND : R = %d, G = %d, B = %d\n"
 																				"WEIGHTS : R = %.2f, G = %.2f, B = %.2f\n\n",
 																					r_obj, g_obj, b_obj,r_back,g_back,b_back, *w_r_ptr, *w_g_ptr, *w_b_ptr);
-					chprintf((BaseSequentialStream *) &SDU1, "Object too dark or not distinct enough.\n\n");
+					chprintf((BaseSequentialStream *) &SD3, "Object too dark or not distinct enough.\n\n");
 					state = WAIT_OBJECT;
 					break;
 				}
-				chprintf((BaseSequentialStream *) &SDU1,"OBJCET : R = %d, G = %d, B = %d\n"
+				chprintf((BaseSequentialStream *) &SD3,"OBJCET : R = %d, G = %d, B = %d\n"
 															"BACKGROUND : R = %d, G = %d, B = %d\n"
 															"WEIGHTS : R = %.2f, G = %.2f, B = %.2f\n\n",
 																r_obj, g_obj, b_obj,r_back,g_back,b_back, *w_r_ptr, *w_g_ptr, *w_b_ptr);
@@ -372,11 +372,11 @@ void vision_init (uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float* w
 				}
 
 				distance_mm_calib = mean/(5*DIST_MEAN_RANGE);
-				chprintf((BaseSequentialStream *) &SDU1, "Calibration : %d\n", distance_mm_calib);
+				chprintf((BaseSequentialStream *) &SD3, "Calibration : %d\n", distance_mm_calib);
 
 				if(abs(distance_mm_calib-ref_dist) > MOVE_TRESH){
 					//show "you moved" with LEDs
-					chprintf((BaseSequentialStream *) &SDU1, "MOVED !\n\n");
+					chprintf((BaseSequentialStream *) &SD3, "MOVED !\n\n");
 					state = WAIT_OBJECT;
 					break;
 				}
@@ -388,12 +388,12 @@ void vision_init (uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float* w
 				create_image(image, size, img_buff_ptr, *w_r_ptr, *w_g_ptr, *w_b_ptr);
 
 
-				if(!dist_measure(image, size, true, NULL)){
+				if(!dist_measure(image, size, true, NULL, NULL)){
 					//show "No object found" with LEDs
 					state = WAIT_OBJECT;
 					break;
 				}
-				chprintf((BaseSequentialStream *) &SDU1, "object size : %d\n", size_obj_mm);
+				chprintf((BaseSequentialStream *) &SD3, "object size : %d\n", size_obj_mm);
 
 				state = INIT_DONE;
 				chThdSleepMilliseconds(100);
