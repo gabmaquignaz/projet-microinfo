@@ -24,6 +24,7 @@
 #define PERIMETER_EPUCK     (PI * WHEEL_DISTANCE)
 #define INTERVAL_TEMPS		0.2 						// [s]
 #define INTERVAL_COURT		0.1
+#define ROTATION_SPEED		500
 #define NSTEP_ONE_TURN		1000
 #define OX					0
 #define OY					0
@@ -58,10 +59,12 @@ static THD_FUNCTION(Trajectoire, arg) {
 		positions[2*i+1] = sqrt(get_real_dist_mm()*get_real_dist_mm()-positions[2*i]*positions[2*i]);
 
 		//filter all positions to close from the last one
+		/*
 		if (sqrt(pow((positions[2*(i-1)]-positions[2*i]), 2)
 				+ pow((positions[2*(i-1)+1]-positions[2*i+1]), 2)) < MIN_DIST){
 			i--;
 		}
+		*/
 
 	}
 	chprintf((BaseSequentialStream *) &SD3,"done\n");
@@ -97,13 +100,23 @@ void dance(void){
 	//drive
 	for(uint8_t i = 0 ; i < NB_POS ; i++){
 
-		//be sure that the motors are initialized
-
+		//rotation
 		if (abs(positions[2*i+1])>0){
-			//rotation
-			left_motor_set_speed(-positions[2*i+1]);
-			right_motor_set_speed(positions[2*i+1]);
-			chThdSleepMilliseconds(1000*INTERVAL_TEMPS);
+			//left_motor_set_speed(-positions[2*i+1]);
+			//right_motor_set_speed(positions[2*i+1]);
+			//chThdSleepMilliseconds(1000*INTERVAL_TEMPS);
+
+			if (positions[2*i+1]>0){
+				//counter-clockwise rotation
+				left_motor_set_speed(-ROTATION_SPEED);
+				right_motor_set_speed(ROTATION_SPEED);
+			}
+			else{
+				//clockwise rotation
+				left_motor_set_speed(ROTATION_SPEED);
+				right_motor_set_speed(-ROTATION_SPEED);
+			}
+			chThdSleepMilliseconds(1000*abs(positions[2*i+1]));
 		}
 
 		//forward
@@ -148,9 +161,12 @@ void convert_pos(void){
 
 
 	for(uint8_t i = 0; i < NB_POS; i++){
-		//Conversion from cm and ° to step/s
+		//Conversion from [cm] to [step/s] for a defined time interval
 		positions[2*i] *= NSTEP_ONE_TURN/(WHEEL_PERIMETER*INTERVAL_TEMPS);
-		positions[2*i+1] *= WHEEL_DISTANCE*NSTEP_ONE_TURN/(2*WHEEL_PERIMETER*INTERVAL_TEMPS);
+		//positions[2*i+1] *= WHEEL_DISTANCE*NSTEP_ONE_TURN/(2*WHEEL_PERIMETER*INTERVAL_TEMPS);
+
+		//Conversion from [radians] to [s] at a defined speed
+		positions[2*i+1] *= WHEEL_DISTANCE*NSTEP_ONE_TURN/(2*WHEEL_PERIMETER*ROTATION_SPEED);
 	}
 
 	dance();
