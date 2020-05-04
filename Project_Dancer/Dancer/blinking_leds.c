@@ -21,7 +21,7 @@ static THD_FUNCTION(Blinking, arg) {
 	while (1){
 	    switch (blinking_state){
 	    		case NO_LED:
-	    			chThdSleepMilliseconds(100);
+	    			chBSemWait(&led_sem);
 	    			break;
 
 			case WAIT_LED:
@@ -140,6 +140,7 @@ static THD_FUNCTION(Blinking, arg) {
 
 void set_blinking_state(uint8_t state){
 	blinking_state = state;
+	if (state != NO_LED) chBSemSignal(&led_sem);
 }
 
 void blinking_start(void){

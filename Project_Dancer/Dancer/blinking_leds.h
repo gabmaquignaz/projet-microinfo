@@ -10,6 +10,8 @@
 
 enum Blinking_state {NO_LED, WAIT_LED, REC_LED, SHAZAM_LED, THINKING_LED, ERROR_LED, SUCCESS_LED};
 
+static BSEMAPHORE_DECL(led_sem, TRUE);
+
 void set_blinking_state(uint8_t state);
 void blinking_start(void);
 
