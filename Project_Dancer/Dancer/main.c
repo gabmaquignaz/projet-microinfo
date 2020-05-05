@@ -61,27 +61,46 @@ static THD_FUNCTION(MainFSM, arg) {
 
 				if(double_click){
 					main_state = RECORD;
+
 				}
 				else {
 					main_state = SHAZAM;
+
 				}
 
 				break;
 
 			case RECORD:
-				if(song_count == MAX_MEM_SONG) {}//error: too many songs
+				chprintf((BaseSequentialStream *) &SD3,"record\n");
+
+				if(song_count == MAX_MEM_SONG) {
+					//error: too many songs
+					chprintf((BaseSequentialStream *) &SD3,"too many songs\n");
+				}
 				else {
 					audio(RECORD, song_count);
+
+					//init vision
+					if(song_count == 0) signal_rec_traj_sem();
+
 					save_trajectory(song_count);
+
 					song_count ++;
 				}
 				main_state = WAIT;
 				break;
 
 			case SHAZAM:
-				current_dance = audio(SHAZAM, song_count);
-				if(current_dance == -1) {}//no matching song
-				else dance(current_dance);
+				chprintf((BaseSequentialStream *) &SD3,"shazam\n");
+				if(song_count == 0) {
+					//error: zero songs memorized
+					chprintf((BaseSequentialStream *) &SD3,"zero songs memorized\n");
+				}
+				else{
+					current_dance = audio(SHAZAM, song_count);
+					if(current_dance == -1) {}//no matching song
+					else dance(current_dance);
+				}
 				main_state = WAIT;
 				break;
 		}
@@ -104,6 +123,7 @@ int main(void){
     //start communication with computer
     usb_start();
     serial_start();
+    chThdSleepMilliseconds(2000);
 
     //starts vision for trajectory recognition
     dcmi_start();

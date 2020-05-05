@@ -57,7 +57,8 @@ uint8_t find_replace (float* micOutput, uint16_t* sample);
 
 static float micFront_cmplx_input[2 * FFT_SIZE];
 static float micFront_output[FFT_SIZE]; //Array containing the computed magnitude of the complex numbers
-static song ref_songs[MAX_MEM_SONG];
+static song ref_songs[MAX_MEM_SONG] = {0};
+static song measured_song = {0};
 
 
 
@@ -70,15 +71,15 @@ int8_t audio(uint8_t record_state, uint8_t song_count){
 	int8_t identified_song = -1;
 
 	if(record_state == RECORD){
-
+		chprintf((BaseSequentialStream *) &SDU1, "YO\n");
 		chThdSleepMilliseconds(5000);
-		chprintf((BaseSequentialStream *) &SDU1, "3\n");
+		chprintf((BaseSequentialStream *) &SD3, "3\n");
 		chThdSleepMilliseconds(1000);
-		chprintf((BaseSequentialStream *) &SDU1, "2\n");
+		chprintf((BaseSequentialStream *) &SD3, "2\n");
 		chThdSleepMilliseconds(1000);
-		chprintf((BaseSequentialStream *) &SDU1, "1\n");
+		chprintf((BaseSequentialStream *) &SD3, "1\n");
 		chThdSleepMilliseconds(1000);
-		chprintf((BaseSequentialStream *) &SDU1, "GO\n");
+		chprintf((BaseSequentialStream *) &SD3, "GO\n");
 
 		//record reference song
 		for (uint8_t i = 0; i < NB_SAMPLES; i++){
@@ -89,25 +90,30 @@ int8_t audio(uint8_t record_state, uint8_t song_count){
 //		//PRINTF POUR VOIR LES MESURES
 //		for (uint8_t i = 0; i < NB_SAMPLES; i++){
 //			for(uint8_t j = 0; j < SAMPLE_SIZE; j++){
-//			   chprintf((BaseSequentialStream *) &SDU1, "%d ", ref_songs[song_count][i][j]);
+//			   chprintf((BaseSequentialStream *) &SD3, "%d ", ref_songs[song_count][i][j]);
 //			}
-//			chprintf((BaseSequentialStream *) &SDU1, "\n");
+//			chprintf((BaseSequentialStream *) &SD3, "\n");
 //		}
-//		chprintf((BaseSequentialStream *) &SDU1, "\n\n\n");
+//		chprintf((BaseSequentialStream *) &SD3, "\n\n\n");
 	}
 
 	else if(record_state == SHAZAM){
 
-		song measured_song = {0};
+		//erase previous measured song
+		for (uint8_t i = 0; i < NB_SAMPLES; i++){
+			for(uint8_t j = 0; j < SAMPLE_SIZE; j++){
+				measured_song[i][j] = 0;
+			}
+		}
 
 		chThdSleepMilliseconds(5000);
-		chprintf((BaseSequentialStream *) &SDU1, "3\n");
+		chprintf((BaseSequentialStream *) &SD3, "3\n");
 		chThdSleepMilliseconds(1000);
-		chprintf((BaseSequentialStream *) &SDU1, "2\n");
+		chprintf((BaseSequentialStream *) &SD3, "2\n");
 		chThdSleepMilliseconds(1000);
-		chprintf((BaseSequentialStream *) &SDU1, "1\n");
+		chprintf((BaseSequentialStream *) &SD3, "1\n");
 		chThdSleepMilliseconds(1000);
-		chprintf((BaseSequentialStream *) &SDU1, "GO\n");
+		chprintf((BaseSequentialStream *) &SD3, "GO\n");
 
 		//record new measured song
 		for (uint8_t i = 0; i < NB_SAMPLES; i++){
@@ -119,9 +125,9 @@ int8_t audio(uint8_t record_state, uint8_t song_count){
 //		//PRINTF POUR VOIR LES MESURES
 //		for (uint8_t i = 0; i < NB_SAMPLES; i++){
 //			for(uint8_t j = 0; j < SAMPLE_SIZE; j++){
-//				chprintf((BaseSequentialStream *) &SDU1, "%d ", measured_song[i][j]);
+//				chprintf((BaseSequentialStream *) &SD3, "%d ", measured_song[i][j]);
 //			}
-//			chprintf((BaseSequentialStream *) &SDU1, "\n");
+//			chprintf((BaseSequentialStream *) &SD3, "\n");
 //		}
 
 
@@ -131,7 +137,7 @@ int8_t audio(uint8_t record_state, uint8_t song_count){
 		for(uint8_t i = 0; i < song_count; i++){
 
 			match = match_song(measured_song, ref_songs[i]);
-			chprintf((BaseSequentialStream *) &SDU1, "(%.2f)\n", match);
+			chprintf((BaseSequentialStream *) &SD3, "(%.2f)\n", match);
 
 			if (match > MATCH_TRESH && match > best_match){
 				best_match = match;
@@ -141,6 +147,7 @@ int8_t audio(uint8_t record_state, uint8_t song_count){
 				//no match
 			}
 		}
+		chprintf((BaseSequentialStream *) &SD3, "identified_song: %d\n", identified_song);
 	}
 
 	return identified_song;
@@ -171,7 +178,7 @@ float match_song (song measured_song, song ref_song){
 			mean += match_sample(measured_song[i-offset], ref_song[i]);
 		}
 		mean /= (end-start);
-//		chprintf((BaseSequentialStream *) &SDU1, "%d)  %.2f\n", offset, mean);
+//		chprintf((BaseSequentialStream *) &SD3, "%d)  %.2f\n", offset, mean);
 		if(mean > best_avrg_match) best_avrg_match = mean;
 	}
 	return best_avrg_match;

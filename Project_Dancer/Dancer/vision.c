@@ -165,7 +165,7 @@ static THD_FUNCTION(ProcessImage, arg) {
 			//verify that all the value of the average tab were initialized before sending the first averaged value
 			if(avrg_count < MOV_AVRG_SIZE-1) avrg_count++;
 			else {
-				chprintf((BaseSequentialStream *) &SD3,"%d %d\n", real_dist, hor_dist);
+//				chprintf((BaseSequentialStream *) &SD3,"%d %d\n", real_dist, hor_dist);
 				signal_dist_ready_sem();
 			}
 		}
@@ -283,7 +283,7 @@ bool dist_measure (uint8_t* image, uint16_t size, bool first_call, int16_t* real
 
 	//error: no object found or object not entirely visible
 	if (state != FINISHED) {
-		chprintf((BaseSequentialStream *) &SD3,"No object found\n");
+//		chprintf((BaseSequentialStream *) &SD3,"No object found\n");
 		return false;
 	}
 
