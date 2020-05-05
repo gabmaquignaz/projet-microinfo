@@ -8,12 +8,9 @@
 #ifndef AUDIO_H_
 #define AUDIO_H_
 
-static BSEMAPHORE_DECL(start_sound_rec_sem, TRUE);
 
-
-void sound_start(void);
-void signal_start_sound_rec_sem(uint8_t state);
-uint8_t get_match_result(void);
+int8_t audio(uint8_t record_state);
+void processAudioData(int16_t *data, uint16_t num_samples);
 
 
 

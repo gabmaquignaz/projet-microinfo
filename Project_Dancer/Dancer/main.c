@@ -9,6 +9,7 @@
 #include "memory_protection.h"
 #include "usbcfg.h"
 #include "motors.h"
+#include <audio/microphone.h>
 
 #include "main.h"
 #include "trajectoire.h"
@@ -55,10 +56,13 @@ int main(void){
     serial_start();
     chThdSleepMilliseconds(2000);
 
-    //starts vision
+    //starts vision for trajectory recognition
     dcmi_start();
 	po8030_start();
 	process_image_start();
+
+	//starts mic for song recognition
+	mic_start(&processAudioData);
 
 //	//start leds
 //	set_blinking_state(NO_LED);
@@ -89,14 +93,14 @@ int main(void){
 				break;
 
 			case RECORD:
-				signal_start_sound_rec_sem(RECORD);
+				//audio(RECORD);
 //				chprintf((BaseSequentialStream *) &SD3,"rec_traj\n");
 //				signal_rec_traj_sem();
 				main_state = WAIT;
 				break;
 
 			case SHAZAM:
-				signal_start_sound_rec_sem(SHAZAM);
+				//audio(SHAZAM);
 				break;
 		}
     }
