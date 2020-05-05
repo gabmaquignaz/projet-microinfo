@@ -87,7 +87,7 @@ static THD_FUNCTION(Blinking, arg) {
 				set_led(LED7, 0);
 				break;
 
-			case ERROR_LED:
+			case ERROR1_LED:
 				set_led(LED1, 2);
 				set_led(LED3, 2);
 				set_led(LED5, 2);
@@ -117,6 +117,14 @@ static THD_FUNCTION(Blinking, arg) {
 				set_led(LED3, 0);
 				set_led(LED5, 0);
 				set_led(LED7, 0);
+				blinking_state = NO_LED;
+				break;
+
+			case ERROR2_LED:
+				set_led(LED1, 2);
+				chThdSleepMilliseconds(150);
+				set_led(LED1, 0);
+				blinking_state = NO_LED;
 				break;
 
 			case SUCCESS_LED:
@@ -131,6 +139,7 @@ static THD_FUNCTION(Blinking, arg) {
 				set_body_led(2);
 				chThdSleepMilliseconds(400);
 				set_body_led(0);
+				blinking_state = NO_LED;
 				break;
 	    }
 

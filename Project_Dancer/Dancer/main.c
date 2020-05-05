@@ -43,9 +43,8 @@ int main(void){
     chSysInit();
     mpu_init();
 
-    //starts trajectory control and motors
+    //starts motors
     motors_init();
-    trajectoire_start();
 
     //start user button
     button_start();
