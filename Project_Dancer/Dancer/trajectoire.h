@@ -10,7 +10,9 @@
 
 static BSEMAPHORE_DECL(dist_ready_sem, TRUE);
 
+void save_trajectory(uint8_t traj_count);
 void convert_pos(uint8_t traj_count);
+void dance(uint8_t traj_count);
 void signal_dist_ready_sem(void);
 
 #endif /* TRAJECTOIRE_H_ */

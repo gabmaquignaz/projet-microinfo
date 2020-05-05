@@ -22,7 +22,6 @@
 
 
 
-
 static void serial_start(void)
 {
 	static SerialConfig ser_cfg = {
@@ -35,6 +34,59 @@ static void serial_start(void)
 	sdStart(&SD3, &ser_cfg); // UART3.
 }
 
+static THD_WORKING_AREA(waMainFSM, 256);
+static THD_FUNCTION(MainFSM, arg) {
+    chRegSetThreadName(__FUNCTION__);
+    (void)arg;
+
+    //Main finite-state machine
+    	uint8_t main_state = WAIT;
+    bool double_click = false;
+
+    	//id of the identified song, -1 -> nothing
+    	int8_t current_dance = -1;
+
+    	//number of memorized song/dance
+    	uint8_t song_count = 0;
+
+	//Infinite loop
+	while (true) {
+		//waits 1 second
+		chThdSleepMilliseconds(1000);
+
+		switch (main_state){
+
+			case WAIT:
+				double_click = wait_click();
+
+				if(double_click){
+					main_state = RECORD;
+				}
+				else {
+					main_state = SHAZAM;
+				}
+
+				break;
+
+			case RECORD:
+				if(song_count == MAX_MEM_SONG) {}//error: too many songs
+				else {
+					audio(RECORD, song_count);
+					save_trajectory(song_count);
+					song_count ++;
+				}
+				main_state = WAIT;
+				break;
+
+			case SHAZAM:
+				current_dance = audio(SHAZAM, song_count);
+				if(current_dance == -1) {}//no matching song
+				else dance(current_dance);
+				main_state = WAIT;
+				break;
+		}
+	}
+}
 
 
 int main(void){
@@ -48,12 +100,10 @@ int main(void){
 
     //start user button
     button_start();
-    bool double_click = false;
 
     //start communication with computer
     usb_start();
     serial_start();
-    chThdSleepMilliseconds(2000);
 
     //starts vision for trajectory recognition
     dcmi_start();
@@ -63,46 +113,16 @@ int main(void){
 	//starts mic for song recognition
 	mic_start(&processAudioData);
 
-//	//start leds
-//	set_blinking_state(NO_LED);
-//	blinking_start();
+	//start leds
+	set_blinking_state(NO_LED);
+	blinking_start();
 
+	chThdCreateStatic(waMainFSM, sizeof(waMainFSM), NORMALPRIO, MainFSM, NULL);
 
-	//Main finite-state machine
-	uint8_t main_state = WAIT;
-
-
-
-    /* Infinite loop. */
-    while (1) {
-//    	//waits 1 second
-       chThdSleepMilliseconds(1000);
-
-		switch (main_state){
-
-			case WAIT:
-				double_click = wait_click();
-
-				if(double_click){
-					main_state = RECORD;
-				}
-				else {
-					main_state = SHAZAM;
-				}
-				break;
-
-			case RECORD:
-				//audio(RECORD);
-//				chprintf((BaseSequentialStream *) &SD3,"rec_traj\n");
-//				signal_rec_traj_sem();
-				main_state = WAIT;
-				break;
-
-			case SHAZAM:
-				//audio(SHAZAM);
-				break;
-		}
-    }
+	//infinite loop
+	while(true){
+		chThdSleepMilliseconds(1000);
+	}
 }
 
 #define STACK_CHK_GUARD 0xe2dee396
