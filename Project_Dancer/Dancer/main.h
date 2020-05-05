@@ -9,7 +9,7 @@ extern "C" {
 #include "msgbus/messagebus.h"
 #include "parameter/parameter.h"
 
-enum Main_states {WAIT, REC_SONG, REC_TRAJ, SHAZAM, DANCE};
+enum Main_states {WAIT, RECORD, SHAZAM};
 
 /** Robot wide IPC bus. */
 extern messagebus_t bus;

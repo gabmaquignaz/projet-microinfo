@@ -154,7 +154,7 @@ static THD_FUNCTION(ProcessImage, arg) {
 		//gets the pointer to the array filled with the last image in RGB565
 		img_buff_ptr = dcmi_get_last_image_ptr();
 		create_image(image, IMAGE_BUFFER_SIZE, img_buff_ptr, w_r, w_g, w_b);
-		SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
+//		SendUint8ToComputer(image, IMAGE_BUFFER_SIZE);
 
 
 		if(dist_measure(image, IMAGE_BUFFER_SIZE, false, &inst_real_dist, &inst_hor_dist)){
@@ -193,6 +193,7 @@ void process_image_start(void){
 	chThdCreateStatic(waProcessImage, sizeof(waProcessImage), NORMALPRIO, ProcessImage, NULL);
 	chThdCreateStatic(waCaptureImage, sizeof(waCaptureImage), NORMALPRIO, CaptureImage, NULL);
 }
+
 
 void signal_rec_traj_sem(void){
 	chBSemSignal(&rec_traj_ready_sem);

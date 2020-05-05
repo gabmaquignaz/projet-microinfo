@@ -81,28 +81,22 @@ int main(void){
 				double_click = wait_click();
 
 				if(double_click){
-					//main_state = REC_SONG;
+					main_state = RECORD;
 				}
 				else {
-					//main_state = SHAZAM;
+					main_state = SHAZAM;
 				}
-
-				main_state = REC_TRAJ;
 				break;
 
-			case REC_SONG:
-				break;
-
-			case REC_TRAJ:
-				chprintf((BaseSequentialStream *) &SD3,"rec_traj\n");
-				signal_rec_traj_sem();
-				main_state = DANCE;
+			case RECORD:
+				signal_start_sound_rec_sem(RECORD);
+//				chprintf((BaseSequentialStream *) &SD3,"rec_traj\n");
+//				signal_rec_traj_sem();
+				main_state = WAIT;
 				break;
 
 			case SHAZAM:
-				break;
-
-			case DANCE:
+				signal_start_sound_rec_sem(SHAZAM);
 				break;
 		}
     }

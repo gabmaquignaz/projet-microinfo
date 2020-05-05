@@ -38,7 +38,7 @@ typedef uint16_t song[NB_SAMPLES][SAMPLE_SIZE];
 #define WAIT_FFT 			2 //one in N set of 1024 samples is used
 
 #define NUM_MEM_SONG			3//number of memorized songs
-enum States {REF, MATCH};
+
 
 
 
@@ -62,7 +62,7 @@ void do_bbl_sort(uint16_t* sample);
 
 static float micFront_cmplx_input[2 * FFT_SIZE];
 static float micFront_output[FFT_SIZE]; //Array containing the computed magnitude of the complex numbers
-static uint8_t state = REF;
+static uint8_t record_state = RECORD;
 static int8_t match_result = -1;
 
 
@@ -81,8 +81,8 @@ static THD_FUNCTION(CaptureSound, arg) {
    while (true) {
 
 		chBSemWait(&start_sound_rec_sem);
-		switch(state){
-			case REF:
+		switch(record_state){
+			case RECORD:
 
 				if(song_count == NUM_MEM_SONG){
 					//error: cannot memorize more songs
@@ -118,7 +118,7 @@ static THD_FUNCTION(CaptureSound, arg) {
 
 				}
 
-			case MATCH:
+			case SHAZAM:
 
 				if(song_count == 0){
 					//error: not reference song to compare
@@ -181,6 +181,15 @@ static THD_FUNCTION(CaptureSound, arg) {
 
 void sound_start(void){
 	chThdCreateStatic(waCaptureSound, sizeof(waCaptureSound), NORMALPRIO, CaptureSound, NULL);
+}
+
+uint8_t get_match_result(void){
+	return match_result;
+}
+
+void signal_start_sound_rec_sem(uint8_t state){
+	record_state = state;
+	chBSemSignal(&start_sound_rec_sem);
 }
 
 
