@@ -41,15 +41,15 @@ enum Ref_color {R, G, B};
 enum Obj_or_back	 					{OBJ, BACK};
 
 #define TOF_MAX_DIST					90
-#define TOF_MIN_DIST					40
+#define TOF_MIN_DIST					50
 #define MOVE_TRESH					10
 #define DIST_MEAN_RANGE				10
 
 #define D_LENS						772.55f
 enum Vision_init_state 				{WAIT_OBJECT, CALIB, INIT_DONE};
 enum Line_detector_state 			{SEARCH_BEGIN, SEARCH_END, FINISHED};
-#define DETECT_TRESH					50
-#define MIN_OBJ_SIZE 				50
+#define DETECT_TRESH					80
+#define MIN_OBJ_SIZE 				40
 #define MAX_DELTA_SIZE				30 //maximum variation of size between two samples
 
 #define MOV_AVRG_SIZE				20
@@ -57,8 +57,8 @@ enum Line_detector_state 			{SEARCH_BEGIN, SEARCH_END, FINISHED};
 
 
 //values obtained after moving average, used by trajectoire.c
-static int16_t hor_dist = 0;
-static int16_t real_dist = 0;
+static float hor_dist = 0;
+static float real_dist = 0;
 
 static uint16_t size_obj_mm = 0;
 static uint16_t distance_mm_calib = 0;
@@ -69,8 +69,8 @@ static uint16_t distance_mm_calib = 0;
 
 //detection functions
 void create_image(uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float w_r, float w_g, float w_b);
-bool dist_measure (uint8_t* image, uint16_t size, bool first_call, int16_t* real_dist_ptr, int16_t* hor_dist_ptr);
-int16_t mov_avrg(int16_t value, int16_t* val_tab, uint8_t* oldest_val_ptr);
+bool dist_measure (uint8_t* image, uint16_t size, bool first_call, float* real_dist_ptr, float* hor_dist_ptr);
+float mov_avrg(float value, float* val_tab, uint8_t* oldest_val_ptr);
 
 //calibration functions
 void vision_init (uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float* w_r_ptr, float* w_g_ptr, float* w_b_ptr);
@@ -104,7 +104,7 @@ static THD_FUNCTION(CaptureImage, arg) {
     (void)arg;
 
 	//Takes pixels 0 to IMAGE_BUFFER_SIZE of the line 10 + 11 (minimum 2 lines because reasons)
-	po8030_advanced_config(FORMAT_RGB565, 0, 10, IMAGE_BUFFER_SIZE, 2, SUBSAMPLING_X1, SUBSAMPLING_X1);
+	po8030_advanced_config(FORMAT_RGB565, 0, 240, IMAGE_BUFFER_SIZE, 2, SUBSAMPLING_X1, SUBSAMPLING_X1);
 	dcmi_enable_double_buffering();
 	dcmi_set_capture_mode(CAPTURE_ONE_SHOT);
 	dcmi_prepare();
@@ -137,13 +137,13 @@ static THD_FUNCTION(ProcessImage, arg) {
 	vision_init (image,  IMAGE_BUFFER_SIZE, img_buff_ptr, &w_r, &w_g, &w_b);
 
 	//Instant values of distances
-	int16_t inst_real_dist = 0;
-	int16_t inst_hor_dist = 0;
+	float inst_real_dist = 0;
+	float inst_hor_dist = 0;
 
 	//Tabs for moving average of RD and HD
-	int16_t mov_avrg_r_tab [MOV_AVRG_SIZE] = {0};
+	float mov_avrg_r_tab [MOV_AVRG_SIZE] = {0};
 	uint8_t oldest_val_r = 0;
-	int16_t mov_avrg_h_tab [MOV_AVRG_SIZE] = {0};
+	float mov_avrg_h_tab [MOV_AVRG_SIZE] = {0};
 	uint8_t oldest_val_h = 0;
 
 	uint8_t avrg_count = 0;
@@ -179,13 +179,13 @@ static THD_FUNCTION(ProcessImage, arg) {
 
 //*************** high level: interaction functions (visible by other files) ***************
 
-uint16_t get_real_dist_mm(void){
-	return real_dist;
+float get_real_dist_mm(void){
+	return real_dist*TRAJ_SCALE;
 }
 
 
-uint16_t get_hor_dist_mm(void){
-	return hor_dist;
+float get_hor_dist_mm(void){
+	return hor_dist*TRAJ_SCALE;
 }
 
 
@@ -203,8 +203,8 @@ void signal_rec_traj_sem(void){
 
 //*************** intermediate level: object recognition functions ***************
 
-int16_t mov_avrg(int16_t value, int16_t* val_tab, uint8_t* oldest_val_ptr){
-	int16_t diff = TRAJ_SCALE*(value-val_tab[*oldest_val_ptr])/MOV_AVRG_SIZE;
+float mov_avrg(float value, float* val_tab, uint8_t* oldest_val_ptr){
+	float diff = (value-val_tab[*oldest_val_ptr])/MOV_AVRG_SIZE;
 	val_tab[*oldest_val_ptr	] = value;
 	(*oldest_val_ptr) ++;
 	*oldest_val_ptr= (*oldest_val_ptr)%MOV_AVRG_SIZE;
@@ -229,7 +229,7 @@ void create_image(uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float w_
 }
 
 
-bool dist_measure (uint8_t* image, uint16_t size, bool first_call, int16_t* real_dist_ptr, int16_t* hor_dist_ptr){
+bool dist_measure (uint8_t* image, uint16_t size, bool first_call, float* real_dist_ptr, float* hor_dist_ptr){
 
 	//state of the object detector, starts by searching for the beginning of the object
 	uint8_t state = SEARCH_BEGIN;
@@ -447,7 +447,7 @@ void calib_colors(uint8_t* r_ptr, uint8_t* g_ptr, uint8_t* b_ptr, bool obj_or_ba
 
 bool compute_weights (uint8_t r_obj, uint8_t g_obj, uint8_t b_obj, uint8_t r_back, uint8_t g_back, uint8_t b_back, float* w_r_ptr, float* w_g_ptr, float* w_b_ptr){
 
-	uint8_t goal_val_obj = 250;
+	uint8_t goal_val_obj = 255;
 	uint8_t goal_val_back = 0;
 
 	//add a line to the matrix to solve with Gauss and change last line until the matrix is invertible

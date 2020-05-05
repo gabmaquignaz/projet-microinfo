@@ -45,7 +45,7 @@ void save_trajectory(uint8_t traj_count){
 
 		//waits until an position has been captured
 		chBSemWait(&dist_ready_sem);
-		chprintf((BaseSequentialStream *) &SD3,"position saved\n");
+
 
 
 		positions[traj_count][2*i] = get_hor_dist_mm();
@@ -57,11 +57,12 @@ void save_trajectory(uint8_t traj_count){
 				+ pow((positions[traj_count][2*(i-1)+1]-positions[traj_count][2*i+1]), 2)) < MIN_DIST){
 			i--;
 		}
+		else chprintf((BaseSequentialStream *) &SD3,"%d %d\n", (int)positions[traj_count][2*i]+400, (int)positions[traj_count][2*i+1]);
 
 
 	}
-	chThdSleepMilliseconds(5000);
 	chprintf((BaseSequentialStream *) &SD3,"done\n");
+
 	chThdSleepMilliseconds(2000);
 	convert_pos(traj_count);
 

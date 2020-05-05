@@ -10,6 +10,7 @@
 #include "usbcfg.h"
 #include "motors.h"
 #include <audio/microphone.h>
+#include "spi_comm.h"
 
 #include "main.h"
 #include "trajectoire.h"
@@ -117,8 +118,8 @@ int main(void){
     //starts motors
     motors_init();
 
-    //start user button
-    button_start();
+    //spi communication for user button
+    spi_comm_start();
 
     //start communication with computer
     usb_start();
@@ -126,8 +127,11 @@ int main(void){
     chThdSleepMilliseconds(2000);
 
     //starts vision for trajectory recognition
+    //augment brightness and disable auto white balance for better color recognition
     dcmi_start();
 	po8030_start();
+	po8030_set_brightness(64);
+	po8030_set_awb(false);
 	process_image_start();
 
 	//starts mic for song recognition
@@ -138,6 +142,7 @@ int main(void){
 	blinking_start();
 
 	chThdCreateStatic(waMainFSM, sizeof(waMainFSM), NORMALPRIO, MainFSM, NULL);
+
 
 	//infinite loop
 	while(true){

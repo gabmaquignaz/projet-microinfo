@@ -30,7 +30,7 @@ typedef uint16_t sample[SAMPLE_SIZE];
 
 #define OFFSET_MAX			20 //At least (NB_SAMPLES-OFFSET_MAX) must be used for a match
 #define MATCH_F_TOL 			2 // frequency difference tolerance to count as a match
-#define MATCH_TRESH			30 //match score required to pass the test
+#define MATCH_TRESH			35 //match score required to pass the test
 #define PEAK_H_MIN			1200
 
 #define QUAD_COEFF			0.015
