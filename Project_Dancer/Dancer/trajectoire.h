@@ -10,9 +10,7 @@
 
 static BSEMAPHORE_DECL(dist_ready_sem, TRUE);
 
-void convert_pos(void);
-void p_control(void);
-void trajectoire_start(void);
+void convert_pos(uint8_t traj_count);
 void signal_dist_ready_sem(void);
 
 #endif /* TRAJECTOIRE_H_ */
