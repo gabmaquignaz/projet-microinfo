@@ -8,6 +8,7 @@
 #ifndef USER_BUTTON_H_
 #define USER_BUTTON_H_
 
+void user_button_start(void);
 bool wait_click(void);
 
 

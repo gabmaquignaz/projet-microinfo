@@ -10,7 +10,6 @@
 #include "usbcfg.h"
 #include "motors.h"
 #include <audio/microphone.h>
-#include "spi_comm.h"
 
 #include "main.h"
 #include "trajectoire.h"
@@ -128,7 +127,7 @@ int main(void){
     motors_init();
 
     //spi communication for user button
-    spi_comm_start();
+    user_button_start();
 
     //start communication with computer
     usb_start();

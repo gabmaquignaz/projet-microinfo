@@ -18,7 +18,7 @@
 #include "blinking_leds.h"
 
 #define PI					3.14159265
-#define NB_POS				100
+#define NB_POS				75
 #define WHEEL_DISTANCE      	53.5f    				// [mm]
 #define WHEEL_PERIMETER     	130 						// [mm]
 #define WHEEL_RADIUS			(13/2*PI)
@@ -27,11 +27,7 @@
 #define INTERVAL_COURT		0.1
 #define ROTATION_SPEED		500
 #define NSTEP_ONE_TURN		1000
-#define OX					0
-#define OY					0
-#define ORIX					0
-#define ORIY					-1
-#define MIN_DIST				5
+#define MIN_DIST				2
 #define NUM_MEM_TRAJ			3 //number of memorized trajectories
 
 
@@ -98,7 +94,7 @@ void dance(uint8_t traj_count){
 	//chprintf((BaseSequentialStream *) &SD3,"DANCING !\n");
 
 	//drive
-	for(uint8_t i = 0 ; i < NB_POS ; i++){
+	for(uint8_t i = 2 ; i < NB_POS ; i++){
 
 		//rotation
 		if (abs(positions[traj_count][2*i+1])>0){
@@ -161,27 +157,11 @@ void convert_pos(uint8_t traj_count){
 															 x_mem, positions[traj_count][2*i+1]);
 
 	}
-	//first two sections from origin
-	x_mem = positions[traj_count][2];
-	positions[traj_count][2] = sqrt((positions[traj_count][2]-positions[traj_count][0])
-								  *(positions[traj_count][2]-positions[traj_count][0])
-								  +(positions[traj_count][3]-positions[traj_count][1])
-								  *(positions[traj_count][3]-positions[traj_count][1]));
-
-	positions[traj_count][3] = angle_from_three_points(OX, OY,
-													 positions[traj_count][0], positions[traj_count][1],
-													 x_mem, positions[traj_count][3]);
-
-	x_mem = positions[traj_count][0];
-	positions[traj_count][0] = sqrt(positions[traj_count][0]*positions[traj_count][0]
-								  +positions[traj_count][1]*positions[traj_count][1]);
-
-	positions[traj_count][1] = angle_from_three_points(ORIX, ORIY, OX, OY, x_mem, positions[traj_count][1]);
 
 
 	//second conversion
 
-	for(uint8_t i = 0; i < NB_POS; i++){
+	for(uint8_t i = 2; i < NB_POS; i++){
 		//Conversion from [mm] to [steps]
 		positions[traj_count][2*i] *= NSTEP_ONE_TURN/(WHEEL_PERIMETER);
 		//positions[2*i+1] *= WHEEL_DISTANCE*NSTEP_ONE_TURN/(2*WHEEL_PERIMETER*INTERVAL_TEMPS);
