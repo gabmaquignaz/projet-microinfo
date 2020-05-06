@@ -24,31 +24,6 @@ static THD_FUNCTION(Blinking, arg) {
 	    			chBSemWait(&led_sem);
 	    			break;
 
-			case WAIT_LED:
-				set_led(LED1, 2);
-				chThdSleepMilliseconds(250);
-				set_led(LED1, 0);
-				set_led(LED5, 2);
-				chThdSleepMilliseconds(250);
-				set_led(LED5, 0);
-				set_led(LED3, 2);
-				chThdSleepMilliseconds(250);
-				set_led(LED3, 0);
-				set_led(LED7, 2);
-				chThdSleepMilliseconds(250);
-				set_led(LED7, 0);
-				break;
-
-			case REC_LED:
-				set_body_led(2);
-				chThdSleepMilliseconds(333);
-				set_body_led(0);
-				chThdSleepMilliseconds(333);
-				set_body_led(2);
-				chThdSleepMilliseconds(333);
-				set_body_led(0);
-				break;
-
 			case SHAZAM_LED:
 				set_led(LED1, 2);
 				chThdSleepMilliseconds(250);
@@ -64,7 +39,7 @@ static THD_FUNCTION(Blinking, arg) {
 				set_led(LED7, 0);
 				break;
 
-			case THINKING_LED:
+			case REC_SOUND_LED:
 				set_led(LED1, 2);
 				set_led(LED5, 2);
 				chThdSleepMilliseconds(250);
@@ -75,75 +50,173 @@ static THD_FUNCTION(Blinking, arg) {
 				chThdSleepMilliseconds(250);
 				set_led(LED3, 0);
 				set_led(LED7, 0);
-				set_led(LED1, 2);
-				set_led(LED5, 2);
-				chThdSleepMilliseconds(250);
-				set_led(LED1, 0);
-				set_led(LED5, 0);
-				set_led(LED3, 2);
-				set_led(LED7, 2);
-				chThdSleepMilliseconds(250);
-				set_led(LED3, 0);
-				set_led(LED7, 0);
-				break;
-
-			case ERROR1_LED:
-				set_led(LED1, 2);
-				set_led(LED3, 2);
-				set_led(LED5, 2);
-				set_led(LED7, 2);
-				chThdSleepMilliseconds(150);
-				set_led(LED1, 0);
-				set_led(LED3, 0);
-				set_led(LED5, 0);
-				set_led(LED7, 0);
-				chThdSleepMilliseconds(150);
-				set_led(LED1, 2);
-				set_led(LED3, 2);
-				set_led(LED5, 2);
-				set_led(LED7, 2);
-				chThdSleepMilliseconds(150);
-				set_led(LED1, 0);
-				set_led(LED3, 0);
-				set_led(LED5, 0);
-				set_led(LED7, 0);
-				chThdSleepMilliseconds(150);
-				set_led(LED1, 2);
-				set_led(LED3, 2);
-				set_led(LED5, 2);
-				set_led(LED7, 2);
-				chThdSleepMilliseconds(400);
-				set_led(LED1, 0);
-				set_led(LED3, 0);
-				set_led(LED5, 0);
-				set_led(LED7, 0);
-				blinking_state = NO_LED;
-				break;
-
-			case ERROR2_LED:
-				set_led(LED1, 2);
-				chThdSleepMilliseconds(150);
-				set_led(LED1, 0);
-				blinking_state = NO_LED;
-				break;
-
-			case SUCCESS_LED:
-				set_body_led(2);
-				chThdSleepMilliseconds(150);
-				set_body_led(0);
-				chThdSleepMilliseconds(150);
-				set_body_led(2);
-				chThdSleepMilliseconds(150);
-				set_body_led(0);
-				chThdSleepMilliseconds(150);
-				set_body_led(2);
-				chThdSleepMilliseconds(400);
-				set_body_led(0);
-				blinking_state = NO_LED;
 				break;
 	    }
 
 	}
+
+}
+
+void led_animation(uint8_t state){
+
+	switch (state){
+		case ERROR1_LED:
+			set_led(LED1, 2);
+			set_led(LED3, 2);
+			set_led(LED5, 2);
+			set_led(LED7, 2);
+			chThdSleepMilliseconds(150);
+			set_led(LED1, 0);
+			set_led(LED3, 0);
+			set_led(LED5, 0);
+			set_led(LED7, 0);
+			chThdSleepMilliseconds(150);
+			set_led(LED1, 2);
+			set_led(LED3, 2);
+			set_led(LED5, 2);
+			set_led(LED7, 2);
+			chThdSleepMilliseconds(150);
+			set_led(LED1, 0);
+			set_led(LED3, 0);
+			set_led(LED5, 0);
+			set_led(LED7, 0);
+			chThdSleepMilliseconds(150);
+			set_led(LED1, 2);
+			set_led(LED3, 2);
+			set_led(LED5, 2);
+			set_led(LED7, 2);
+			chThdSleepMilliseconds(400);
+			set_led(LED1, 0);
+			set_led(LED3, 0);
+			set_led(LED5, 0);
+			set_led(LED7, 0);
+			break;
+
+		case ERROR2_LED:
+			set_led(LED1, 2);
+			set_led(LED3, 2);
+			set_led(LED5, 2);
+			set_led(LED7, 2);
+			chThdSleepMilliseconds(200);
+			set_led(LED1, 0);
+			set_led(LED3, 0);
+			set_led(LED5, 0);
+			set_led(LED7, 0);
+			break;
+
+		case SUCCESS1_LED:
+			set_body_led(2);
+			chThdSleepMilliseconds(150);
+			set_body_led(0);
+			chThdSleepMilliseconds(150);
+			set_body_led(2);
+			chThdSleepMilliseconds(150);
+			set_body_led(0);
+			chThdSleepMilliseconds(150);
+			set_body_led(2);
+			chThdSleepMilliseconds(400);
+			set_body_led(0);
+			break;
+
+		case SUCCESS2_LED:
+			set_body_led(2);
+			chThdSleepMilliseconds(150);
+			set_body_led(0);
+			break;
+
+		case REC_TRAJ_LED:
+			set_led(LED1, 2);
+			chThdSleepMilliseconds(100);
+			set_led(LED1, 0);
+			break;
+
+		case DANCE_LED:
+			set_body_led(2);
+			chThdSleepMilliseconds(150);
+			set_led(LED1, 2);
+			chThdSleepMilliseconds(150);
+			set_led(LED1, 0);
+			set_led(LED3, 2);
+			set_led(LED7, 2);
+			chThdSleepMilliseconds(150);
+			set_led(LED3, 0);
+			set_led(LED7, 0);
+			set_led(LED5, 2);
+			chThdSleepMilliseconds(150);
+			set_led(LED5, 0);
+			set_led(LED3, 2);
+			set_led(LED7, 2);
+			chThdSleepMilliseconds(150);
+			set_led(LED1, 2);
+			set_led(LED3, 0);
+			set_led(LED7, 0);
+			set_body_led(0);
+			chThdSleepMilliseconds(150);
+			set_led(LED1, 0);
+			set_led(LED3, 2);
+			set_led(LED7, 2);
+			chThdSleepMilliseconds(150);
+			set_led(LED3, 0);
+			set_led(LED7, 0);
+			set_led(LED5, 2);
+			chThdSleepMilliseconds(150);
+			set_led(LED5, 0);
+			set_led(LED3, 2);
+			set_led(LED7, 2);
+			chThdSleepMilliseconds(150);
+			set_led(LED3, 0);
+			set_led(LED7, 0);
+			break;
+
+		case COUNTDOWN:
+			set_led(LED1, 2);
+			set_led(LED3, 2);
+			set_led(LED5, 2);
+			set_led(LED7, 2);
+			chThdSleepMilliseconds(150);
+			set_led(LED7, 0);
+			chThdSleepMilliseconds(150);
+			set_led(LED5, 0);
+			chThdSleepMilliseconds(150);
+			set_led(LED3, 0);
+			chThdSleepMilliseconds(150);
+			set_led(LED1, 0);
+			break;
+
+		case TOO_DARK:
+			set_led(LED3, 2);
+			set_led(LED7, 2);
+			chThdSleepMilliseconds(100);
+			set_led(LED3, 0);
+			set_led(LED7, 0);
+			chThdSleepMilliseconds(100);
+			set_led(LED3, 2);
+			set_led(LED7, 2);
+			chThdSleepMilliseconds(100);
+			set_led(LED3, 0);
+			set_led(LED7, 0);
+			break;
+
+		case SIMILAR:
+			set_led(LED3, 2);
+			set_led(LED5, 2);
+			set_led(LED7, 2);
+			chThdSleepMilliseconds(100);
+			set_led(LED3, 0);
+			set_led(LED5, 0);
+			set_led(LED7, 0);
+			chThdSleepMilliseconds(100);
+			set_led(LED3, 2);
+			set_led(LED5, 2);
+			set_led(LED7, 2);
+			chThdSleepMilliseconds(100);
+			set_led(LED3, 0);
+			set_led(LED5, 0);
+			set_led(LED7, 0);
+			break;
+
+	}
+
 
 }
 

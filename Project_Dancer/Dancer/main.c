@@ -76,6 +76,7 @@ static THD_FUNCTION(MainFSM, arg) {
 
 				if(song_count == MAX_MEM_SONG) {
 					//error: too many songs
+					led_animation(ERROR2_LED);
 					chprintf((BaseSequentialStream *) &SD3,"too many songs\n");
 				}
 				else {
@@ -85,6 +86,7 @@ static THD_FUNCTION(MainFSM, arg) {
 					if(song_count == 0) signal_rec_traj_sem();
 
 					save_trajectory(song_count);
+					led_animation(SUCCESS2_LED);
 
 					song_count ++;
 				}
@@ -95,12 +97,18 @@ static THD_FUNCTION(MainFSM, arg) {
 				chprintf((BaseSequentialStream *) &SD3,"shazam\n");
 				if(song_count == 0) {
 					//error: zero songs memorized
+					led_animation(ERROR2_LED);
 					chprintf((BaseSequentialStream *) &SD3,"zero songs memorized\n");
 				}
 				else{
 					current_dance = audio(SHAZAM, song_count);
-					if(current_dance == -1) {}//no matching song
-					else dance(current_dance);
+					if(current_dance == -1) led_animation(ERROR1_LED); //no matching song
+					else {
+						led_animation(SUCCESS1_LED);
+						set_blinking_state(DANCE_LED);
+						dance(current_dance);
+						set_blinking_state(NO_LED);
+					}
 				}
 				main_state = WAIT;
 				break;

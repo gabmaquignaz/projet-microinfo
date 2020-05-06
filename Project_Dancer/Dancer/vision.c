@@ -20,6 +20,7 @@
 #include "msgbus/messagebus.h"
 #include "parameter/parameter.h"
 #include "trajectoire.h"
+#include "blinking_leds.h"
 
 #include <vision.h>
 
@@ -168,9 +169,6 @@ static THD_FUNCTION(ProcessImage, arg) {
 //				chprintf((BaseSequentialStream *) &SD3,"%d %d\n", real_dist, hor_dist);
 				signal_dist_ready_sem();
 			}
-		}
-		else {
-			//show "recognition error" with LEDS
 		}
 		chThdSleepMilliseconds(10);
 	}
@@ -342,16 +340,16 @@ void vision_init (uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float* w
 				//control if the user moved
 				tof_dist = VL53L0X_get_dist_mm();
 				if(abs(tof_dist-ref_dist) > MOVE_TRESH){
-					//show "you moved" with LEDs
+					led_animation(ERROR2_LED);
 					chprintf((BaseSequentialStream *) &SD3, "MOVED !\n\n");
 					state = WAIT_OBJECT;
 					break;
 				}
-
+				led_animation(SUCCESS2_LED);
 				 // measure object color then try to compute weights
 				calib_colors(&r_obj, &g_obj, &b_obj, OBJ);
 				if(!compute_weights (r_obj, g_obj, b_obj, r_back, g_back, b_back, w_r_ptr, w_g_ptr, w_b_ptr)){
-					//show "Object too dark or not distinct enough" with LED's
+					led_animation(TOO_DARK);
 					chprintf((BaseSequentialStream *) &SD3,"OBJCET : R = %d, G = %d, B = %d\n"
 																				"BACKGROUND : R = %d, G = %d, B = %d\n"
 																				"WEIGHTS : R = %.2f, G = %.2f, B = %.2f\n\n",
@@ -376,7 +374,7 @@ void vision_init (uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float* w
 				chprintf((BaseSequentialStream *) &SD3, "Calibration : %d\n", distance_mm_calib);
 
 				if(abs(distance_mm_calib-ref_dist) > MOVE_TRESH){
-					//show "you moved" with LEDs
+					led_animation(ERROR2_LED);
 					chprintf((BaseSequentialStream *) &SD3, "MOVED !\n\n");
 					state = WAIT_OBJECT;
 					break;
@@ -390,7 +388,7 @@ void vision_init (uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float* w
 
 
 				if(!dist_measure(image, size, true, NULL, NULL)){
-					//show "No object found" with LEDs
+					led_animation(ERROR1_LED);
 					state = WAIT_OBJECT;
 					break;
 				}

@@ -15,6 +15,7 @@
 
 #include "chprintf.h"
 #include "usbcfg.h"
+#include "blinking_leds.h"
 
 #define PI					3.14159265
 #define NB_POS				100
@@ -57,7 +58,7 @@ void save_trajectory(uint8_t traj_count){
 				+ pow((positions[traj_count][2*(i-1)+1]-positions[traj_count][2*i+1]), 2)) < MIN_DIST){
 			i--;
 		}
-		else chprintf((BaseSequentialStream *) &SD3,"%d %d\n", (int)positions[traj_count][2*i]+400, (int)positions[traj_count][2*i+1]);
+		else led_animation(REC_TRAJ_LED);
 
 
 	}

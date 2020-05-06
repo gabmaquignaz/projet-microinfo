@@ -16,6 +16,7 @@
 #include <arm_math.h>
 #include <arm_const_structs.h>
 #include <sound.h>
+#include <blinking_leds.h>
 
 enum Mic {R,L,B,F};
 
@@ -71,16 +72,9 @@ int8_t audio(uint8_t record_state, uint8_t song_count){
 	int8_t identified_song = -1;
 
 	if(record_state == RECORD){
-		chprintf((BaseSequentialStream *) &SDU1, "YO\n");
-		chThdSleepMilliseconds(5000);
-		chprintf((BaseSequentialStream *) &SD3, "3\n");
-		chThdSleepMilliseconds(1000);
-		chprintf((BaseSequentialStream *) &SD3, "2\n");
-		chThdSleepMilliseconds(1000);
-		chprintf((BaseSequentialStream *) &SD3, "1\n");
-		chThdSleepMilliseconds(1000);
-		chprintf((BaseSequentialStream *) &SD3, "GO\n");
 
+		led_animation(COUNTDOWN);
+		set_blinking_state(REC_SOUND_LED);
 		//record reference song
 		for (uint8_t i = 0; i < NB_SAMPLES; i++){
 		chBSemWait(&FFT_ready_sem);
@@ -106,15 +100,8 @@ int8_t audio(uint8_t record_state, uint8_t song_count){
 			}
 		}
 
-		chThdSleepMilliseconds(5000);
-		chprintf((BaseSequentialStream *) &SD3, "3\n");
-		chThdSleepMilliseconds(1000);
-		chprintf((BaseSequentialStream *) &SD3, "2\n");
-		chThdSleepMilliseconds(1000);
-		chprintf((BaseSequentialStream *) &SD3, "1\n");
-		chThdSleepMilliseconds(1000);
-		chprintf((BaseSequentialStream *) &SD3, "GO\n");
-
+		led_animation(COUNTDOWN);
+		set_blinking_state(SHAZAM_LED);
 		//record new measured song
 		for (uint8_t i = 0; i < NB_SAMPLES; i++){
 			chBSemWait(&FFT_ready_sem);
@@ -143,13 +130,10 @@ int8_t audio(uint8_t record_state, uint8_t song_count){
 				best_match = match;
 				identified_song = i;
 			}
-			else {
-				//no match
-			}
 		}
 		chprintf((BaseSequentialStream *) &SD3, "identified_song: %d\n", identified_song);
 	}
-
+	set_blinking_state(NO_LED);
 	return identified_song;
 }
 
