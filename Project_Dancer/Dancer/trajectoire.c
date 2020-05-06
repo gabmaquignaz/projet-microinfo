@@ -62,11 +62,7 @@ void save_trajectory(uint8_t traj_count){
 
 
 	}
-	chprintf((BaseSequentialStream *) &SD3,"done\n");
-
-	chThdSleepMilliseconds(2000);
 	convert_pos(traj_count);
-
 }
 
 
@@ -99,7 +95,7 @@ float angle_from_three_points(float x1, float y1, float x2, float y2, float x3, 
 }
 
 void dance(uint8_t traj_count){
-	chprintf((BaseSequentialStream *) &SD3,"DANCING !\n");
+	//chprintf((BaseSequentialStream *) &SD3,"DANCING !\n");
 
 	//drive
 	for(uint8_t i = 0 ; i < NB_POS ; i++){

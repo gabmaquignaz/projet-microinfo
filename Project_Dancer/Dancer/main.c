@@ -72,36 +72,37 @@ static THD_FUNCTION(MainFSM, arg) {
 				break;
 
 			case RECORD:
-				chprintf((BaseSequentialStream *) &SD3,"record\n");
+				//chprintf((BaseSequentialStream *) &SD3,"record\n");
 
 				if(song_count == MAX_MEM_SONG) {
 					//error: too many songs
 					led_animation(ERROR2_LED);
-					chprintf((BaseSequentialStream *) &SD3,"too many songs\n");
+					//chprintf((BaseSequentialStream *) &SD3,"too many songs\n");
 				}
 				else {
 					audio(RECORD, song_count);
+					led_animation(SUCCESS2_LED);
 
 					//init vision
 					if(song_count == 0) signal_rec_traj_sem();
 
 					save_trajectory(song_count);
 					led_animation(SUCCESS2_LED);
-
 					song_count ++;
 				}
 				main_state = WAIT;
 				break;
 
 			case SHAZAM:
-				chprintf((BaseSequentialStream *) &SD3,"shazam\n");
+				//chprintf((BaseSequentialStream *) &SD3,"shazam\n");
 				if(song_count == 0) {
 					//error: zero songs memorized
 					led_animation(ERROR2_LED);
-					chprintf((BaseSequentialStream *) &SD3,"zero songs memorized\n");
+					//chprintf((BaseSequentialStream *) &SD3,"zero songs memorized\n");
 				}
 				else{
 					current_dance = audio(SHAZAM, song_count);
+					chThdSleepMilliseconds(1000);
 					if(current_dance == -1) led_animation(ERROR1_LED); //no matching song
 					else {
 						led_animation(SUCCESS1_LED);

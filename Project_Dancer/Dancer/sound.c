@@ -75,11 +75,14 @@ int8_t audio(uint8_t record_state, uint8_t song_count){
 
 		led_animation(COUNTDOWN);
 		set_blinking_state(REC_SOUND_LED);
+
 		//record reference song
 		for (uint8_t i = 0; i < NB_SAMPLES; i++){
 		chBSemWait(&FFT_ready_sem);
 		extract_freq_id(micFront_output, ref_songs[song_count][i]);
 		}
+
+		set_blinking_state(NO_LED);
 
 //		//PRINTF POUR VOIR LES MESURES
 //		for (uint8_t i = 0; i < NB_SAMPLES; i++){
@@ -108,7 +111,7 @@ int8_t audio(uint8_t record_state, uint8_t song_count){
 			extract_freq_id(micFront_output, measured_song[i]);
 		}
 
-
+		set_blinking_state(NO_LED);
 //		//PRINTF POUR VOIR LES MESURES
 //		for (uint8_t i = 0; i < NB_SAMPLES; i++){
 //			for(uint8_t j = 0; j < SAMPLE_SIZE; j++){
@@ -124,16 +127,15 @@ int8_t audio(uint8_t record_state, uint8_t song_count){
 		for(uint8_t i = 0; i < song_count; i++){
 
 			match = match_song(measured_song, ref_songs[i]);
-			chprintf((BaseSequentialStream *) &SD3, "(%.2f)\n", match);
+//			chprintf((BaseSequentialStream *) &SD3, "(%.2f)\n", match);
 
 			if (match > MATCH_TRESH && match > best_match){
 				best_match = match;
 				identified_song = i;
 			}
 		}
-		chprintf((BaseSequentialStream *) &SD3, "identified_song: %d\n", identified_song);
+		//chprintf((BaseSequentialStream *) &SD3, "identified_song: %d\n", identified_song);
 	}
-	set_blinking_state(NO_LED);
 	return identified_song;
 }
 

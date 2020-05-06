@@ -132,9 +132,9 @@ static THD_FUNCTION(ProcessImage, arg) {
 	uint8_t* img_buff_ptr = NULL;
 	float w_r = 0; float w_g = 0; float w_b = 0; //weights used to detect the desired color in the image
 
-	chprintf((BaseSequentialStream *) &SD3, "started process image\n");
+	//chprintf((BaseSequentialStream *) &SD3, "started process image\n");
 	chBSemWait(&rec_traj_ready_sem);
-	chprintf((BaseSequentialStream *) &SD3, "started vision init \n");
+	//chprintf((BaseSequentialStream *) &SD3, "started vision init \n");
 	vision_init (image,  IMAGE_BUFFER_SIZE, img_buff_ptr, &w_r, &w_g, &w_b);
 
 	//Instant values of distances
@@ -188,8 +188,8 @@ float get_hor_dist_mm(void){
 
 
 void process_image_start(void){
-	chThdCreateStatic(waProcessImage, sizeof(waProcessImage), NORMALPRIO, ProcessImage, NULL);
-	chThdCreateStatic(waCaptureImage, sizeof(waCaptureImage), NORMALPRIO, CaptureImage, NULL);
+	chThdCreateStatic(waProcessImage, sizeof(waProcessImage), HIGHPRIO, ProcessImage, NULL);
+	chThdCreateStatic(waCaptureImage, sizeof(waCaptureImage), HIGHPRIO, CaptureImage, NULL);
 }
 
 
@@ -319,13 +319,15 @@ void vision_init (uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float* w
 		switch(state){
 
 			case WAIT_OBJECT :
+				led_animation(WAIT_OBJECT_LED);
+
 				for(uint8_t i = 0; i < DIST_MEAN_RANGE; i++){
 					uint16_t curent = VL53L0X_get_dist_mm();
 					mean += curent;
 					chThdSleepMilliseconds(100);
 				}
 				mean /= DIST_MEAN_RANGE;
-				chprintf((BaseSequentialStream *) &SD3, "Dist : %d\n", mean);
+				//chprintf((BaseSequentialStream *) &SD3, "Dist : %d\n", mean);
 				if(mean < TOF_MAX_DIST && mean > TOF_MIN_DIST){
 					chprintf((BaseSequentialStream *) &SD3, "OK\n\n");
 					state = CALIB;
@@ -341,7 +343,7 @@ void vision_init (uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float* w
 				tof_dist = VL53L0X_get_dist_mm();
 				if(abs(tof_dist-ref_dist) > MOVE_TRESH){
 					led_animation(ERROR2_LED);
-					chprintf((BaseSequentialStream *) &SD3, "MOVED !\n\n");
+					//chprintf((BaseSequentialStream *) &SD3, "MOVED !\n\n");
 					state = WAIT_OBJECT;
 					break;
 				}
@@ -350,18 +352,18 @@ void vision_init (uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float* w
 				calib_colors(&r_obj, &g_obj, &b_obj, OBJ);
 				if(!compute_weights (r_obj, g_obj, b_obj, r_back, g_back, b_back, w_r_ptr, w_g_ptr, w_b_ptr)){
 					led_animation(TOO_DARK);
-					chprintf((BaseSequentialStream *) &SD3,"OBJCET : R = %d, G = %d, B = %d\n"
-																				"BACKGROUND : R = %d, G = %d, B = %d\n"
-																				"WEIGHTS : R = %.2f, G = %.2f, B = %.2f\n\n",
-																					r_obj, g_obj, b_obj,r_back,g_back,b_back, *w_r_ptr, *w_g_ptr, *w_b_ptr);
-					chprintf((BaseSequentialStream *) &SD3, "Object too dark or not distinct enough.\n\n");
+//					chprintf((BaseSequentialStream *) &SD3,"OBJCET : R = %d, G = %d, B = %d\n"
+//																				"BACKGROUND : R = %d, G = %d, B = %d\n"
+//																				"WEIGHTS : R = %.2f, G = %.2f, B = %.2f\n\n",
+//																					r_obj, g_obj, b_obj,r_back,g_back,b_back, *w_r_ptr, *w_g_ptr, *w_b_ptr);
+					//chprintf((BaseSequentialStream *) &SD3, "Object too dark or not distinct enough.\n\n");
 					state = WAIT_OBJECT;
 					break;
 				}
-				chprintf((BaseSequentialStream *) &SD3,"OBJCET : R = %d, G = %d, B = %d\n"
-															"BACKGROUND : R = %d, G = %d, B = %d\n"
-															"WEIGHTS : R = %.2f, G = %.2f, B = %.2f\n\n",
-																r_obj, g_obj, b_obj,r_back,g_back,b_back, *w_r_ptr, *w_g_ptr, *w_b_ptr);
+//				chprintf((BaseSequentialStream *) &SD3,"OBJCET : R = %d, G = %d, B = %d\n"
+//															"BACKGROUND : R = %d, G = %d, B = %d\n"
+//															"WEIGHTS : R = %.2f, G = %.2f, B = %.2f\n\n",
+//																r_obj, g_obj, b_obj,r_back,g_back,b_back, *w_r_ptr, *w_g_ptr, *w_b_ptr);
 
 				//measure precisely distance and control if the user moved
 				for(uint8_t i = 0; i < 5*DIST_MEAN_RANGE; i++){
@@ -371,11 +373,11 @@ void vision_init (uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float* w
 				}
 
 				distance_mm_calib = mean/(5*DIST_MEAN_RANGE);
-				chprintf((BaseSequentialStream *) &SD3, "Calibration : %d\n", distance_mm_calib);
+				//chprintf((BaseSequentialStream *) &SD3, "Calibration : %d\n", distance_mm_calib);
 
 				if(abs(distance_mm_calib-ref_dist) > MOVE_TRESH){
 					led_animation(ERROR2_LED);
-					chprintf((BaseSequentialStream *) &SD3, "MOVED !\n\n");
+					//chprintf((BaseSequentialStream *) &SD3, "MOVED !\n\n");
 					state = WAIT_OBJECT;
 					break;
 				}
@@ -392,14 +394,14 @@ void vision_init (uint8_t* image, uint16_t size, uint8_t* img_buff_ptr, float* w
 					state = WAIT_OBJECT;
 					break;
 				}
-				chprintf((BaseSequentialStream *) &SD3, "object size : %d\n", size_obj_mm);
+				//chprintf((BaseSequentialStream *) &SD3, "object size : %d\n", size_obj_mm);
 
 				state = INIT_DONE;
 				chThdSleepMilliseconds(100);
 				break;
 		}
 	}
-
+	led_animation(SUCCESS2_LED);
 	VL53L0X_stop();
 }
 
