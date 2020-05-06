@@ -8,37 +8,34 @@
 
 #include "ch.h"
 #include "hal.h"
-#include <main.h>
-#include <usbcfg.h>
-#include <chprintf.h>
-
 #include <audio/microphone.h>
 #include <arm_math.h>
 #include <arm_const_structs.h>
-#include <sound.h>
+
+#include <main.h>
 #include <blinking_leds.h>
+#include <sound.h>
 
 enum Mic {R,L,B,F};
 
 #define FFT_SIZE 			1024
 
 //fifty samples composed of the five stronger frequencies at a given time are stored
-//frequency are refered to by their index i in the micOutput array, conversion to [Hz] is useless
+//frequency are referred to by their index i in the micOutput array, conversion to [Hz] is useless
 #define NB_SAMPLES			50
 #define SAMPLE_SIZE 			5
 typedef uint16_t song[NB_SAMPLES][SAMPLE_SIZE];
 typedef uint16_t sample[SAMPLE_SIZE];
 
 #define OFFSET_MAX			20 //At least (NB_SAMPLES-OFFSET_MAX) must be used for a match
-#define MATCH_F_TOL 			2 // frequency difference tolerance to count as a match
+#define MATCH_F_TOL 			2 // frequency difference tolerance
 #define MATCH_TRESH			35 //match score required to pass the test
 #define PEAK_H_MIN			1200
 
 #define QUAD_COEFF			0.015
 #define LIN_COEFF			(-0.03)
 
-#define WAIT_FFT 			2 //one in N set of 1024 samples is used
-
+#define WAIT_FFT 			2 //one in N sets of 1024 samples is used
 
 
 
@@ -64,7 +61,7 @@ static song measured_song = {0};
 
 
 
-//*************** High level interaction functions (visible by other files) ***************
+//*************** High level public functions ***************
 
 //returns the number of the song (0, 1, 2, ...) if identified, returns -1 if no song identified or recording ref song
 int8_t audio(uint8_t record_state, uint8_t song_count){
@@ -83,15 +80,6 @@ int8_t audio(uint8_t record_state, uint8_t song_count){
 		}
 
 		set_blinking_state(NO_LED);
-
-//		//PRINTF POUR VOIR LES MESURES
-//		for (uint8_t i = 0; i < NB_SAMPLES; i++){
-//			for(uint8_t j = 0; j < SAMPLE_SIZE; j++){
-//			   chprintf((BaseSequentialStream *) &SD3, "%d ", ref_songs[song_count][i][j]);
-//			}
-//			chprintf((BaseSequentialStream *) &SD3, "\n");
-//		}
-//		chprintf((BaseSequentialStream *) &SD3, "\n\n\n");
 	}
 
 	else if(record_state == SHAZAM){
@@ -105,6 +93,7 @@ int8_t audio(uint8_t record_state, uint8_t song_count){
 
 		led_animation(COUNTDOWN);
 		set_blinking_state(SHAZAM_LED);
+
 		//record new measured song
 		for (uint8_t i = 0; i < NB_SAMPLES; i++){
 			chBSemWait(&FFT_ready_sem);
@@ -112,14 +101,6 @@ int8_t audio(uint8_t record_state, uint8_t song_count){
 		}
 
 		set_blinking_state(NO_LED);
-//		//PRINTF POUR VOIR LES MESURES
-//		for (uint8_t i = 0; i < NB_SAMPLES; i++){
-//			for(uint8_t j = 0; j < SAMPLE_SIZE; j++){
-//				chprintf((BaseSequentialStream *) &SD3, "%d ", measured_song[i][j]);
-//			}
-//			chprintf((BaseSequentialStream *) &SD3, "\n");
-//		}
-
 
 		float match = 0.0;
 		float best_match = 0.0;
@@ -127,15 +108,14 @@ int8_t audio(uint8_t record_state, uint8_t song_count){
 		for(uint8_t i = 0; i < song_count; i++){
 
 			match = match_song(measured_song, ref_songs[i]);
-//			chprintf((BaseSequentialStream *) &SD3, "(%.2f)\n", match);
 
 			if (match > MATCH_TRESH && match > best_match){
 				best_match = match;
 				identified_song = i;
 			}
 		}
-		//chprintf((BaseSequentialStream *) &SD3, "identified_song: %d\n", identified_song);
 	}
+
 	return identified_song;
 }
 
@@ -143,9 +123,10 @@ int8_t audio(uint8_t record_state, uint8_t song_count){
 
 //*************** Intermediate level: Match testing functions ***************
 
-//computes a match score between a reference song and a measured song
 float match_song (song measured_song, song ref_song){
+
 	float best_avrg_match = 0;
+
 	//Try match with different offsets, equivalent to a correlation between two discrete signals
 	for(int8_t offset = -OFFSET_MAX; offset <= OFFSET_MAX; offset++){
 
@@ -160,13 +141,15 @@ float match_song (song measured_song, song ref_song){
 		}
 
 		float mean = 0;
+
 		for(int8_t i = start; i < end; i++){
 			mean += match_sample(measured_song[i-offset], ref_song[i]);
 		}
 		mean /= (end-start);
-//		chprintf((BaseSequentialStream *) &SD3, "%d)  %.2f\n", offset, mean);
+
 		if(mean > best_avrg_match) best_avrg_match = mean;
 	}
+
 	return best_avrg_match;
 }
 
@@ -180,7 +163,6 @@ uint8_t match_sample (sample measured_sample, sample ref_sample){
 	}
 	if(empty_ref) return 0;
 
-
 	uint8_t match_counter = 0;
 	uint8_t best_match = 0;
 	bool used [SAMPLE_SIZE] = {false};
@@ -193,7 +175,8 @@ uint8_t match_sample (sample measured_sample, sample ref_sample){
 				best_match ++;
 				best_match = best_match % SAMPLE_SIZE;
 			}
-			//find the frequency in ref closest to measure[i]
+
+			//find the frequency in ref_sample closest to measured_sample[i]
 			if(abs(measured_sample[i]-ref_sample[j]) < abs(measured_sample[i]-ref_sample[best_match]) && !used[j]) best_match = j;
 		}
 
@@ -262,7 +245,7 @@ void doFFT_optimized(uint16_t size, float* complex_buffer){
 
 //*************** Low level: frequency recognition functions ***************
 
-//Searches the FFT for peaks and store the five stronger freqs in sample
+//Searches the FFT for peaks and store the five stronger frequencies in sample
 void extract_freq_id (float* micOutput,  uint16_t* sample){
 
 	uint8_t index_replace_next = 0;
@@ -282,7 +265,7 @@ void extract_freq_id (float* micOutput,  uint16_t* sample){
 
 
 //finds the frequency of the sample that should be replaced next
-//Either a frequency that is still initialized at 0 or the freq that has the smallest peak from the sample
+//Either a frequency that is still initialized at 0 or the frequency that has the smallest peak from the sample
 uint8_t find_replace (float* micOutput, uint16_t* sample){
 	uint8_t index_smallest = 0;
 	for(uint8_t i = 1; i < SAMPLE_SIZE; i++){

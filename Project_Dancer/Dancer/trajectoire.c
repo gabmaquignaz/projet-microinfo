@@ -27,7 +27,7 @@
 #define INTERVAL_COURT		0.1
 #define ROTATION_SPEED		500
 #define NSTEP_ONE_TURN		1000
-#define MIN_DIST				2
+#define MIN_DIST				5
 #define NUM_MEM_TRAJ			3 //number of memorized trajectories
 
 

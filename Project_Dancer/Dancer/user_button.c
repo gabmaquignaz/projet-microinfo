@@ -32,7 +32,7 @@ static void timer12_start(void){
 }
 
 void user_button_start(void){
-	spi_comm_start(); //start comm for button tracking
+	spi_comm_start(); //start communication for button tracking
 	timer12_start();
 }
 
@@ -57,7 +57,6 @@ bool wait_click(void){
 
 	//wait for potential second click
 	while(true){
-//      chprintf((BaseSequentialStream *) &SDU1, "%d\n", GPTD12.tim->CNT);
 		if (button_is_pressed() && GPTD12.tim->CNT > CLICKDELAY){
 			double_click = true;
 		}

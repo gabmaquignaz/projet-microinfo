@@ -2,12 +2,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <string.h>
 
 #include "ch.h"
 #include "hal.h"
 #include "memory_protection.h"
-#include "usbcfg.h"
+
 #include "motors.h"
 #include <audio/microphone.h>
 
@@ -18,98 +17,74 @@
 #include "user_button.h"
 #include "blinking_leds.h"
 
-#include "chprintf.h"
 
-
-
-static void serial_start(void)
-{
-	static SerialConfig ser_cfg = {
-	    115200,
-	    0,
-	    0,
-	    0,
-	};
-
-	sdStart(&SD3, &ser_cfg); // UART3.
-}
 
 static THD_WORKING_AREA(waMainFSM, 256);
 static THD_FUNCTION(MainFSM, arg) {
     chRegSetThreadName(__FUNCTION__);
     (void)arg;
 
-    //Main finite-state machine
     	uint8_t main_state = WAIT;
     bool double_click = false;
 
     	//id of the identified song, -1 -> nothing
-    	int8_t current_dance = -1;
+    	int8_t current_song = -1;
 
-    	//number of memorized song/dance
+    	//current number of memorized song/dance
     	uint8_t song_count = 0;
 
 	//Infinite loop
 	while (true) {
-		//waits 1 second
+
 		chThdSleepMilliseconds(1000);
 
 		switch (main_state){
 
 			case WAIT:
+
+				//stays in func wait_click until click
 				double_click = wait_click();
-
-				if(double_click){
-					main_state = RECORD;
-
-				}
-				else {
-					main_state = SHAZAM;
-
-				}
-
+				if(double_click) main_state = RECORD;
+				else main_state = SHAZAM;
 				break;
 
-			case RECORD:
-				//chprintf((BaseSequentialStream *) &SD3,"record\n");
 
-				if(song_count == MAX_MEM_SONG) {
-					//error: too many songs
-					led_animation(ERROR2_LED);
-					//chprintf((BaseSequentialStream *) &SD3,"too many songs\n");
-				}
+			case RECORD:
+
+				if(song_count == MAX_MEM_SONG) led_animation(ERROR2_LED); //error: too many songs
 				else {
 					audio(RECORD, song_count);
 					led_animation(SUCCESS2_LED);
 
-					//init vision
-					if(song_count == 0) signal_rec_traj_sem();
+					if(song_count == 0) signal_rec_traj_sem(); //record color and size of the object
 
 					save_trajectory(song_count);
 					led_animation(SUCCESS2_LED);
+
 					song_count ++;
 				}
+
 				main_state = WAIT;
 				break;
 
 			case SHAZAM:
-				//chprintf((BaseSequentialStream *) &SD3,"shazam\n");
-				if(song_count == 0) {
-					//error: zero songs memorized
-					led_animation(ERROR2_LED);
-					//chprintf((BaseSequentialStream *) &SD3,"zero songs memorized\n");
-				}
+
+				if(song_count == 0) led_animation(ERROR2_LED); //error: zero songs memorized
 				else{
-					current_dance = audio(SHAZAM, song_count);
+					current_song = audio(SHAZAM, song_count);
 					chThdSleepMilliseconds(1000);
-					if(current_dance == -1) led_animation(ERROR1_LED); //no matching song
+
+					if(current_song == -1) led_animation(ERROR1_LED); //no matching song
 					else {
 						led_animation(SUCCESS1_LED);
+
 						set_blinking_state(DANCE_LED);
-						dance(current_dance);
+						dance(current_song);
+
 						set_blinking_state(NO_LED);
 					}
 				}
+
 				main_state = WAIT;
 				break;
 		}
@@ -129,11 +104,6 @@ int main(void){
     //spi communication for user button
     user_button_start();
 
-    //start communication with computer
-    usb_start();
-    serial_start();
-    chThdSleepMilliseconds(2000);
-
     //starts vision for trajectory recognition
     //augment brightness and disable auto white balance for better color recognition
     dcmi_start();
@@ -149,6 +119,7 @@ int main(void){
 	set_blinking_state(NO_LED);
 	blinking_start();
 
+	//Finite state machine thread
 	chThdCreateStatic(waMainFSM, sizeof(waMainFSM), NORMALPRIO, MainFSM, NULL);
 
 
@@ -157,6 +128,7 @@ int main(void){
 		chThdSleepMilliseconds(1000);
 	}
 }
+
 
 #define STACK_CHK_GUARD 0xe2dee396
 uintptr_t __stack_chk_guard = STACK_CHK_GUARD;
