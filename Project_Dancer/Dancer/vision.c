@@ -86,14 +86,19 @@ void subtract_lines(float matrix [M][N], uint8_t line_a, uint8_t line_b, float f
 static BSEMAPHORE_DECL(image_ready_sem, TRUE);
 
 
-//Thread repris du cours MICRO-315 (TP4_CamReg), F. Mondada, E. Ferragni
+//Thread adapté du cours MICRO-315 (TP4_CamReg), F. Mondada, E. Ferragni
 static THD_WORKING_AREA(waCaptureImage, 256);
 static THD_FUNCTION(CaptureImage, arg) {
     chRegSetThreadName(__FUNCTION__);
     (void)arg;
 
-	//Takes pixels 0 to IMAGE_BUFFER_SIZE of the line 10 + 11 (minimum 2 lines because reasons)
-	po8030_advanced_config(FORMAT_RGB565, 0, 240, IMAGE_BUFFER_SIZE, 2, SUBSAMPLING_X1, SUBSAMPLING_X1);
+	//Takes pixels 0 to IMAGE_BUFFER_SIZE of the line 240 + 241
+    po8030_advanced_config(FORMAT_RGB565, 0, 240, IMAGE_BUFFER_SIZE, 2, SUBSAMPLING_X1, SUBSAMPLING_X1);
+
+    //augment brightness and disable auto white balance for better color recognition
+    po8030_set_brightness(64);
+    	po8030_set_awb(false);
+
 	dcmi_enable_double_buffering();
 	dcmi_set_capture_mode(CAPTURE_ONE_SHOT);
 	dcmi_prepare();
@@ -172,8 +177,8 @@ float get_hor_dist_mm(void){
 
 
 void process_image_start(void){
-	chThdCreateStatic(waProcessImage, sizeof(waProcessImage), HIGHPRIO, ProcessImage, NULL);
-	chThdCreateStatic(waCaptureImage, sizeof(waCaptureImage), HIGHPRIO, CaptureImage, NULL);
+	chThdCreateStatic(waProcessImage, sizeof(waProcessImage), NORMALPRIO+1, ProcessImage, NULL);
+	chThdCreateStatic(waCaptureImage, sizeof(waCaptureImage), NORMALPRIO+1, CaptureImage, NULL);
 }
 
 

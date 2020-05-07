@@ -105,18 +105,14 @@ int main(void){
     user_button_start();
 
     //starts vision for trajectory recognition
-    //augment brightness and disable auto white balance for better color recognition
     dcmi_start();
 	po8030_start();
-	po8030_set_brightness(64);
-	po8030_set_awb(false);
 	process_image_start();
 
 	//starts mic for song recognition
 	mic_start(&processAudioData);
 
 	//start leds
-	set_blinking_state(NO_LED);
 	blinking_start();
 
 	//Finite state machine thread

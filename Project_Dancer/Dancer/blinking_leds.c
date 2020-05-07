@@ -203,8 +203,6 @@ void led_animation(uint8_t state){
 			break;
 
 	}
-
-
 }
 
 void set_blinking_state(uint8_t state){
@@ -214,4 +212,5 @@ void set_blinking_state(uint8_t state){
 
 void blinking_start(void){
 	chThdCreateStatic(waBlinking, sizeof(waBlinking), NORMALPRIO, Blinking, NULL);
+	set_blinking_state(NO_LED);
 }
