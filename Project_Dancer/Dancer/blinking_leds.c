@@ -4,13 +4,13 @@
  *  Created on: 2 May 2020
  *      Author: Gabriel Maquignaz & Maxime P. Poffet
  */
-#include <stdint.h>
+
 #include "ch.h"
 #include "blinking_leds.h"
 #include "leds.h"
-#include "main.h"
 
 static uint8_t blinking_state;
+
 
 static THD_WORKING_AREA(waBlinking, 256);
 static THD_FUNCTION(Blinking, arg) {

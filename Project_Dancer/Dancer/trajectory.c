@@ -5,17 +5,12 @@
  *  		Author: Gabriel Maquignaz & Maxime P. Poffet
  */
 
-
-#include "ch.h"
-#include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include "ch.h"
 #include "trajectory.h"
 #include "motors.h"
 #include "vision.h"
-
-#include "chprintf.h"
-#include "usbcfg.h"
 #include "blinking_leds.h"
 
 #define PI					3.14159265
