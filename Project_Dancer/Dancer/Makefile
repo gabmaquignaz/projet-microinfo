@@ -1,6 +1,9 @@
 
-#This is a template to build your own project with the e-puck2_main-processor folder as a library.
-#Simply adapt the lines below to be able to compile
+ # Makefile
+ 
+ #  Created on: 6 Apr 2020
+ #      Author: Gabriel Maquignaz & Maxime P. Poffet
+ 
 
 # Define project name here
 PROJECT = Dancer
@@ -10,7 +13,7 @@ GLOBAL_PATH = ../../lib/e-puck2_main-processor
 
 #Source files to include
 CSRC += ./main.c \
-		./trajectoire.c \
+		./trajectory.c \
 		./vision.c \
 		./sound.c \
 		./user_button.c \

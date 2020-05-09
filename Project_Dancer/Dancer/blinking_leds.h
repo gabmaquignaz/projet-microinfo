@@ -2,7 +2,7 @@
  * blinking_leds.h
  *
  *  Created on: 2 May 2020
- *      Author: maximepoffet
+ *      Author: Gabriel Maquignaz & Maxime P. Poffet
  */
 
 #ifndef BLINKING_LEDS_H_

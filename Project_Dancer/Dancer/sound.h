@@ -1,8 +1,8 @@
 /*
- * audio.h
+ * sound.h
  *
  *  Created on: 25 Apr 2020
- *      Author: Gabriel Maquignaz
+ *      Author: Gabriel Maquignaz & Maxime P. Poffet
  */
 
 #ifndef AUDIO_H_

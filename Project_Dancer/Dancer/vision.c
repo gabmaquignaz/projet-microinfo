@@ -17,9 +17,9 @@
 #include "parameter/parameter.h"
 
 #include <main.h>
-#include "trajectoire.h"
 #include "blinking_leds.h"
 #include <vision.h>
+#include "trajectory.h"
 
 
 #define RED							(31 << 11)	//0b11111 000000 00000

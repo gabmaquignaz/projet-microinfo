@@ -1,3 +1,9 @@
+/*
+ * main.c
+ *
+ *  Created on: 2 May 2020
+ *      Author: Gabriel Maquignaz & Maxime P. Poffet
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,11 +17,11 @@
 #include <audio/microphone.h>
 
 #include "main.h"
-#include "trajectoire.h"
 #include "sound.h"
 #include "vision.h"
 #include "user_button.h"
 #include "blinking_leds.h"
+#include "trajectory.h"
 
 
 

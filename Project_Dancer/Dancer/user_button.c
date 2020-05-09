@@ -2,7 +2,7 @@
  * user_button.c
  *
  *  Created on: 30 Apr 2020
- *      Author: gabmac
+ *      Author: Gabriel Maquignaz & Maxime P. Poffet
  */
 
 #include <stdbool.h>

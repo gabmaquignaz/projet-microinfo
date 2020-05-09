@@ -2,7 +2,7 @@
  * user_button.h
  *
  *  Created on: 1 May 2020
- *      Author: gabmac
+ *      Author: Gabriel Maquignaz & Maxime P. Poffet
  */
 
 #ifndef USER_BUTTON_H_

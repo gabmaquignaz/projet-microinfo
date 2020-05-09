@@ -1,34 +1,33 @@
 /*
- * trajectoire.c
+ * trajectory.c
  *
  *  Created on: 6 Apr 2020
- *  		Author: maximepoffet
+ *  		Author: Gabriel Maquignaz & Maxime P. Poffet
  */
+
 
 #include "ch.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <trajectoire.h>
-#include <motors.h>
-#include <vision.h>
+#include "trajectory.h"
+#include "motors.h"
+#include "vision.h"
 
 #include "chprintf.h"
 #include "usbcfg.h"
 #include "blinking_leds.h"
 
 #define PI					3.14159265
-#define NB_POS				75
-#define WHEEL_DISTANCE      	53.5f    				// [mm]
-#define WHEEL_PERIMETER     	130 						// [mm]
+#define NB_POS				75 					//number of positions saved
+#define WHEEL_DISTANCE      	53.5f    			// [mm]
+#define WHEEL_PERIMETER     	130 					// [mm]
 #define WHEEL_RADIUS			(13/2*PI)
-#define PERIMETER_EPUCK     (PI * WHEEL_DISTANCE)
-#define INTERVAL_TEMPS		0.2 						// [s]
-#define INTERVAL_COURT		0.1
+#define RADIUS_EPUCK     	35					// [mm]
 #define ROTATION_SPEED		500
 #define NSTEP_ONE_TURN		1000
-#define MIN_DIST				5
-#define NUM_MEM_TRAJ			3 //number of memorized trajectories
+#define MIN_DIST				5 					// minimum distance between two consecutive points
+#define NUM_MEM_TRAJ			3 					//number of memorized trajectories
 
 
 static float positions[NUM_MEM_TRAJ][2*NB_POS] = {0};
@@ -40,7 +39,7 @@ void save_trajectory(uint8_t traj_count){
 
 	for(uint16_t i = 0; i< NB_POS; i++){
 
-		//waits until an position has been captured
+		//waits until a position has been captured
 		chBSemWait(&dist_ready_sem);
 
 
@@ -91,16 +90,25 @@ float angle_from_three_points(float x1, float y1, float x2, float y2, float x3, 
 }
 
 void dance(uint8_t traj_count){
-	//chprintf((BaseSequentialStream *) &SD3,"DANCING !\n");
 
-	//drive
+	//place the center of the robot on the starting point
+	left_motor_set_pos(0);
+	right_motor_set_pos(0);
+
+	left_motor_set_speed(ROTATION_SPEED);
+	right_motor_set_speed(ROTATION_SPEED);
+
+	while (left_motor_get_pos() < RADIUS_EPUCK
+		   || right_motor_get_pos() < RADIUS_EPUCK);
+
+	left_motor_set_speed(0);
+	right_motor_set_speed(0);
+
+	//move from point to point
 	for(uint8_t i = 2 ; i < NB_POS ; i++){
 
 		//rotation
 		if (abs(positions[traj_count][2*i+1])>0){
-			//left_motor_set_speed(-positions[2*i+1]);
-			//right_motor_set_speed(positions[2*i+1]);
-			//chThdSleepMilliseconds(1000*INTERVAL_TEMPS);
 
 			left_motor_set_pos(0);
 			right_motor_set_pos(0);
@@ -127,7 +135,8 @@ void dance(uint8_t traj_count){
 		left_motor_set_speed(ROTATION_SPEED);
 		right_motor_set_speed(ROTATION_SPEED);
 
-		while (left_motor_get_pos() < positions[traj_count][2*i] || right_motor_get_pos() < positions[traj_count][2*i]);
+		while (left_motor_get_pos() < positions[traj_count][2*i]
+			   || right_motor_get_pos() < positions[traj_count][2*i]);
 	}
 
 	left_motor_set_speed(0);
@@ -164,7 +173,6 @@ void convert_pos(uint8_t traj_count){
 	for(uint8_t i = 2; i < NB_POS; i++){
 		//Conversion from [mm] to [steps]
 		positions[traj_count][2*i] *= NSTEP_ONE_TURN/(WHEEL_PERIMETER);
-		//positions[2*i+1] *= WHEEL_DISTANCE*NSTEP_ONE_TURN/(2*WHEEL_PERIMETER*INTERVAL_TEMPS);
 
 		//Conversion from [radians] to [steps]
 		positions[traj_count][2*i+1] *=WHEEL_DISTANCE*NSTEP_ONE_TURN/(2*WHEEL_PERIMETER);

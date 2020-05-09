@@ -2,7 +2,7 @@
  * blinking_leds.c
  *
  *  Created on: 2 May 2020
- *      Author: maximepoffet
+ *      Author: Gabriel Maquignaz & Maxime P. Poffet
  */
 #include <stdint.h>
 #include "ch.h"

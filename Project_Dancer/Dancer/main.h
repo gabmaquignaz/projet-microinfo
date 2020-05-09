@@ -1,3 +1,10 @@
+/*
+ * main.h
+ *
+ *  Created on: 2 May 2020
+ *      Author: Gabriel Maquignaz & Maxime P. Poffet
+ */
+
 #ifndef MAIN_H
 #define MAIN_H
 
