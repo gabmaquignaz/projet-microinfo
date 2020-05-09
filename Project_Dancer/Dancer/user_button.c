@@ -36,16 +36,13 @@ void user_button_start(void){
 	timer12_start();
 }
 
-
 bool wait_click(void){
 
 	bool double_click = false;
 
-
 	//wait for click
 	while(!button_is_pressed()){
 		chThdSleepMilliseconds(100);
-
 	}
 
 	//Wait for release

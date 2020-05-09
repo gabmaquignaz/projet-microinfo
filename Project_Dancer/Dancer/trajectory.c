@@ -29,7 +29,6 @@
 #define MIN_DIST				5 					// minimum distance between two consecutive points
 #define NUM_MEM_TRAJ			3 					//number of memorized trajectories
 
-
 static float positions[NUM_MEM_TRAJ][2*NB_POS] = {0};
 
 
@@ -42,8 +41,6 @@ void save_trajectory(uint8_t traj_count){
 		//waits until a position has been captured
 		chBSemWait(&dist_ready_sem);
 
-
-
 		positions[traj_count][2*i] = get_hor_dist_mm();
 		positions[traj_count][2*i+1] = sqrt(get_real_dist_mm()*get_real_dist_mm()
 										  -positions[traj_count][2*i]*positions[traj_count][2*i]);
@@ -55,11 +52,9 @@ void save_trajectory(uint8_t traj_count){
 		}
 		else led_animation(REC_TRAJ_LED);
 
-
 	}
 	convert_pos(traj_count);
 }
-
 
 void signal_dist_ready_sem(void){
 	chBSemSignal(&dist_ready_sem);
@@ -141,7 +136,6 @@ void dance(uint8_t traj_count){
 
 	left_motor_set_speed(0);
 	right_motor_set_speed(0);
-
 }
 
 void convert_pos(uint8_t traj_count){
@@ -166,7 +160,6 @@ void convert_pos(uint8_t traj_count){
 															 x_mem, positions[traj_count][2*i+1]);
 
 	}
-
 
 	//second conversion
 
