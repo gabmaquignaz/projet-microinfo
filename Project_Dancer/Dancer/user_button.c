@@ -6,7 +6,9 @@
  */
 
 #include <stdbool.h>
+
 #include "hal.h"
+
 #include "button.h"
 #include "spi_comm.h"
 #include "blinking_leds.h"

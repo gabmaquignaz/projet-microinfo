@@ -8,13 +8,13 @@
 
 #include "ch.h"
 #include "hal.h"
-#include <audio/microphone.h>
-#include <arm_math.h>
-#include <arm_const_structs.h>
+#include "audio/microphone.h"
+#include "arm_math.h"
+#include "arm_const_structs.h"
 
-#include <main.h>
-#include <blinking_leds.h>
-#include <sound.h>
+#include "main.h"
+#include "blinking_leds.h"
+#include "sound.h"
 
 enum Mic {R,L,B,F};
 

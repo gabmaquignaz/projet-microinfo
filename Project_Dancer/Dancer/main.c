@@ -14,7 +14,7 @@
 #include "memory_protection.h"
 
 #include "motors.h"
-#include <audio/microphone.h>
+#include "audio/microphone.h"
 
 #include "main.h"
 #include "sound.h"
@@ -50,8 +50,10 @@ static THD_FUNCTION(MainFSM, arg) {
 
 				//stays in func wait_click until click
 				double_click = wait_click();
+
 				if(double_click) main_state = RECORD;
 				else main_state = SHAZAM;
+
 				break;
 
 
@@ -62,9 +64,12 @@ static THD_FUNCTION(MainFSM, arg) {
 					audio(RECORD, song_count);
 					led_animation(SUCCESS2_LED);
 
+					vision_set_active(true); //reactivates image processing
+
 					if(song_count == 0) signal_rec_traj_sem(); //record color and size of the object
 
 					save_trajectory(song_count);
+					vision_set_active(false); //deactivates image processing until needed
 					led_animation(SUCCESS2_LED);
 
 					song_count ++;

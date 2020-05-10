@@ -7,7 +7,9 @@
 
 #include <stdlib.h>
 #include <math.h>
+
 #include "ch.h"
+
 #include "trajectory.h"
 #include "motors.h"
 #include "vision.h"

@@ -2,7 +2,7 @@
  * vision.c
  *
  *  Created on: 2 Apr 2020
- *      Author: Gabriel Maquignaz
+ *      Author: Gabriel Maquignaz & Maxime P. Poffet
  */
 
 #include <stdbool.h>
@@ -10,15 +10,15 @@
 
 #include "ch.h"
 #include "hal.h"
-#include <camera/po8030.h>
+#include "camera/po8030.h"
 #include "sensors/VL53L0X/VL53L0X.h"
 #include "camera/dcmi_camera.h"
 #include "msgbus/messagebus.h"
 #include "parameter/parameter.h"
 
-#include <main.h>
+#include "main.h"
 #include "blinking_leds.h"
-#include <vision.h>
+#include "vision.h"
 #include "trajectory.h"
 
 
@@ -63,6 +63,8 @@ static float real_dist = 0;
 
 static uint16_t size_obj_mm = 0;
 static uint16_t distance_mm_calib = 0;
+
+static bool active = true;
 
 
 
@@ -140,26 +142,46 @@ static THD_FUNCTION(ProcessImage, arg) {
 
 	uint8_t avrg_count = 0;
 
+	bool prev_active = active;
+
 	while(1){
-	    	//waits until an image has been captured
-		chBSemWait(&image_ready_sem);
-		//gets the pointer to the array filled with the last image in RGB565
-		img_buff_ptr = dcmi_get_last_image_ptr();
-		//transform the image using the weights
-		create_image(image, IMAGE_BUFFER_SIZE, img_buff_ptr, w_r, w_g, w_b);
+		if(active){
+
+			if (!prev_active) prev_active = true;
+			//waits until an image has been captured
+			chBSemWait(&image_ready_sem);
+			//gets the pointer to the array filled with the last image in RGB565
+			img_buff_ptr = dcmi_get_last_image_ptr();
+			//transform the image using the weights
+			create_image(image, IMAGE_BUFFER_SIZE, img_buff_ptr, w_r, w_g, w_b);
 
 
-		if(dist_measure(image, IMAGE_BUFFER_SIZE, false, &inst_real_dist, &inst_hor_dist)){
+			if(dist_measure(image, IMAGE_BUFFER_SIZE, false, &inst_real_dist, &inst_hor_dist)){
 
-			//do moving average with iterative method
-			real_dist += mov_avrg(inst_real_dist, mov_avrg_r_tab, &oldest_val_r);
-			hor_dist += mov_avrg(inst_hor_dist, mov_avrg_h_tab, &oldest_val_h);
+				//do moving average with iterative method
+				real_dist += mov_avrg(inst_real_dist, mov_avrg_r_tab, &oldest_val_r);
+				hor_dist += mov_avrg(inst_hor_dist, mov_avrg_h_tab, &oldest_val_h);
 
-			//verify that all the value of the average tab were initialized before sending the first averaged value
-			if(avrg_count < MOV_AVRG_SIZE-1) avrg_count++;
-			else signal_dist_ready_sem();
+				//verify that all the value of the average tab were initialized before sending the first averaged value
+				if(avrg_count < MOV_AVRG_SIZE-1) avrg_count++;
+				else signal_dist_ready_sem();
+			}
+			chThdSleepMilliseconds(10);
 		}
-		chThdSleepMilliseconds(10);
+		else {
+			if (prev_active){
+				//reset the moving average for the next time the loop is active
+				for(uint8_t i = 0; i < MOV_AVRG_SIZE; i++){
+					mov_avrg_r_tab [i] = 0;
+					mov_avrg_h_tab [i] = 0;
+				}
+				oldest_val_r = 0;
+				oldest_val_h = 0;
+				avrg_count = 0;
+			}
+			prev_active = false;
+			chThdSleepMilliseconds(100);
+		}
 	}
 }
 
@@ -184,6 +206,10 @@ void process_image_start(void){
 
 void signal_rec_traj_sem(void){
 	chBSemSignal(&rec_traj_ready_sem);
+}
+
+void vision_set_active(bool val){
+	active = val;
 }
 
 
